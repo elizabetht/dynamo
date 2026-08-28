@@ -4303,6 +4303,12 @@ pub fn images_router(
     (vec![doc, edits_doc], router)
 }
 
+fn single_sse_event_stream<T, E>(
+    event: Result<Option<T>, E>,
+) -> impl futures::Stream<Item = Result<T, E>> {
+    stream::iter(event.transpose())
+}
+
 async fn videos(
     State(state): State<Arc<service_v2::State>>,
     headers: HeaderMap,
@@ -4375,11 +4381,7 @@ async fn videos(
                 &mut response_collector,
                 &mut http_queue_guard,
             );
-            match sse_result {
-                Ok(Some(ev)) => stream::iter(vec![Ok(ev)]),
-                Ok(None) => stream::iter(vec![]),
-                Err(e) => stream::iter(vec![Err(e)]),
-            }
+            single_sse_event_stream(sse_result)
         });
         // monitor_for_disconnects: arms stream_handle, pre-marks inflight Cancelled,
         // emits data:[DONE] on natural end, demotes to Internal on mid-stream Err,
@@ -8535,5 +8537,22 @@ mod tests {
             err_msg.contains("not a multiple of 4"),
             "error should mention the multiple-of-4 check, got: {err_msg}"
         );
+    }
+
+    #[tokio::test]
+    async fn single_sse_event_stream_preserves_some_none_and_error() {
+        let data: Vec<_> = single_sse_event_stream::<_, &'static str>(Ok(Some("chunk")))
+            .collect()
+            .await;
+        let empty: Vec<_> = single_sse_event_stream::<&str, &'static str>(Ok(None))
+            .collect()
+            .await;
+        let error: Vec<_> = single_sse_event_stream::<&str, _>(Err("backend error"))
+            .collect()
+            .await;
+
+        assert_eq!(data, vec![Ok("chunk")]);
+        assert!(empty.is_empty());
+        assert_eq!(error, vec![Err("backend error")]);
     }
 }
