@@ -992,6 +992,16 @@ impl<P: SequencePublisher + 'static> ActiveSequencesMultiWorker<P> {
         result
     }
 
+    pub fn project_worker_loads_into(
+        &self,
+        token_sequence: Option<&[SequenceHash]>,
+        decay_now: Instant,
+        projections: &mut FxHashMap<WorkerWithDpRank, WorkerLoadProjection>,
+    ) {
+        self.prompt_registry
+            .project_worker_loads_into(token_sequence, decay_now, projections);
+    }
+
     /// Query all workers for their current number of active blocks.
     pub fn active_blocks(&self) -> HashMap<WorkerWithDpRank, usize> {
         self.prompt_registry.active_blocks()

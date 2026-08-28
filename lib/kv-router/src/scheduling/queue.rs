@@ -1008,9 +1008,11 @@ impl<
         request: &mut SchedulingRequest,
         decay_now: Instant,
     ) -> Result<SelectedWorkerForRequest, KvSchedulerError> {
-        request.worker_loads = self
-            .slots
-            .project_worker_loads(request.token_seq.as_deref(), decay_now);
+        self.slots.project_worker_loads_into(
+            request.token_seq.as_deref(),
+            decay_now,
+            &mut request.worker_loads,
+        );
 
         {
             let workers = self.workers_with_configs.borrow();
