@@ -169,6 +169,13 @@ func TestComputeBetaDGDWorkersSpecHash_ChangesOnPodAffectingFields(t *testing.T)
 		},
 	}
 	assert.NotEqual(t, baseHash, mustComputeBetaDGDWorkersSpecHash(t, dgd6), "podTemplate metadata change should change hash")
+
+	// Startup-only inference settings must select a new managed worker
+	// generation. The rollout controller can then admit the replacement before
+	// draining the previous generation instead of requiring a graph-wide bounce.
+	dgd7 := base()
+	dgd7.Spec.Services["worker"].Args = []string{"--speculative-depth", "4"}
+	assert.NotEqual(t, baseHash, mustComputeBetaDGDWorkersSpecHash(t, betaDGD(t, dgd7)), "worker args change should change hash")
 }
 
 func TestComputeBetaDGDWorkersSpecHash_TracksPropagatedDGDObjectAnnotations(t *testing.T) {

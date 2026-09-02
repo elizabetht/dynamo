@@ -97,6 +97,46 @@ complete. If a pod receives `SIGKILL` before draining finishes, increase
 
 </Steps>
 
+## Roll out startup-only configuration
+
+Inference engines read many tuning settings only when a worker starts. Change those settings in the
+worker component of the `DynamoGraphDeployment`; do not restart the entire graph. The operator hashes
+the rendered worker configuration. A change to worker arguments, environment variables, resources,
+image, or pod template creates a new worker generation and starts a managed rollout. Replica-only
+changes scale the active generation and do not create another generation.
+
+For example, change a startup argument with a normal Kubernetes patch:
+
+```bash
+kubectl patch dynamographdeployment <deployment> --type=json \\
+  -p='[{"op":"replace","path":"/spec/services/VllmWorker/args","value":["--speculative-depth","4"]}]'
+```
+
+The operator keeps the completed generation as its recovery source of truth while the replacement is
+pending. With the default rolling strategy, it brings the replacement to readiness before scaling
+down the old generation. Kubernetes then sends `SIGTERM` to the old pods, and Dynamo removes their
+endpoints from discovery before waiting for admitted requests to drain.
+
+If another control plane stores the desired values, have its adapter update the DGD fields. When the
+worker reads an external configuration object whose contents are not present in the pod template,
+update `spec.restart.id` after publishing the new object. Any change to this arbitrary string asks the
+operator to restart the graph according to `spec.restart.strategy`:
+
+```bash
+kubectl patch dynamographdeployment <deployment> --type=merge \\
+  -p='{"spec":{"restart":{"id":"config-2026-09-02-1","strategy":{"type":"Sequential"}}}}'
+```
+
+Use a monotonic configuration revision or content digest for the ID so the desired state remains
+declarative and auditable. The database, Git repository, or configuration service remains outside
+the Dynamo data plane; Dynamo does not need a second embedded desired-state store.
+
+Model weights may be shared across generations only when the selected backend and memory service
+support attaching to an existing immutable allocation. Treat request queues, scheduler state, and KV
+cache blocks as generation-owned unless that backend provides an explicit compatibility and ownership
+protocol. Sharing mutable request state across overlapping generations can mix incompatible layouts
+or keep stale work alive after the old worker has drained.
+
 ## Custom workers
 
 If you author your own worker with the Dynamo SDK, the `graceful_shutdown` parameter on `serve_endpoint()` controls whether that endpoint waits for in-flight requests (`True`) or returns immediately (`False`). Backend workers default to `True`. For the parameter, the shutdown sequence, and per-backend cleanup patterns, see [Graceful Shutdown Architecture](../../developer-guide/knowledge-base/concepts/fault-tolerance/graceful-shutdown-architecture.md) and the [Writing Python Workers](../../developer-guide/advanced-customizations/writing-custom-backends/writing-python-workers.md) guide.
