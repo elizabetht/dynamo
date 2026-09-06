@@ -322,10 +322,22 @@ impl PromptRegistry {
         token_sequence: Option<&[SequenceHash]>,
         decay_now: Instant,
     ) -> FxHashMap<WorkerWithDpRank, WorkerLoadProjection> {
+        let mut projections = FxHashMap::default();
+        self.project_worker_loads_into(token_sequence, decay_now, &mut projections);
+        projections
+    }
+
+    pub(super) fn project_worker_loads_into(
+        &self,
+        token_sequence: Option<&[SequenceHash]>,
+        decay_now: Instant,
+        projections: &mut FxHashMap<WorkerWithDpRank, WorkerLoadProjection>,
+    ) {
         let query_len = token_sequence.map_or(0, |query| query.len());
         let matched_depth = self.membership.compute_overlap_depths(token_sequence);
         let loads = self.loads.read();
-        let mut projections = FxHashMap::with_capacity_and_hasher(loads.len(), FxBuildHasher);
+        projections.clear();
+        projections.reserve(loads.len());
 
         for (worker, load) in loads.iter() {
             let overlap_depth = matched_depth.get(&worker).copied().unwrap_or(0);
@@ -339,8 +351,6 @@ impl PromptRegistry {
                 },
             );
         }
-
-        projections
     }
 
     pub(super) fn active_blocks(&self) -> HashMap<WorkerWithDpRank, usize> {
@@ -678,5 +688,27 @@ mod tests {
 
         assert_eq!(actual.0, expected.0);
         assert_eq!(actual.1, expected.1);
+    }
+
+    #[test]
+    fn project_worker_loads_into_reuses_capacity_and_replaces_stale_entries() {
+        let worker_a = WorkerWithDpRank::new(1, 0);
+        let worker_b = WorkerWithDpRank::new(2, 0);
+        let stale_worker = WorkerWithDpRank::new(99, 0);
+        let registry = PromptRegistry::new([worker_a, worker_b]);
+        registry.replace_worker_load_state(worker_a, worker_load_snapshot(3));
+        registry.replace_worker_load_state(worker_b, worker_load_snapshot(1));
+
+        let mut projections = FxHashMap::with_capacity_and_hasher(8, FxBuildHasher);
+        projections.insert(stale_worker, WorkerLoadProjection::default());
+        let capacity_before = projections.capacity();
+
+        registry.project_worker_loads_into(None, Instant::now(), &mut projections);
+
+        assert_eq!(projections.capacity(), capacity_before);
+        assert_eq!(projections.len(), 2);
+        assert!(!projections.contains_key(&stale_worker));
+        assert_eq!(projections[&worker_a].active_decode_blocks, 3);
+        assert_eq!(projections[&worker_b].active_decode_blocks, 1);
     }
 }
