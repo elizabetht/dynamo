@@ -461,8 +461,7 @@ impl OAIChatLikeRequest for UnifiedRequest {
     }
 
     fn messages(&self) -> minijinja::value::Value {
-        let messages_json = serde_json::to_value(&self.inner.inner.messages).unwrap();
-        minijinja::value::Value::from_serialize(&messages_json)
+        OAIChatLikeRequest::messages(&self.inner)
     }
 
     fn typed_messages(&self) -> Option<&[dynamo_protocols::types::ChatCompletionRequestMessage]> {

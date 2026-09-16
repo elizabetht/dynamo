@@ -239,8 +239,7 @@ impl OAIChatLikeRequest for NvCreateChatCompletionRequest {
     }
 
     fn messages(&self) -> Value {
-        let messages_json = serde_json::to_value(&self.inner.messages).unwrap();
-        Value::from_serialize(&messages_json)
+        Value::from_serialize(&self.inner.messages)
     }
 
     fn typed_messages(&self) -> Option<&[dynamo_protocols::types::ChatCompletionRequestMessage]> {
@@ -591,6 +590,76 @@ fn truncate_rendered_prompt(prompt: RenderedPrompt, end: usize) -> RenderedPromp
 #[cfg(test)]
 mod tests {
     use super::normalize_tool_call_arguments;
+
+    use crate::protocols::openai::chat_completions::NvCreateChatCompletionRequest;
+    use crate::protocols::unified::UnifiedRequest;
+    use dynamo_renderer::OAIChatLikeRequest;
+    use minijinja::{Environment, context, value::Value};
+    use serde_json::json;
+
+    fn assert_message_parity(messages: serde_json::Value) {
+        let request: NvCreateChatCompletionRequest = serde_json::from_value(json!({
+            "model": "test-model",
+            "messages": messages,
+        }))
+        .unwrap();
+        let legacy = Value::from_serialize(serde_json::to_value(&request.inner.messages).unwrap());
+        let direct = request.messages();
+        let unified = UnifiedRequest::from(request).messages();
+        let expected_json = serde_json::to_string(&legacy).unwrap();
+        let env = Environment::new();
+        // Include field iteration: preserving JSON values alone misses key-order changes
+        // that alter template output, tokenization, and ultimately KV cache identity.
+        let template = env
+            .template_from_str(
+                "{% for message in messages %}{% for key, value in message|items %}{{ key }}={{ value }};{% endfor %}\n{% endfor %}",
+            )
+            .unwrap();
+        let expected = template.render(context!(messages => legacy)).unwrap();
+        for actual in [direct, unified] {
+            assert_eq!(serde_json::to_string(&actual).unwrap(), expected_json);
+            assert_eq!(
+                template.render(context!(messages => actual)).unwrap(),
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn text_roles_preserve_template_values_and_order() {
+        assert_message_parity(json!([
+            {"role": "developer", "content": "Follow these instructions"},
+            {"role": "system", "content": "System: café 🦀"},
+            {"role": "user", "name": "caller", "content": "你好\n<|im_start|>"},
+            {"role": "assistant", "content": "", "reasoning_content": "Thinking"},
+            {"role": "user", "content": [{"type": "text", "text": "More context"}]}
+        ]));
+    }
+
+    #[test]
+    fn tool_calls_preserve_nulls_and_argument_strings() {
+        assert_message_parity(json!([
+            {"role": "assistant", "content": null, "tool_calls": [{
+                "id": "call_1", "type": "function",
+                "function": {"name": "lookup", "arguments": "{\"z\":9007199254740993,\"a\":null}"}
+            }]},
+            {"role": "tool", "tool_call_id": "call_1", "content": "result"},
+            {"role": "assistant", "content": "Done", "refusal": ""},
+            {"role": "assistant", "function_call": {"name": "legacy", "arguments": "{}"}},
+            {"role": "function", "name": "legacy", "content": "result"}
+        ]));
+    }
+
+    #[test]
+    fn multimodal_parts_preserve_nested_values_and_order() {
+        assert_message_parity(json!([
+            {"role": "user", "content": [
+                {"type": "text", "text": "Describe these"},
+                {"type": "image_url", "image_url": {"url": "https://example.invalid/image.png", "detail": "high"}},
+                {"type": "input_audio", "input_audio": {"data": "AAAA", "format": "wav"}}
+            ]}
+        ]));
+    }
 
     fn make_tool_call_messages(arguments: &str) -> serde_json::Value {
         serde_json::json!([{
