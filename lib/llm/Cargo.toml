@@ -39,6 +39,10 @@ request-trace-bench = []
 request-trace-s3 = []
 
 [[bench]]
+name = "prompt_messages"
+harness = false
+
+[[bench]]
 name = "tokenizer_simple"
 harness = false
 
