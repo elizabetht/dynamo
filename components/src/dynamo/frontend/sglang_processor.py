@@ -886,6 +886,15 @@ class SglangProcessor:
                     )
                     break
 
+                raw_finish_reason = engine_response.get("finish_reason")
+                if isinstance(raw_finish_reason, dict) and "error" in raw_finish_reason:
+                    message = raw_finish_reason["error"]
+                    logger.error(
+                        "Backend error for request %s: %s", request_id, message
+                    )
+                    yield as_error_envelope(make_internal_error(request_id, message))
+                    break
+
                 new_ids = engine_response["token_ids"]
                 log_probs = engine_response.get("log_probs")
                 top_logprobs = engine_response.get("top_logprobs")
@@ -912,7 +921,6 @@ class SglangProcessor:
 
                 chunk_tokens = len(new_ids)
                 cumulative_output_tokens += chunk_tokens
-                raw_finish_reason = engine_response.get("finish_reason")
                 finish_reason = _map_finish_reason(raw_finish_reason)
                 stop_reason = engine_response.get("stop_reason")
                 stop_terminated = raw_finish_reason in {"eos", "stop"}
