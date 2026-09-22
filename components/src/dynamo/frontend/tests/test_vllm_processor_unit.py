@@ -7,6 +7,7 @@ Tests for the tool-stripping behaviour of _prepare_request when
 tool_choice='none' and the exclude_tools_when_tool_choice_none flag.
 """
 
+import copy
 import importlib.util
 import json
 from types import SimpleNamespace
@@ -3538,3 +3539,42 @@ class TestReasoningTokenAccounting:
         usage = {"completion_tokens_details": {"reasoning_tokens": backend}}
         annotated = self._annotator(post).annotate(usage)
         assert annotated["completion_tokens_details"]["reasoning_tokens"] == 2
+
+
+@pytest.mark.parametrize("skip_validation", [False, True])
+@pytest.mark.parametrize("field", ["tools", "response_format", "structured_outputs"])
+def test_nested_request_validation_preserves_defaults(
+    monkeypatch, skip_validation, field
+):
+    monkeypatch.setattr(prepost_module, "SKIP_REQUEST_VALIDATION", skip_validation)
+    fields = {
+        "tools": TOOL_REQUEST["tools"],
+        "response_format": {"type": "json_object"},
+        "structured_outputs": {"json": {"type": "object"}},
+    }
+    raw = {
+        "model": MODEL,
+        "request_id": "validation-regression",
+        "messages": [{"role": "user", "content": "Hello"}],
+        field: fields[field],
+    }
+    expected = prepost_module.ChatCompletionRequest.model_validate(copy.deepcopy(raw))
+    actual = prepost_module._validate_chat_completion_request(raw)
+    assert actual.model_dump() == expected.model_dump()
+    assert actual.model_fields_set == expected.model_fields_set
+
+
+@pytest.mark.parametrize("skip_validation", [False, True])
+def test_raw_tools_still_validate_tool_choice(monkeypatch, skip_validation):
+    from vllm.exceptions import VLLMValidationError
+
+    monkeypatch.setattr(prepost_module, "SKIP_REQUEST_VALIDATION", skip_validation)
+    with pytest.raises(VLLMValidationError, match="Invalid value for `tool_choice`"):
+        prepost_module._validate_chat_completion_request(
+            {**TOOL_REQUEST, "tool_choice": "invalid"}
+        )
+
+
+def test_typed_request_preserves_identity():
+    request = prepost_module.ChatCompletionRequest.model_validate(TOOL_REQUEST)
+    assert prepost_module._validate_chat_completion_request(request) is request
