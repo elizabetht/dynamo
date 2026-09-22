@@ -4227,6 +4227,39 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
 
         asyncio.run(check())
 
+    @pytest.mark.parametrize("after_tokens", [False, True])
+    def test_canonical_error_finish_preserves_diagnostic(
+        self, tokenizer, caplog, after_tokens
+    ):
+        inputs = []
+        if after_tokens:
+            inputs.append({"token_ids": tokenizer.encode("Visible text")})
+        inputs.extend(
+            [
+                {
+                    "token_ids": tokenizer.encode("must not be emitted"),
+                    "finish_reason": {"error": "controlled worker failure"},
+                },
+                {"token_ids": [], "finish_reason": "stop"},
+            ]
+        )
+
+        items = self._run_stream(tokenizer, inputs)
+
+        assert items[-1] == {
+            "_dynamo_annotated": True,
+            "event": "error",
+            "comment": ["controlled worker failure"],
+        }
+        assert len(items) == (2 if after_tokens else 1)
+        assert all(
+            choice["finish_reason"] is None
+            for item in items[:-1]
+            for choice in item["choices"]
+        )
+        assert "controlled worker failure" in caplog.text
+        assert "unhashable" not in caplog.text
+
     def test_routed_engine_none_data_is_skipped(self, tokenizer):
         """data() is None (e.g. comment-only event) is skipped, not yielded as error."""
         items = self._run_stream(
