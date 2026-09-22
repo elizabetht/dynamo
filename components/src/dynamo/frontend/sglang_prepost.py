@@ -1593,7 +1593,15 @@ class SglangStreamingPostProcessor:
             )
             should_reparse = False
             full_text = ""
-            if missing_names or missing_args:
+            # Hermes can leave later calls buffered after completing the first.
+            if (
+                missing_names
+                or missing_args
+                or (
+                    not self._is_json_array_parser
+                    and self._tool_call_parser_name == "hermes"
+                )
+            ):
                 full_text = "".join(self._tool_text_parts)
                 # Skip the re-parse when the accumulated text has no
                 # tool-call markers.  Avoids wasted `parse_non_stream`
