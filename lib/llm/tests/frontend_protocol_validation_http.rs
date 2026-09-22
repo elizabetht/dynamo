@@ -860,3 +860,170 @@ async fn tool_name_limit_is_shared_across_protocols() {
     })
     .await;
 }
+
+#[tokio::test]
+#[serial]
+async fn legacy_worker_http_errors_keep_status_in_chat_sse() {
+    temp_env::async_with_vars(BASE_ENV, async {
+        for (code, class, late) in [
+            (400, "Unknown", false),
+            (400, "Unknown", true),
+            (503, "Unknown", false),
+            (415, "InvalidArgument", false),
+        ] {
+            // Deserialize the pre-semantic worker wire format rather than creating
+            // a current producer with an authoritative semantic class.
+            let error: DynamoError = serde_json::from_value(json!({
+                "error_type": {"Backend": class},
+                "message": json!({"message": "private worker detail", "code": code}).to_string()
+            }))
+            .unwrap();
+            let mut prefix = Vec::new();
+            if late {
+                prefix = load_agent_fixture("text.sse").await.unwrap();
+                prefix.truncate(2);
+            }
+            let svc = HarnessService::start_with_backend_error(prefix, error).await;
+            let response = post_json(
+                &svc,
+                "/v1/chat/completions",
+                json!({
+                    "model": MODEL,
+                    "messages": [{"role": "user", "content": "Return JSON"}],
+                    "response_format": {"type": "json_object"},
+                    "stream": true
+                }),
+            )
+            .await;
+            assert_eq!(response.status(), reqwest::StatusCode::OK);
+            let body = response.text().await.unwrap();
+            let error: Value = body
+                .lines()
+                .filter_map(|line| line.strip_prefix("data: "))
+                .filter_map(|data| serde_json::from_str::<Value>(data).ok())
+                .find_map(|frame| frame.get("error").cloned())
+                .expect("SSE error frame");
+            assert_eq!(error["code"], code, "{body}");
+            assert!(!body.contains("private worker detail"));
+            assert_eq!(body.matches("data: [DONE]").count(), 1);
+            if late {
+                assert!(body.contains("Pong."));
+                assert!(body.find("Pong.").unwrap() < body.find("\"error\"").unwrap());
+            }
+            assert!(!body.contains("\"finish_reason\":\"stop\""));
+            let metrics = svc.metrics.clone();
+            svc.shutdown().await;
+            let expected_type = if code == 503 {
+                ErrorType::Unavailable
+            } else {
+                ErrorType::Validation
+            };
+            assert_eq!(
+                metrics.get_request_counter(
+                    MODEL,
+                    &Endpoint::ChatCompletions,
+                    &RequestType::Stream,
+                    &Status::Error,
+                    &expected_type
+                ),
+                1
+            );
+        }
+    })
+    .await;
+}
+
+#[tokio::test]
+#[serial]
+async fn chat_sse_preserves_canonical_errors_and_rejects_malformed_legacy_envelopes() {
+    use dynamo_runtime::error::{BackendError, ErrorClass};
+    temp_env::async_with_vars(BASE_ENV, async {
+        let cases = [
+            (
+                DynamoError::builder()
+                    .class(ErrorClass::Internal)
+                    .diagnostic(r#"{"message":"private worker detail","code":400}"#)
+                    .build(),
+                500,
+            ),
+            (
+                DynamoError::builder()
+                    .error_type(DynamoErrorType::Backend(BackendError::Unknown))
+                    .message(r#"{"message":"private worker detail","code":"400"}"#)
+                    .build(),
+                500,
+            ),
+            (
+                DynamoError::builder()
+                    .class(ErrorClass::InvalidRequest)
+                    .diagnostic("private worker detail")
+                    .public_message("Invalid JSON schema")
+                    .build(),
+                400,
+            ),
+        ];
+        for (error, expected_code) in cases {
+            let public_message = error.public_message().map(str::to_owned);
+            let svc = HarnessService::start_with_backend_error(Vec::new(), error).await;
+            let response = post_json(
+                &svc,
+                "/v1/chat/completions",
+                json!({
+                    "model": MODEL, "messages": [{"role": "user", "content": "Return JSON"}],
+                    "stream": true
+                }),
+            )
+            .await;
+            assert_eq!(response.status(), reqwest::StatusCode::OK);
+            let body = response.text().await.unwrap();
+            let error: Value = body
+                .lines()
+                .filter_map(|line| line.strip_prefix("data: "))
+                .filter_map(|data| serde_json::from_str::<Value>(data).ok())
+                .find_map(|frame| frame.get("error").cloned())
+                .expect("SSE error frame");
+            assert_eq!(error["code"], expected_code, "{body}");
+            if let Some(message) = public_message {
+                assert_eq!(error["message"], message);
+            }
+            assert!(!body.contains("private worker detail"));
+            assert_eq!(body.matches("data: [DONE]").count(), 1);
+            svc.shutdown().await;
+        }
+    })
+    .await;
+}
+
+#[tokio::test]
+#[serial]
+async fn legacy_worker_http_error_uses_normalized_anthropic_body() {
+    temp_env::async_with_vars(BASE_ENV, async {
+        let error: DynamoError = serde_json::from_value(json!({
+            "error_type": {"Backend": "Unknown"},
+            "message": r#"{"message":"private worker detail","code":400}"#
+        }))
+        .unwrap();
+        let svc = HarnessService::start_with_backend_error(Vec::new(), error).await;
+        let response = post_json(
+            &svc,
+            "/v1/messages",
+            json!({
+                "model": MODEL, "messages": [{"role": "user", "content": "Return JSON"}],
+                "max_tokens": 16, "stream": true
+            }),
+        )
+        .await;
+        assert_eq!(response.status(), reqwest::StatusCode::OK);
+        let body = response.text().await.unwrap();
+        let events = http_harness::parse_json_sse(&body).await.unwrap();
+        let error = events
+            .iter()
+            .find(|event| event.event == "error")
+            .expect("error event");
+        assert_eq!(error.data["error"]["type"], "invalid_request_error");
+        assert!(!body.contains("private worker detail"));
+        assert!(!body.contains("event: message_stop"));
+        svc.shutdown().await;
+    })
+    .await;
+}
