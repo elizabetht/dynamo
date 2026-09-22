@@ -657,11 +657,12 @@ async def preprocess_chat_request(
 ) -> PreprocessResult:
     validated_request = _validate_chat_completion_request(request)
     assistant_guided_decoding = _build_assistant_guided_decoding(validated_request)
-    client_structured_guidance = deepcopy(
-        _guided_decoding_from_structured_outputs(
-            validated_request.extract_structured_outputs()
-        )
+    client_structured_guidance = _guided_decoding_from_structured_outputs(
+        validated_request.extract_structured_outputs()
     )
+    if tool_parser_class is not None or reasoning_parser_class is not None:
+        # Parser adjustments may mutate nested schemas in place.
+        client_structured_guidance = deepcopy(client_structured_guidance)
     is_forced_tool_choice = _is_forced_tool_choice(validated_request.tool_choice)
     # Must be read BEFORE _prepare_request: it calls ToolParser.adjust_request(),
     # which mutates this same request object in place and can set
