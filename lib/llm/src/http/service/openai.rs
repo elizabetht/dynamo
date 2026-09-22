@@ -955,6 +955,10 @@ fn backend_http_error_class(status: StatusCode) -> ErrorClass {
         return ErrorClass::CapacityExhausted;
     }
 
+    backend_http_status_class(status)
+}
+
+fn backend_http_status_class(status: StatusCode) -> ErrorClass {
     match status {
         status if status.as_u16() == 499 => ErrorClass::Cancelled,
         StatusCode::BAD_REQUEST | StatusCode::UNPROCESSABLE_ENTITY => ErrorClass::InvalidRequest,
@@ -2787,9 +2791,32 @@ pub(super) fn set_stream_semantic_error<T>(
     else {
         return false;
     };
+    let normalized = normalize_legacy_stream_error(error);
+    let error = normalized.as_ref().unwrap_or(error);
     let error_type = metric_error_type_for_class(error.class());
     error_signal.set_semantic(error_type, error);
     true
+}
+
+fn normalize_legacy_stream_error(error: &DynamoError) -> Option<DynamoError> {
+    // N-2 Python workers encoded HTTP status in a private JSON diagnostic.
+    // Remove this adapter when those workers leave the supported window.
+    if !matches!(
+        error.reason().as_str(),
+        "backend.unknown" | "backend.invalid_argument"
+    ) || error.public_details().is_some()
+    {
+        return None;
+    }
+    let payload: ErrorPayload = serde_json::from_str(error.message()).ok()?;
+    let status = StatusCode::from_u16(payload.code?).ok()?;
+    payload.message?;
+    Some(
+        DynamoError::builder()
+            .class(backend_http_status_class(status))
+            .cause(error.clone())
+            .build(),
+    )
 }
 
 /// A backend error extracted from an event, ready for `backend_error_response`.
