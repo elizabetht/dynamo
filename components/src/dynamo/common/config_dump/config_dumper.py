@@ -11,6 +11,8 @@ import pathlib
 from enum import Enum
 from typing import Any, Dict, Optional
 
+import msgspec
+
 from .environment import get_environment_vars
 from .system_info import (
     get_gpu_info,
@@ -217,6 +219,13 @@ def register_encoder(type_class: type) -> Any:
     """
     logger.debug(f"Registering encoder for {type_class}")
     return _preprocess_for_encode.register(type_class)
+
+
+@register_encoder(msgspec.Struct)
+def _preprocess_for_encode_struct(obj: msgspec.Struct) -> dict:
+    # Struct fields live in slots, even when dict=True adds a __dict__ for
+    # private bookkeeping (as in SGLang ServerArgs). Encode only the fields.
+    return msgspec.structs.asdict(obj)
 
 
 @register_encoder(set)

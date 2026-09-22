@@ -9,9 +9,19 @@ import logging
 from typing import TYPE_CHECKING, Type
 
 try:
+    # 0.5.19 needs the late-resolution API's publication guard; its
+    # declare_resolution is only for resolver passes.
     from sglang.srt.arg_groups.overrides import declare_late_resolution
 except ImportError:
-    declare_late_resolution = None
+    try:
+        # 0.5.20 unifies resolver and launcher declarations under this API.
+        from sglang.srt.arg_groups.overrides import (
+            declare_resolution as declare_late_resolution,
+        )
+    except ImportError:
+        # The separately pinned XPU 0.5.11 predates declarations. Remove
+        # this fallback when the XPU pin is upgraded to 0.5.19+.
+        declare_late_resolution = None
 
 if TYPE_CHECKING:
     from gpu_memory_service.integrations.sglang.model_loader import GMSModelLoader

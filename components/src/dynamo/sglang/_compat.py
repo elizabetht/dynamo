@@ -118,11 +118,19 @@ def publish_server_args(server_args: Any, *, role: str) -> None:
 
 
 try:
+    # 0.5.19 needs the late-resolution API's publication guard; its
+    # declare_resolution is only for resolver passes.
     from sglang.srt.arg_groups.overrides import declare_late_resolution
 except ImportError:
-    # The separately pinned XPU SGLang 0.5.11 predates declarations. Remove
-    # when the XPU SGLang pin is upgraded to 0.5.18+.
-    declare_late_resolution = None
+    try:
+        # 0.5.20 unifies resolver and launcher declarations under this API.
+        from sglang.srt.arg_groups.overrides import (
+            declare_resolution as declare_late_resolution,
+        )
+    except ImportError:
+        # The separately pinned XPU 0.5.11 predates declarations. Remove
+        # this fallback when the XPU pin is upgraded to 0.5.19+.
+        declare_late_resolution = None
 
 try:
     from sglang.srt.arg_groups.model_override_base import (
