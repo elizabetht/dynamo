@@ -1514,6 +1514,67 @@ async def test_generator_inner_forwards_reasoning_parser_and_model_config(
     assert captured.get("model_config") is sentinel_model_config
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("extensions", "expected_salt"),
+    [
+        ({"nvext": {"cache_salt": "canonical"}, "cache_salt": "legacy"}, "canonical"),
+        ({"nvext": {"cache_salt": ""}, "cache_salt": "legacy"}, "legacy"),
+        ({"nvext": {"cache_salt": ""}}, None),
+    ],
+)
+async def test_generator_preserves_cache_namespace(
+    vllm_processor_module, tokenizer, monkeypatch, extensions, expected_salt
+):
+    module = vllm_processor_module
+    renderer = SimpleNamespace(
+        render_messages_async=AsyncMock(return_value=(None, {"prompt_token_ids": [1]})),
+        process_for_engine_async=AsyncMock(return_value={}),
+    )
+    input_processor = SimpleNamespace(
+        renderer=renderer,
+        model_config=None,
+        generation_config_fields={},
+        process_inputs=lambda request_id, inputs, params, tasks: SimpleNamespace(
+            sampling_params=params, mm_features=None
+        ),
+    )
+    monkeypatch.setattr(
+        module.InputProcessor, "assign_request_id", lambda request: None
+    )
+    processor = module.VllmProcessor(
+        tokenizer, input_processor, object(), None, None, object()
+    )
+    monkeypatch.setattr(
+        processor, "_prepare_mm_routing", AsyncMock(return_value=(None, [], False))
+    )
+    captured = {}
+
+    async def capture(request_id, request, preproc, *args, **kwargs):
+        captured.update(preproc)
+        yield {"captured": True}
+
+    monkeypatch.setattr(processor, "_generate_and_stream", capture)
+    routing = {"priority": 7}
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": "Hello"}],
+        "routing": routing,
+        "max_completion_tokens": 8,
+        **extensions,
+    }
+    assert [item async for item in processor.generator(request)] == [{"captured": True}]
+    assert routing == {"priority": 7}
+    prompt = renderer.process_for_engine_async.call_args.args[0]
+    assert prompt.get("cache_salt") == expected_salt
+    assert captured["routing"].get("cache_salt") == expected_salt
+    assert captured["routing"]["priority"] == 7
+    assert (
+        captured.get("extra_args", {}).get("nvext", {}).get("cache_salt")
+        == expected_salt
+    )
+
+
 def _make_processor(module, routed_engine):
     processor = module.VllmProcessor.__new__(module.VllmProcessor)
     processor.routed_engine = routed_engine
