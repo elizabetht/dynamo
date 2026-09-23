@@ -413,6 +413,7 @@ def _build_dynamo_preproc(
         logprobs_val = top_logprobs
 
     nvext = request.get("nvext") or {}
+    cache_salt = nvext.get("cache_salt") or request.get("cache_salt")
     routing = request.get("routing")
     nvext_routing = (
         _routing_from_agent_hints(nvext) if isinstance(nvext, dict) else None
@@ -438,6 +439,9 @@ def _build_dynamo_preproc(
             routing = {**nvext_routing, **routing}
     else:
         routing = nvext_routing
+
+    if cache_salt:
+        routing = {**(routing or {}), "cache_salt": cache_salt}
 
     preproc = {
         "model": model_name,
@@ -491,6 +495,8 @@ def _build_dynamo_preproc(
     nvext_passthrough = {
         key: nvext[key] for key in ("metadata_upload", "extra_fields") if key in nvext
     }
+    if cache_salt:
+        nvext_passthrough["cache_salt"] = cache_salt
     if nvext_passthrough:
         preproc["extra_args"] = {"nvext": nvext_passthrough}
 
