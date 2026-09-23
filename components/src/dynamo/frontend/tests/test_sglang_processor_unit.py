@@ -3556,12 +3556,14 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
         assert content == "한"
         assert "\ufffd" not in content
 
-    def test_logprobs_reconstruct_split_multibyte_character(self):
+    @pytest.mark.parametrize("as_ids", [False, True])
+    def test_logprobs_reconstruct_split_multibyte_character(self, as_ids):
         """Logprob token strings use context to reconstruct split UTF-8."""
         post = SglangStreamingPostProcessor(
             tokenizer=self.ByteTokenizer(),
             tool_call_parser=None,
             reasoning_parser=None,
+            return_tokens_as_token_ids=as_ids,
         )
 
         encoded = list("한".encode("utf-8"))
@@ -3587,16 +3589,17 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
         assert choice is not None
         assert choice["delta"]["content"] == "한"
         logprob_content = choice["logprobs"]["content"]
-        assert [entry["token"] for entry in logprob_content] == ["", "", "한"]
+        expected = [f"token_id:{tid}" for tid in encoded] if as_ids else ["", "", "한"]
+        assert [entry["token"] for entry in logprob_content] == expected
         assert [entry["bytes"] for entry in logprob_content] == [
-            None,
-            None,
-            list("한".encode("utf-8")),
+            list(token.encode("utf-8")) if token else None for token in expected
         ]
-        assert [entry["top_logprobs"][0]["token"] for entry in logprob_content] == [
-            "",
-            "",
-            "한",
+        assert [
+            entry["top_logprobs"][0]["token"] for entry in logprob_content
+        ] == expected
+        assert all("_token_id" not in entry for entry in logprob_content)
+        assert [entry["top_logprobs"][0]["bytes"] for entry in logprob_content] == [
+            list(token.encode("utf-8")) if token else None for token in expected
         ]
 
     def test_logprobs_regular_token_is_unchanged(self):
@@ -3978,11 +3981,13 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
         assert final["delta"] == {}
         assert final["finish_reason"] == "stop"
 
-    def test_split_stop_string_logprobs_are_not_emitted(self):
+    @pytest.mark.parametrize("as_ids", [False, True])
+    def test_split_stop_string_logprobs_are_not_emitted(self, as_ids):
         post = SglangStreamingPostProcessor(
             tokenizer=self.ByteTokenizer(),
             tool_call_parser=None,
             reasoning_parser=None,
+            return_tokens_as_token_ids=as_ids,
             stop_strings={"END"},
         )
 
@@ -4003,17 +4008,21 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
 
         assert first is not None
         assert first["delta"]["content"] == "A"
-        assert [entry["token"] for entry in first["logprobs"]["content"]] == ["A"]
+        assert [entry["token"] for entry in first["logprobs"]["content"]] == [
+            "token_id:65" if as_ids else "A"
+        ]
         assert final is not None
         assert final["delta"] == {}
         assert final["finish_reason"] == "stop"
         assert final["logprobs"] is None
 
-    def test_pending_stop_logprobs_are_flushed_without_match(self):
+    @pytest.mark.parametrize("as_ids", [False, True])
+    def test_pending_stop_logprobs_are_flushed_without_match(self, as_ids):
         post = SglangStreamingPostProcessor(
             tokenizer=self.ByteTokenizer(),
             tool_call_parser=None,
             reasoning_parser=None,
+            return_tokens_as_token_ids=as_ids,
             stop_strings={"END"},
         )
 
@@ -4035,10 +4044,9 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
         assert first["delta"]["content"] == "A"
         assert final is not None
         assert final["delta"]["content"] == "EN"
-        assert [entry["token"] for entry in final["logprobs"]["content"]] == [
-            "E",
-            "N",
-        ]
+        assert [entry["token"] for entry in final["logprobs"]["content"]] == (
+            ["token_id:69", "token_id:78"] if as_ids else ["E", "N"]
+        )
 
     def test_complete_stop_string_is_suppressed_before_backend_finish(self, tokenizer):
         post = SglangStreamingPostProcessor(

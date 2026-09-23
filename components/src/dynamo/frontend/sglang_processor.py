@@ -642,6 +642,7 @@ class SglangProcessor:
             prompt_token_ids=pre.prompt_token_ids,
             stop_strings=_request_stop_strings(request),
             skip_special_tokens=request.get("skip_special_tokens"),
+            return_tokens_as_token_ids=request.get("return_tokens_as_token_ids", False),
             stop_token_ids=set(_request_stop_token_ids(request)),
         )
 
@@ -706,6 +707,7 @@ class SglangProcessor:
             prompt_token_ids=preproc_result.prompt_token_ids,
             stop_strings=_request_stop_strings(request),
             skip_special_tokens=request.get("skip_special_tokens"),
+            return_tokens_as_token_ids=request.get("return_tokens_as_token_ids", False),
             stop_token_ids=set(_request_stop_token_ids(request)),
         )
 

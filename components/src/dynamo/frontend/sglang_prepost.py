@@ -1046,8 +1046,10 @@ class SglangStreamingPostProcessor:
         stop_strings: set[str] | None = None,
         stop_token_ids: set[int] | None = None,
         skip_special_tokens: bool | None = None,
+        return_tokens_as_token_ids: bool = False,
     ) -> None:
         self.tokenizer = tokenizer
+        self._return_tokens_as_token_ids = return_tokens_as_token_ids
         self.tool_call_parser = tool_call_parser
         self.reasoning_parser = reasoning_parser
         self.history_tool_calls_count = history_tool_calls_count
@@ -1197,7 +1199,14 @@ class SglangStreamingPostProcessor:
                     candidate.get("token"),
                     context_token_ids,
                 )
-                candidate_bytes = candidate.get("bytes")
+                if (
+                    self._return_tokens_as_token_ids
+                    and candidate.get("token_id") is not None
+                ):
+                    candidate_token = f"token_id:{candidate['token_id']}"
+                    candidate_bytes = list(candidate_token.encode("utf-8"))
+                else:
+                    candidate_bytes = candidate.get("bytes")
                 if candidate_bytes is None:
                     candidate_bytes = (
                         list(candidate_token.encode("utf-8"))
@@ -1219,6 +1228,9 @@ class SglangStreamingPostProcessor:
                     "top_logprobs": openai_top_logprobs,
                 }
             )
+
+            if self._return_tokens_as_token_ids:
+                content[-1]["_token_id"] = token_id
 
         return {"content": content, "refusal": None} if content else None
 
@@ -1308,6 +1320,11 @@ class SglangStreamingPostProcessor:
             self._pending_logprobs_content = []
         if not content:
             return None
+        if self._return_tokens_as_token_ids:
+            # Stop matching above needs decoded text until these entries are emitted.
+            for entry in content:
+                entry["token"] = f"token_id:{entry.pop('_token_id')}"
+                entry["bytes"] = list(entry["token"].encode("utf-8"))
         return {"content": content, "refusal": None}
 
     @property
