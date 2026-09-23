@@ -1047,9 +1047,6 @@ class VllmProcessor:
                     [vllm_response]
                 )
 
-                if vllm_out.reqs_to_abort:
-                    pass
-
                 choices = []
                 postprocess_error = False
                 if vllm_out.request_outputs:
@@ -1077,10 +1074,26 @@ class VllmProcessor:
                     # Stop: the error frame is terminal, so do not read more.
                     break
 
+                request_finished = (
+                    vllm_out.reqs_to_abort or finish_reason is not None
+                ) and not any(
+                    registered_id in self.output_processor.request_states
+                    for registered_id in registered_request_ids
+                )
+                usage = engine_response.get("completion_usage")
+                if not usage and request_finished and vllm_out.reqs_to_abort:
+                    # Token-mode workers leave stop-string detection here and
+                    # may never emit their terminal usage before cancellation.
+                    usage = {
+                        "prompt_tokens": input_tokens,
+                        "completion_tokens": cumulative_output_tokens,
+                        "total_tokens": input_tokens + cumulative_output_tokens,
+                    }
+
                 # One envelope per iteration carries both data and metrics so
                 # client cancellation can't drop the annotation between yields.
                 envelope: dict[str, Any] = {"_dynamo_annotated": True}
-                if choices:
+                if choices or (usage and request_finished):
                     dynamo_out = {
                         "id": request_id,
                         "choices": choices,
@@ -1088,7 +1101,7 @@ class VllmProcessor:
                         "model": request["model"],
                         "object": "chat.completion.chunk",
                     }
-                    if usage := engine_response.get("completion_usage"):
+                    if usage:
                         dynamo_out["usage"] = reasoning_usage.annotate(usage)
                     envelope["data"] = dynamo_out
 
@@ -1108,6 +1121,8 @@ class VllmProcessor:
                 envelope["comment"] = [json.dumps(metrics)]
 
                 yield envelope
+                if request_finished:
+                    break
             _nvtx.end_range(rng_stream)
         except VLLMClientError:
             # Preserve request-side 400/404/422 errors for generator(), which
