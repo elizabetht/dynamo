@@ -1047,9 +1047,6 @@ class VllmProcessor:
                     [vllm_response]
                 )
 
-                if vllm_out.reqs_to_abort:
-                    pass
-
                 choices = []
                 postprocess_error = False
                 if vllm_out.request_outputs:
@@ -1108,6 +1105,11 @@ class VllmProcessor:
                 envelope["comment"] = [json.dumps(metrics)]
 
                 yield envelope
+                if (vllm_out.reqs_to_abort or finish_reason is not None) and not any(
+                    request_id in self.output_processor.request_states
+                    for request_id in registered_request_ids
+                ):
+                    break
             _nvtx.end_range(rng_stream)
         except VLLMClientError:
             # Preserve request-side 400/404/422 errors for generator(), which

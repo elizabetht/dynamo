@@ -6,3 +6,35 @@
 The API gateway for serving LLM inference requests with OpenAI-compatible HTTP and KServe gRPC endpoints.
 
 See [docs/components/frontend/](../../../../docs/fern/pages/developer-guide/knowledge-base/modular-components/frontend/overview.md) for documentation.
+
+## vLLM frontend string stops
+
+The vLLM Python frontend owns string-stop detection because the token-only worker
+runs without detokenization. Once all choices for a request finish, the frontend
+now releases its routed stream after emitting the final response and metrics.
+Previously it ignored the native output processor's abort notification and kept
+reading worker tokens until the worker finished, delaying HTTP completion and
+leaving generation active after a local string stop. Other choices and concurrent
+requests retain their own state.
+
+Run the CPU regressions with vLLM installed and the Qwen3 tokenizer available:
+
+```bash
+PYTHONPATH=components/src python -m pytest \
+  components/src/dynamo/frontend/tests/test_vllm_processor_unit.py \
+  -k local_stop_releases -q
+```
+
+The three cases use vLLM's native output processor and cover a single local stop,
+multiple local stops, and a local stop followed by another choice's length limit.
+They also check unrelated request state and the final usage annotation. The
+baseline continues consuming the tail; the candidate leaves it unread.
+
+Local HTTP validation with vLLM 0.29.0 and the Qwen/Qwen3-0.6B tokenizer exercised
+24 requests per revision: ordinary text, automatic tools, two staggered choices,
+normal-completion controls, unary/SSE, and stream intervals 1 and 20. All responses
+matched. All 16 stop cases released the synthetic worker early, and all eight
+normal-completion controls retained their output. These checks used real
+Rust HTTP/router/TCP and native Python processing with synthetic worker tokens.
+They do not establish real-engine abort or GPU release. Cluster validation is
+pending. No performance improvement has been measured.

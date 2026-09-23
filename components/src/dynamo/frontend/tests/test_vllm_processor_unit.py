@@ -23,7 +23,11 @@ from _tool_guidance_parity import (
     tool_choice_value,
 )
 from transformers import AutoTokenizer
-from vllm.sampling_params import SamplingParams, StructuredOutputsParams
+from vllm.sampling_params import (
+    RequestOutputKind,
+    SamplingParams,
+    StructuredOutputsParams,
+)
 from vllm.tool_parsers import ToolParser
 
 from dynamo.common.utils.guided_json import admits_only_empty_object
@@ -1555,6 +1559,96 @@ async def _run_generate(processor, preproc, *, mm_routing_info=None, context=Non
             context=context,
         )
     ]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("second_finish", [None, "stop", "length"])
+async def test_local_stop_releases_only_after_all_choices_finish(
+    tokenizer, second_finish
+):
+    module = importlib.import_module("dynamo.frontend.vllm_processor")
+    count = 1 if second_finish is None else 2
+
+    def encode(text):
+        return tokenizer.encode(text, add_special_tokens=False)
+
+    routed = _FakeRoutedEngine(
+        [
+            {"index": 0, "token_ids": encode("First STOP")},
+            {"index": 0, "token_ids": encode("ignored tail")},
+            {
+                "index": 1,
+                "token_ids": encode(
+                    "Second STOP" if second_finish == "stop" else "Second"
+                ),
+                "finish_reason": None if second_finish == "stop" else "length",
+                "completion_usage": {
+                    "prompt_tokens": 3,
+                    "completion_tokens": 7,
+                    "total_tokens": 10,
+                },
+            },
+            {"index": 0, "token_ids": encode("unconsumed tail")},
+        ]
+    )
+    processor = _make_processor(module, routed)
+    processor.output_processor = module.OutputProcessor(tokenizer, log_stats=False)
+    unrelated = object()
+    processor.output_processor.request_states["unrelated"] = unrelated
+    params = SamplingParams(n=count, stop=["STOP"], output_kind=RequestOutputKind.DELTA)
+    native_request = module.EngineCoreRequest(
+        request_id="local-stop",
+        external_req_id="local-stop",
+        prompt_token_ids=[1, 2, 3],
+        mm_features=None,
+        sampling_params=params,
+        pooling_params=None,
+        arrival_time=0.0,
+        lora_request=None,
+        cache_salt=None,
+        data_parallel_rank=None,
+    )
+
+    class PostProcessor:
+        reasoning_token_total = 0
+
+        def process_output(self, output):
+            return {
+                "index": output.index,
+                "delta": {"content": output.text},
+                "finish_reason": output.finish_reason,
+            }
+
+    chunks = [
+        item
+        async for item in processor._generate_and_stream(
+            "local-stop",
+            {"model": MODEL},
+            _base_preproc(),
+            [1, 2, 3],
+            native_request,
+            {index: PostProcessor() for index in range(count)},
+        )
+    ]
+    choices = [
+        choice for item in chunks for choice in item.get("data", {}).get("choices", [])
+    ]
+    assert [
+        (c["index"], c["delta"]["content"], c["finish_reason"]) for c in choices
+    ] == (
+        [(0, "First ", "stop")]
+        + (
+            []
+            if count == 1
+            else [
+                (1, "Second " if second_finish == "stop" else "Second", second_finish)
+            ]
+        )
+    )
+    assert routed.yielded == (1 if count == 1 else 3)
+    assert processor.output_processor.request_states == {"unrelated": unrelated}
+    if count == 2:
+        assert chunks[-1]["data"]["usage"]["completion_tokens"] == 7
 
 
 class TestRoutedEnginePath:
