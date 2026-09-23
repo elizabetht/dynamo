@@ -761,6 +761,7 @@ class SglangProcessor:
             def flush_pending(
                 *,
                 finish_reason: str | None,
+                detailed_finish_reason: str | None,
                 stop_reason: Any | None,
                 stop_terminated: bool,
                 engine_data: Any | None,
@@ -829,6 +830,18 @@ class SglangProcessor:
                         request, "engine_data"
                     ):
                         response_nvext["engine_data"] = engine_data
+                    effective_detailed_finish = (
+                        "stop" if post.locally_finished else detailed_finish_reason
+                    )
+                    if (
+                        effective_detailed_finish is not None
+                        and nvext_extra_field_requested(
+                            request, "detailed_finish_reason"
+                        )
+                    ):
+                        response_nvext[
+                            "detailed_finish_reason"
+                        ] = effective_detailed_finish
                     if response_nvext:
                         dynamo_out["nvext"] = response_nvext
 
@@ -902,6 +915,7 @@ class SglangProcessor:
                     if pending_logprob_shape != chunk_logprob_shape:
                         envelope = flush_pending(
                             finish_reason=None,
+                            detailed_finish_reason=None,
                             stop_reason=None,
                             stop_terminated=False,
                             engine_data=None,
@@ -939,6 +953,7 @@ class SglangProcessor:
                 if finish_reason or len(pending_token_ids) >= flush_threshold:
                     envelope = flush_pending(
                         finish_reason=finish_reason,
+                        detailed_finish_reason=raw_finish_reason,
                         stop_reason=stop_reason,
                         stop_terminated=stop_terminated,
                         engine_data=engine_data,
