@@ -605,6 +605,10 @@ def _prepare_request(
     chat_params = ChatParams(
         chat_template=request_for_sampling.chat_template,
         chat_template_content_format="auto",
+        tool_choice=(
+            request_for_sampling.tool_choice if request_for_sampling.tools else None
+        ),
+        response_format=request_for_sampling.response_format,
         # Renderer-managed keys last so a nested duplicate can't raise TypeError.
         chat_template_kwargs={
             **chat_template_kwargs,

@@ -473,6 +473,32 @@ class TestPrepareRequestToolStripping:  # FRONTEND.1 + FRONTEND.3 — tool strip
         ), "No tools in request should produce None tools in template"
 
 
+class TestRendererRequestMetadata:
+    @pytest.mark.parametrize("tool_choice", ["required", "none", "auto"])
+    def test_tool_choice_reaches_renderer(self, tokenizer, tool_choice):
+        request, _, _, _, params = _prepare_request(
+            {**TOOL_REQUEST, "tool_choice": tool_choice},
+            tokenizer=tokenizer,
+            tool_parser_class=None,
+        )
+        assert params.tool_choice == request.tool_choice
+
+    def test_response_format_reaches_renderer_without_implicit_tool_choice(
+        self, tokenizer
+    ):
+        request, _, _, _, params = _prepare_request(
+            {
+                "model": MODEL,
+                "messages": [{"role": "user", "content": "Return JSON."}],
+                "response_format": {"type": "json_object"},
+            },
+            tokenizer=tokenizer,
+            tool_parser_class=None,
+        )
+        assert params.response_format == request.response_format
+        assert params.tool_choice is None
+
+
 class TestChatTemplateArgsPassthrough:
     """Per-request chat template kwargs must survive into the rendered template.
 
