@@ -25,9 +25,18 @@ def trailing_stop_prefix_len(text: str, stop_strings: set[str]) -> int:
     """Return the longest trailing substring that prefixes a stop string."""
     if not text or not stop_strings:
         return 0
-    max_len = min(len(text), max(len(stop) for stop in stop_strings))
-    for suffix_len in range(max_len, 0, -1):
-        suffix = text[-suffix_len:]
-        if any(stop.startswith(suffix) for stop in stop_strings):
-            return suffix_len
-    return 0
+    longest = 0
+    last = text[-1]
+    for stop in stop_strings:
+        end = min(len(text), len(stop))
+        while end > longest:
+            # A matching prefix must end in the final character of the text.
+            index = stop.rfind(last, longest, end)
+            if index < 0:
+                break
+            length = index + 1
+            if text.endswith(stop[:length]):
+                longest = length
+                break
+            end = index
+    return longest
