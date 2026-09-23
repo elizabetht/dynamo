@@ -2517,6 +2517,107 @@ class TestToolCallGuidedDecoding:
             "arguments": '{"city":"Paris"}',
         }
 
+    @pytest.mark.parametrize("named", [True, False], ids=["named", "required"])
+    @pytest.mark.parametrize(
+        "thinking,include_reasoning", [(True, True), (True, False), (False, True)]
+    )
+    @pytest.mark.asyncio
+    async def test_parser_json_guidance_uses_json_tool_response(
+        self, tokenizer, named, thinking, include_reasoning
+    ):
+        from vllm.reasoning.qwen3_engine_reasoning_parser import (
+            Qwen3ParserReasoningAdapter,
+        )
+        from vllm.tool_parsers.hermes_tool_parser import Hermes2ProToolParser
+
+        tool_choice = (
+            {"type": "function", "function": {"name": "get_weather"}}
+            if named
+            else "required"
+        )
+        result = await prepost_module.preprocess_chat_request(
+            {
+                **TOOL_REQUEST,
+                "tool_choice": tool_choice,
+                "chat_template_kwargs": {"enable_thinking": thinking},
+                "include_reasoning": include_reasoning,
+            },
+            tokenizer=tokenizer,
+            renderer=SimpleNamespace(
+                render_messages_async=AsyncMock(
+                    return_value=(None, {"prompt_token_ids": []})
+                )
+            ),
+            tool_parser_class=Hermes2ProToolParser,
+            reasoning_parser_class=Qwen3ParserReasoningAdapter,
+            structural_tag_mode="off",
+        )
+        assert result.guided_decoding is not None
+        assert "json" in result.guided_decoding
+        assert result.uses_dynamo_json_tool_call_fallback is True
+        post = StreamingPostProcessor(
+            tokenizer=tokenizer,
+            request_for_sampling=result.request_for_sampling,
+            sampling_params=SamplingParams(),
+            prompt_token_ids=[],
+            tool_parser=result.tool_parser,
+            reasoning_parser_class=Qwen3ParserReasoningAdapter,
+            chat_template_kwargs=result.chat_template_kwargs,
+            uses_dynamo_json_tool_call_fallback=result.uses_dynamo_json_tool_call_fallback,
+        )
+        parameters = {"city": '東京 "quoted" \\ path'}
+        wire = (
+            parameters if named else [{"name": "get_weather", "parameters": parameters}]
+        )
+        text = ("<think>OK</think>" if thinking else "") + json.dumps(wire)
+        choice = post.process_output(
+            SimpleNamespace(
+                index=0,
+                text=text,
+                token_ids=tokenizer.encode(text),
+                finish_reason="stop",
+                logprobs=None,
+            )
+        )
+        assert choice["finish_reason"] == "tool_calls"
+        assert not choice["delta"].get("content")
+        assert choice["delta"].get("reasoning_content", "") == (
+            "OK" if thinking and include_reasoning else ""
+        )
+        call = choice["delta"]["tool_calls"][0]
+        assert call["id"]
+        assert call["function"]["name"] == "get_weather"
+        assert json.loads(call["function"]["arguments"]) == parameters
+
+    @pytest.mark.asyncio
+    async def test_parser_native_json_keeps_native_decoder(self, tokenizer):
+        from vllm.tool_parsers.hermes_tool_parser import Hermes2ProToolParser
+
+        class NativeJsonParser(Hermes2ProToolParser):
+            supports_required_and_named = False
+
+            def adjust_request(self, request):
+                request.structured_outputs = StructuredOutputsParams(
+                    json={"type": "array", "items": {"type": "string"}}
+                )
+                return request
+
+        result = await prepost_module.preprocess_chat_request(
+            {**TOOL_REQUEST, "tool_choice": "required"},
+            tokenizer=tokenizer,
+            renderer=SimpleNamespace(
+                render_messages_async=AsyncMock(
+                    return_value=(None, {"prompt_token_ids": []})
+                )
+            ),
+            tool_parser_class=NativeJsonParser,
+            structural_tag_mode="off",
+        )
+        assert result.guided_decoding == {
+            "json": {"type": "array", "items": {"type": "string"}}
+        }
+        assert result.uses_dynamo_json_tool_call_fallback is False
+
     @pytest.mark.asyncio
     async def test_named_closed_zero_arg_regex_becomes_a_tool_call(self, tokenizer):
         request = json.loads(json.dumps(TOOL_REQUEST))
