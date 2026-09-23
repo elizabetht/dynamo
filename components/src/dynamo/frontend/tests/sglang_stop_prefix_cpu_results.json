@@ -1,0 +1,525 @@
+{
+  "scope": "CPU time inside real SGLang process_output during localhost native HTTP; scripted worker tokens; no GPU",
+  "base_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "candidate_source_sha256": "2b2c7407e63bee02fe929eb9928488c1cfe1bb079a1075e958d4e7fc3954cdcf",
+  "python": "3.11.15",
+  "cpu": "AMD Ryzen 7 6800H",
+  "sglang_source_commit": "3c82e48e825bae504527ed28e2442b1429d36650",
+  "tokenizer": "Qwen/Qwen3-0.6B",
+  "tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "dynamo_binding_sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+  "repetitions": 3,
+  "order": [
+    "baseline/candidate",
+    "candidate/baseline",
+    "baseline/candidate"
+  ],
+  "units": "ms summed process_output wall time per request; excludes network/generation",
+  "rows": [
+    {
+      "case": "prefix-8-plain-repeat-0-variant-baseline",
+      "process_output_ms": 0.96661,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-guided-repeat-0-variant-baseline",
+      "process_output_ms": 0.879324,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-tools-repeat-0-variant-baseline",
+      "process_output_ms": 1.278187,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-plain-repeat-0-variant-baseline",
+      "process_output_ms": 2.808826,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-guided-repeat-0-variant-baseline",
+      "process_output_ms": 2.843118,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-tools-repeat-0-variant-baseline",
+      "process_output_ms": 3.185734,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-plain-repeat-0-variant-baseline",
+      "process_output_ms": 9.543977,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-guided-repeat-0-variant-baseline",
+      "process_output_ms": 9.618446,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-tools-repeat-0-variant-baseline",
+      "process_output_ms": 10.017239,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-plain-repeat-0-variant-baseline",
+      "process_output_ms": 34.516277,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-guided-repeat-0-variant-baseline",
+      "process_output_ms": 33.343032,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-tools-repeat-0-variant-baseline",
+      "process_output_ms": 35.695159,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "control-0-plain-repeat-0-variant-baseline",
+      "process_output_ms": 4.89395,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "control-16-plain-repeat-0-variant-baseline",
+      "process_output_ms": 6.154781,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-plain-repeat-0-variant-candidate",
+      "process_output_ms": 0.85434,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-guided-repeat-0-variant-candidate",
+      "process_output_ms": 0.8736,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-tools-repeat-0-variant-candidate",
+      "process_output_ms": 1.27864,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-plain-repeat-0-variant-candidate",
+      "process_output_ms": 2.551182,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-guided-repeat-0-variant-candidate",
+      "process_output_ms": 2.307713,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-tools-repeat-0-variant-candidate",
+      "process_output_ms": 2.784843,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-plain-repeat-0-variant-candidate",
+      "process_output_ms": 7.254836,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-guided-repeat-0-variant-candidate",
+      "process_output_ms": 7.337025,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-tools-repeat-0-variant-candidate",
+      "process_output_ms": 7.788072,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-plain-repeat-0-variant-candidate",
+      "process_output_ms": 27.658925,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-guided-repeat-0-variant-candidate",
+      "process_output_ms": 28.857731,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-tools-repeat-0-variant-candidate",
+      "process_output_ms": 27.892127,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "control-0-plain-repeat-0-variant-candidate",
+      "process_output_ms": 4.57497,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "control-16-plain-repeat-0-variant-candidate",
+      "process_output_ms": 4.850083,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-plain-repeat-1-variant-candidate",
+      "process_output_ms": 0.851671,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-guided-repeat-1-variant-candidate",
+      "process_output_ms": 0.984548,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-tools-repeat-1-variant-candidate",
+      "process_output_ms": 1.188948,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-plain-repeat-1-variant-candidate",
+      "process_output_ms": 2.342731,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-guided-repeat-1-variant-candidate",
+      "process_output_ms": 2.48044,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-tools-repeat-1-variant-candidate",
+      "process_output_ms": 2.658271,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-plain-repeat-1-variant-candidate",
+      "process_output_ms": 6.850556,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-guided-repeat-1-variant-candidate",
+      "process_output_ms": 7.393471,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-tools-repeat-1-variant-candidate",
+      "process_output_ms": 8.105171,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-plain-repeat-1-variant-candidate",
+      "process_output_ms": 28.178637,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-guided-repeat-1-variant-candidate",
+      "process_output_ms": 27.545428,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-tools-repeat-1-variant-candidate",
+      "process_output_ms": 28.893537,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "control-0-plain-repeat-1-variant-candidate",
+      "process_output_ms": 4.838782,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "control-16-plain-repeat-1-variant-candidate",
+      "process_output_ms": 5.24457,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-plain-repeat-1-variant-baseline",
+      "process_output_ms": 1.111101,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-guided-repeat-1-variant-baseline",
+      "process_output_ms": 1.221502,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-tools-repeat-1-variant-baseline",
+      "process_output_ms": 1.346676,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-plain-repeat-1-variant-baseline",
+      "process_output_ms": 3.024088,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-guided-repeat-1-variant-baseline",
+      "process_output_ms": 2.769518,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-tools-repeat-1-variant-baseline",
+      "process_output_ms": 3.348147,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-plain-repeat-1-variant-baseline",
+      "process_output_ms": 8.609611,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-guided-repeat-1-variant-baseline",
+      "process_output_ms": 9.05997,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-tools-repeat-1-variant-baseline",
+      "process_output_ms": 9.487702,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-plain-repeat-1-variant-baseline",
+      "process_output_ms": 34.907199,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-guided-repeat-1-variant-baseline",
+      "process_output_ms": 33.425025,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-tools-repeat-1-variant-baseline",
+      "process_output_ms": 38.643213,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "control-0-plain-repeat-1-variant-baseline",
+      "process_output_ms": 4.799342,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "control-16-plain-repeat-1-variant-baseline",
+      "process_output_ms": 5.600889,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-plain-repeat-2-variant-baseline",
+      "process_output_ms": 1.010786,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-guided-repeat-2-variant-baseline",
+      "process_output_ms": 0.993818,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-tools-repeat-2-variant-baseline",
+      "process_output_ms": 1.393663,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-plain-repeat-2-variant-baseline",
+      "process_output_ms": 2.711882,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-guided-repeat-2-variant-baseline",
+      "process_output_ms": 2.729187,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-tools-repeat-2-variant-baseline",
+      "process_output_ms": 3.304025,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-plain-repeat-2-variant-baseline",
+      "process_output_ms": 9.180951,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-guided-repeat-2-variant-baseline",
+      "process_output_ms": 8.644493,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-tools-repeat-2-variant-baseline",
+      "process_output_ms": 9.712997,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-plain-repeat-2-variant-baseline",
+      "process_output_ms": 34.640057,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-guided-repeat-2-variant-baseline",
+      "process_output_ms": 33.908003,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-tools-repeat-2-variant-baseline",
+      "process_output_ms": 34.935149,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "control-0-plain-repeat-2-variant-baseline",
+      "process_output_ms": 4.582574,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "control-16-plain-repeat-2-variant-baseline",
+      "process_output_ms": 5.294391,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-plain-repeat-2-variant-candidate",
+      "process_output_ms": 0.881598,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-guided-repeat-2-variant-candidate",
+      "process_output_ms": 0.928086,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-8-tools-repeat-2-variant-candidate",
+      "process_output_ms": 1.24054,
+      "process_output_calls": 33,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-plain-repeat-2-variant-candidate",
+      "process_output_ms": 2.404005,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-guided-repeat-2-variant-candidate",
+      "process_output_ms": 2.422125,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-64-tools-repeat-2-variant-candidate",
+      "process_output_ms": 3.126205,
+      "process_output_calls": 89,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-plain-repeat-2-variant-candidate",
+      "process_output_ms": 12.019071,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-guided-repeat-2-variant-candidate",
+      "process_output_ms": 7.468572,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-256-tools-repeat-2-variant-candidate",
+      "process_output_ms": 8.487915,
+      "process_output_calls": 281,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-plain-repeat-2-variant-candidate",
+      "process_output_ms": 31.473306,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-guided-repeat-2-variant-candidate",
+      "process_output_ms": 28.198597,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "prefix-1024-tools-repeat-2-variant-candidate",
+      "process_output_ms": 29.446503,
+      "process_output_calls": 1049,
+      "passed": true
+    },
+    {
+      "case": "control-0-plain-repeat-2-variant-candidate",
+      "process_output_ms": 4.389137,
+      "process_output_calls": 194,
+      "passed": true
+    },
+    {
+      "case": "control-16-plain-repeat-2-variant-candidate",
+      "process_output_ms": 4.831318,
+      "process_output_calls": 194,
+      "passed": true
+    }
+  ],
+  "warmup_requests": 28
+}
