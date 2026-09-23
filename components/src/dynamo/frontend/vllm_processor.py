@@ -792,6 +792,14 @@ class VllmProcessor:
             "annotations": [],
             "routing": request.get("routing"),
         }
+        token_constraints = {}
+        if sp.allowed_token_ids is not None:
+            token_constraints["allowed_token_ids"] = sp.allowed_token_ids
+        if request.get("bad_words_token_ids") is not None:
+            token_constraints["bad_words_token_ids"] = request["bad_words_token_ids"]
+        if token_constraints:
+            dynamo_preproc["extra_args"] = {"sampling_options": token_constraints}
+
         if guided_decoding is not None:
             dynamo_preproc["sampling_options"]["guided_decoding"] = guided_decoding
         if reasoning_metadata.engine_reasoning_ended is not None:

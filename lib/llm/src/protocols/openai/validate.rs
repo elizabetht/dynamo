@@ -116,6 +116,22 @@ pub const PASSTHROUGH_EXTRA_FIELDS: &[&str] = &[
     "logprob_token_ids",
 ];
 
+// Python chat engines receive the serialized request. Keep accepted extensions,
+// while unknown fields allowed by the ignore policy must still be dropped.
+pub(super) fn serialize_passthrough_fields<S>(
+    fields: &std::collections::HashMap<String, serde_json::Value>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.collect_map(
+        fields
+            .iter()
+            .filter(|(key, _)| PASSTHROUGH_EXTRA_FIELDS.contains(&key.as_str())),
+    )
+}
+
 static IGNORE_OPENAI_FE_UNSUPPORTED_FIELDS: LazyLock<bool> =
     LazyLock::new(|| env_is_truthy(DYN_IGNORE_OPENAI_FE_UNSUPPORTED_FIELDS));
 

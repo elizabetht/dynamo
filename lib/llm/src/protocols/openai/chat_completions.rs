@@ -130,7 +130,11 @@ pub struct NvCreateChatCompletionRequest {
     pub return_tokens_as_token_ids: Option<bool>,
 
     /// Catch-all for unsupported fields - checked during validation
-    #[serde(flatten, default, skip_serializing)]
+    #[serde(
+        flatten,
+        default,
+        serialize_with = "validate::serialize_passthrough_fields"
+    )]
     pub unsupported_fields: std::collections::HashMap<String, serde_json::Value>,
 }
 
@@ -1048,6 +1052,31 @@ mod tests {
             Some(&serde_json::json!([[12, 13]]))
         );
         assert!(ValidateRequest::validate(&request).is_ok());
+    }
+
+    #[test]
+    fn test_passthrough_fields_survive_serialization() {
+        let mut request: NvCreateChatCompletionRequest = serde_json::from_value(json!({
+            "model": "test-model",
+            "messages": [{"role": "user", "content": "Hello"}],
+            "allowed_token_ids": [10, 11],
+            "bad_words_token_ids": [[12, 13]],
+            "stop_token_ids": [14],
+            "cache_salt": "request-cache",
+            "detokenize": false,
+            "logprob_token_ids": [15]
+        }))
+        .expect("deserialize passthrough request");
+        assert!(ValidateRequest::validate(&request).is_ok());
+        request
+            .unsupported_fields
+            .insert("ignored_unknown".into(), json!(true));
+
+        let serialized = serde_json::to_value(&request).expect("serialize request");
+        for key in validate::PASSTHROUGH_EXTRA_FIELDS {
+            assert_eq!(serialized.get(*key), request.unsupported_fields.get(*key));
+        }
+        assert!(serialized.get("ignored_unknown").is_none());
     }
 
     #[test]
