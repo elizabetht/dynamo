@@ -1044,6 +1044,7 @@ class SglangStreamingPostProcessor:
         eos_token_ids: list[int] | None = None,
         prompt_token_ids: list[int] | None = None,
         stop_strings: set[str] | None = None,
+        min_tokens: int = 0,
         stop_token_ids: set[int] | None = None,
         skip_special_tokens: bool | None = None,
     ) -> None:
@@ -1075,6 +1076,7 @@ class SglangStreamingPostProcessor:
         self._eos_token_ids = set(eos_token_ids or [])
         self._request_stop_token_ids = set(stop_token_ids or [])
         self._stop_strings = stop_strings or set()
+        self._min_tokens_remaining = min_tokens if self._stop_strings else 0
         self._pending_stop_text = ""
         self._locally_finished = False
         self._local_stop_reason: str | None = None
@@ -1466,9 +1468,26 @@ class SglangStreamingPostProcessor:
             if top_logprobs is not None and len(top_logprobs) == raw_token_count:
                 top_logprobs = top_logprobs[:retained_token_count]
 
+        protected_text = ""
+        decode_ids = token_ids
+        if self._min_tokens_remaining:
+            # A batch may cross the floor. Text decoded from the first min_tokens
+            # tokens must not participate in local stop-string matching.
+            protected_count = min(self._min_tokens_remaining, len(token_ids))
+            self._min_tokens_remaining -= protected_count
+            # Decode individually so a trailing partial UTF-8 character cannot
+            # hold earlier protected text until after the floor.
+            protected_text = "".join(
+                self._incremental_decode(
+                    [token_id],
+                    flush=finish_reason is not None and index == len(token_ids) - 1,
+                )
+                for index, token_id in enumerate(token_ids[:protected_count])
+            )
+            decode_ids = token_ids[protected_count:]
         delta_text = (
-            self._incremental_decode(token_ids, flush=finish_reason is not None)
-            if token_ids or finish_reason is not None
+            self._incremental_decode(decode_ids, flush=finish_reason is not None)
+            if decode_ids or finish_reason is not None
             else ""
         )
         openai_logprobs = None
@@ -1482,6 +1501,7 @@ class SglangStreamingPostProcessor:
         delta_text, locally_finished = self._filter_stop_string_delta(
             delta_text, finish_reason, stop_reason
         )
+        delta_text = protected_text + delta_text
         if locally_finished:
             finish_reason = "stop"
 

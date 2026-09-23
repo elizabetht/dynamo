@@ -3493,6 +3493,51 @@ def test_generator_preserves_decode_and_routing_options(
     assert engine.requests[0]["routing"] == (worker_routing if pin_workers else None)
 
 
+@pytest.mark.parametrize("use_pool", [False, True], ids=["inline", "pool"])
+def test_generator_minimum_tokens_stop_string(tokenizer, monkeypatch, use_pool):
+    text = "Hi STOP one two three four five six seven eight STOP tail"
+    ids = tokenizer.encode(text, add_special_tokens=False)
+    engine = FakeRoutedEngine(items=[{"token_ids": ids, "finish_reason": "length"}])
+    if use_pool:
+        monkeypatch.setattr(sglang_processor_module, "_w_tokenizer", tokenizer)
+        monkeypatch.setattr(sglang_processor_module, "_w_tool_call_parser_name", None)
+        monkeypatch.setattr(sglang_processor_module, "_w_reasoning_parser_name", None)
+        monkeypatch.setattr(
+            sglang_processor_module, "_w_exclude_tools_when_tool_choice_none", True
+        )
+        monkeypatch.setattr(
+            sglang_processor_module, "_w_template_force_reasoning", False
+        )
+        monkeypatch.setattr(sglang_processor_module, "_w_default_thinking_mode", None)
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": "Say hello."}],
+        "stop": ["STOP"],
+        "min_tokens": 8,
+    }
+    with ThreadPoolExecutor(max_workers=1) if use_pool else nullcontext() as pool:
+        processor = SglangProcessor(
+            tokenizer,
+            engine,
+            None,
+            None,
+            None,
+            preprocess_pool=pool,
+            preprocess_workers=1 if use_pool else 0,
+        )
+
+        async def collect():
+            return [item async for item in processor.generator(request)]
+
+        output = asyncio.run(collect())
+    choices = [c for item in output for c in item.get("data", {}).get("choices", [])]
+    assert "".join(c["delta"].get("content", "") for c in choices) == (
+        "Hi STOP one two three four five six seven eight "
+    )
+    assert [c["finish_reason"] for c in choices if c["finish_reason"]] == ["stop"]
+    assert engine.requests[0]["stop_conditions"]["min_tokens"] == 8
+
+
 class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
     """Test safe-boundary incremental detokenization."""
 
@@ -4039,6 +4084,59 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
             "E",
             "N",
         ]
+
+    @pytest.mark.parametrize("batch_size", [1, 7, 64])
+    @pytest.mark.parametrize(
+        "text, minimum, expected, finish",
+        [
+            ("AENDbcdefENDtail", 8, "AENDbcdef", "stop"),
+            ("AENDbcdefENDtail", 0, "A", "stop"),
+            ("AEND", 8, "AEND", "length"),
+            ("AEND🙂bcENDtail", 6, "AEND🙂bc", "stop"),
+        ],
+    )
+    def test_stop_string_respects_minimum_tokens(
+        self, batch_size, text, minimum, expected, finish
+    ):
+        post = SglangStreamingPostProcessor(
+            tokenizer=self.ByteTokenizer(),
+            tool_call_parser=None,
+            reasoning_parser=None,
+            stop_strings={"END"},
+            min_tokens=minimum,
+        )
+        ids = list(text.encode())
+        choices = []
+        for start in range(0, len(ids), batch_size):
+            batch = ids[start : start + batch_size]
+            choice = post.process_output(
+                {
+                    "token_ids": batch,
+                    "finish_reason": "length"
+                    if start + batch_size >= len(ids)
+                    else None,
+                    "log_probs": [-0.1] * len(batch),
+                }
+            )
+            if choice:
+                choices.append(choice)
+            if post.locally_finished:
+                break
+        assert "".join(c["delta"].get("content", "") for c in choices) == expected
+        assert [c["finish_reason"] for c in choices if c["finish_reason"]] == [finish]
+        assert sum(
+            len((c.get("logprobs") or {}).get("content", [])) for c in choices
+        ) == len(expected.encode())
+        if not expected.isascii():
+            return
+        assert (
+            "".join(
+                entry["token"]
+                for c in choices
+                for entry in (c.get("logprobs") or {}).get("content", [])
+            )
+            == expected
+        )
 
     def test_complete_stop_string_is_suppressed_before_backend_finish(self, tokenizer):
         post = SglangStreamingPostProcessor(
