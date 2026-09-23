@@ -55,6 +55,7 @@ _SAMPLING_OPTION_FIELDS = (
     "top_p",
     "top_k",
     "min_p",
+    "logit_bias",
 )
 BYPASS_REMOTE_PREFILL_ANNOTATION = "x-bypass-remote-prefill"
 _MAX_ABORT_MESSAGE_LENGTH = 8192
@@ -169,9 +170,15 @@ def _nvext_extra_field_requested(request: Dict[str, Any], field: str) -> bool:
     return False
 
 
-def _sampling_option_params(values: Dict[str, Any]) -> Dict[str, Any]:
+def _sampling_option_params(
+    values: Dict[str, Any], extra_args: Any = None
+) -> Dict[str, Any]:
     """Extract sampling options that SGLang accepts as sampling params."""
     params = {field: values.get(field) for field in _SAMPLING_OPTION_FIELDS}
+    if isinstance(extra_args, Mapping):
+        passthrough = extra_args.get("sampling_options")
+        if isinstance(passthrough, Mapping) and "logit_bias" in passthrough:
+            params["logit_bias"] = passthrough["logit_bias"]
     if values.get("seed") is not None:
         params["sampling_seed"] = values.get("seed")
     return params
@@ -506,7 +513,7 @@ class DecodeWorkerHandler(BaseWorkerHandler):
                 if hold_engine_open
                 else stop_conditions.get("ignore_eos"),
                 "stop_token_ids": stop_token_ids,
-                **_sampling_option_params(sampling_opts),
+                **_sampling_option_params(sampling_opts, request.get("extra_args")),
                 **self._get_guided_decoding_params(
                     sampling_opts.get("guided_decoding")
                 ),

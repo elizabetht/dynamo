@@ -111,7 +111,7 @@ class PrefillWorkerHandler(BaseWorkerHandler):
             sampling_params = {
                 "n": sampling_opts.get("n"),
                 "max_new_tokens": stop_conditions.get("max_tokens"),
-                **_sampling_option_params(sampling_opts),
+                **_sampling_option_params(sampling_opts, request.get("extra_args")),
                 **self._get_guided_decoding_params(
                     sampling_opts.get("guided_decoding")
                 ),

@@ -493,6 +493,11 @@ def _build_dynamo_preproc(
     }
     if nvext_passthrough:
         preproc["extra_args"] = {"nvext": nvext_passthrough}
+    if request.get("logit_bias") is not None:
+        # SamplingOptions has no logit_bias field; use the sampling passthrough.
+        preproc.setdefault("extra_args", {})["sampling_options"] = {
+            "logit_bias": request["logit_bias"]
+        }
 
     return preproc
 
