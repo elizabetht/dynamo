@@ -1562,9 +1562,12 @@ async def _run_generate(processor, preproc, *, mm_routing_info=None, context=Non
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("second_finish", [None, "stop", "length"])
+@pytest.mark.parametrize(
+    "second_finish, backend_usage",
+    [(None, False), ("stop", False), ("stop", True), ("length", True)],
+)
 async def test_local_stop_releases_only_after_all_choices_finish(
-    tokenizer, second_finish
+    tokenizer, second_finish, backend_usage
 ):
     module = importlib.import_module("dynamo.frontend.vllm_processor")
     count = 1 if second_finish is None else 2
@@ -1582,11 +1585,15 @@ async def test_local_stop_releases_only_after_all_choices_finish(
                     "Second STOP" if second_finish == "stop" else "Second"
                 ),
                 "finish_reason": None if second_finish == "stop" else "length",
-                "completion_usage": {
-                    "prompt_tokens": 3,
-                    "completion_tokens": 7,
-                    "total_tokens": 10,
-                },
+                "completion_usage": (
+                    {
+                        "prompt_tokens": 3,
+                        "completion_tokens": 7,
+                        "total_tokens": 10,
+                    }
+                    if backend_usage
+                    else None
+                ),
             },
             {"index": 0, "token_ids": encode("unconsumed tail")},
         ]
@@ -1647,8 +1654,17 @@ async def test_local_stop_releases_only_after_all_choices_finish(
     )
     assert routed.yielded == (1 if count == 1 else 3)
     assert processor.output_processor.request_states == {"unrelated": unrelated}
-    if count == 2:
-        assert chunks[-1]["data"]["usage"]["completion_tokens"] == 7
+    usage = chunks[-1]["data"]["usage"]
+    if backend_usage:
+        assert usage["completion_tokens"] == 7
+    else:
+        expected_tokens = len(encode("First STOP"))
+        if count == 2:
+            expected_tokens += len(encode("ignored tail")) + len(encode("Second STOP"))
+        assert usage["prompt_tokens"] == 3
+        assert usage["completion_tokens"] == expected_tokens
+        assert usage["total_tokens"] == 3 + expected_tokens
+        assert "prompt_tokens_details" not in usage
 
 
 class TestRoutedEnginePath:
