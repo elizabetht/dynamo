@@ -3538,3 +3538,58 @@ class TestReasoningTokenAccounting:
         usage = {"completion_tokens_details": {"reasoning_tokens": backend}}
         annotated = self._annotator(post).annotate(usage)
         assert annotated["completion_tokens_details"]["reasoning_tokens"] == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings(
+    "ignore:max_tokens is deprecated in favor of the max_completion_tokens field:DeprecationWarning"
+)
+@pytest.mark.parametrize(
+    "default_limit,request_limits,expected",
+    [
+        (2, {}, 2),
+        (2, {"max_tokens": 3, "max_completion_tokens": 4}, 4),
+        (65536, {}, None),
+        (None, {}, None),
+    ],
+)
+async def test_model_default_output_limit(
+    vllm_processor_module, monkeypatch, default_limit, request_limits, expected
+):
+    # Lazy imports keep the optional-backend marker collector usable.
+    from vllm.config import DeviceConfig
+    from vllm.renderers.hf import HfRenderer
+    from vllm.tokenizers import get_tokenizer
+
+    tokenizer = get_tokenizer(MODEL)
+    module = vllm_processor_module
+    model_config = module.ModelConfig(model=MODEL, max_model_len=32768)
+    config = module.VllmConfig(
+        model_config=model_config, device_config=DeviceConfig(device="cpu")
+    )
+    input_processor = module.InputProcessor(config, HfRenderer(config, tokenizer))
+    input_processor.generation_config_fields["max_new_tokens"] = default_limit
+    processor = module.VllmProcessor(
+        tokenizer=tokenizer,
+        input_processor=input_processor,
+        output_processor=object(),
+        tool_parser_class=None,
+        reasoning_parser_class=None,
+        routed_engine=object(),
+    )
+    captured = {}
+
+    async def capture(request_id, request, dynamo_preproc, tokens, *args, **kwargs):
+        captured.update(dynamo_preproc)
+        yield {}
+
+    monkeypatch.setattr(processor, "_generate_and_stream", capture)
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": "Reply briefly."}],
+        **request_limits,
+    }
+    assert [item async for item in processor.generator(request)] == [{}]
+    if expected is None:
+        expected = model_config.max_model_len - len(captured["token_ids"])
+    assert captured["stop_conditions"]["max_tokens"] == expected
