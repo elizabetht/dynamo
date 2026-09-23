@@ -3538,3 +3538,75 @@ class TestReasoningTokenAccounting:
         usage = {"completion_tokens_details": {"reasoning_tokens": backend}}
         annotated = self._annotator(post).annotate(usage)
         assert annotated["completion_tokens_details"]["reasoning_tokens"] == 2
+
+
+@pytest.mark.parametrize("stream_response", [True, False])
+@pytest.mark.parametrize("finish_reason", ["stop", "length"])
+def test_reasoning_tool_handoff_preserves_parallel_call_identity(
+    tokenizer, stream_response, finish_reason
+):
+    from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
+    from vllm.outputs import CompletionOutput
+    from vllm.reasoning.qwen3_engine_reasoning_parser import Qwen3ParserReasoningAdapter
+    from vllm.tool_parsers.hermes_tool_parser import Hermes2ProToolParser
+
+    request = ChatCompletionRequest(**dict(TOOL_REQUEST, tool_choice="auto"))
+    post = StreamingPostProcessor(
+        tokenizer=tokenizer,
+        request_for_sampling=request,
+        sampling_params=SamplingParams(),
+        prompt_token_ids=tokenizer.encode("<think>", add_special_tokens=False),
+        tool_parser=Hermes2ProToolParser(tokenizer, request.tools),
+        reasoning_parser_class=Qwen3ParserReasoningAdapter,
+        chat_template_kwargs={},
+        stream_response=stream_response,
+    )
+    cities = ["Paris", '東京 "晴れ"']
+    calls = [
+        "<tool_call>\n"
+        + json.dumps(
+            {"name": "get_weather", "arguments": {"city": city}}, ensure_ascii=False
+        )
+        + "\n</tool_call>"
+        for city in cities
+    ]
+    chunks = [
+        "<think>Check cities.",
+        "</think>\n" + calls[0].removesuffix("</tool_call>"),
+        "</tool_call>\n",
+        calls[1],
+    ]
+    results = []
+    for index, text in enumerate(chunks):
+        result = post.process_output(
+            CompletionOutput(
+                index=0,
+                text=text,
+                token_ids=tokenizer.encode(text, add_special_tokens=False),
+                cumulative_logprob=None,
+                logprobs=None,
+                finish_reason=finish_reason if index == len(chunks) - 1 else None,
+            )
+        )
+        if result is not None:
+            results.append(result)
+
+    tool_calls = [
+        call for result in results for call in result["delta"].get("tool_calls", [])
+    ]
+    assert [call["index"] for call in tool_calls] == [0, 1]
+    assert len({call["id"] for call in tool_calls}) == 2
+    assert [call["function"]["name"] for call in tool_calls] == ["get_weather"] * 2
+    assert [json.loads(call["function"]["arguments"]) for call in tool_calls] == [
+        {"city": city} for city in cities
+    ]
+    assert not "".join(result["delta"].get("content", "") for result in results).strip()
+    assert (
+        "".join(result["delta"].get("reasoning_content", "") for result in results)
+        == "Check cities."
+    )
+    assert results[-1]["finish_reason"] == (
+        "tool_calls" if finish_reason == "stop" else "length"
+    )
+    if stream_response:
+        assert any(result["delta"].get("tool_calls") for result in results[:-1])
