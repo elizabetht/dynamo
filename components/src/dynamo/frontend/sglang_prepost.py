@@ -546,9 +546,21 @@ def _render_deepseek_v4_prompt_token_ids(
     return _normalize_prompt_token_ids(tokenizer.encode(prompt))
 
 
-@lru_cache(maxsize=64)
 def _callable_accepts_kwarg(func: Any, kwarg: str) -> bool:
+    if inspect.ismethod(func):
+        return _cached_callable_accepts_kwarg(func.__func__, kwarg, True)
+    return _cached_callable_accepts_kwarg(func, kwarg, False)
+
+
+@lru_cache(maxsize=64)
+def _cached_callable_accepts_kwarg(
+    func: Any, kwarg: str, is_bound_method: bool
+) -> bool:
     try:
+        # Bind to a disposable receiver to preserve inspect's bound-method
+        # semantics without retaining the request's parser in the cache key.
+        if is_bound_method:
+            func = func.__get__(object())
         signature = inspect.signature(func)
     except (TypeError, ValueError):
         return False

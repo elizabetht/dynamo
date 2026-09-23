@@ -1,0 +1,460 @@
+{
+  "baseline_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "cpu_benchmark": {
+    "scope": "Warm real Python SGLang preprocessing CPU benchmark, no HTTP or generation",
+    "python": "3.11.15",
+    "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+    "cpu": "AMD Ryzen 7 6800H with Radeon Vega Mobile Gfx",
+    "jinja2": "3.1.6",
+    "pairs": 5,
+    "requests_per_pair_arm": 100,
+    "tokenizer": "Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca",
+    "source_sha256": {
+      "baseline": "744b981f594d189a191d4e11796a8a4999825ea67f2a7aecaee2986d48f8b614",
+      "candidate": "729b6f2d8535b25e99d3b67d912fa32075c62e97100185c0ba71abdec90d6edb"
+    },
+    "rows": [
+      {
+        "case": "plain",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            0.14106,
+            0.08977,
+            0.07804,
+            0.08887,
+            0.07594000000000001
+          ],
+          "candidate": [
+            0.1059,
+            0.08035,
+            0.08927,
+            0.07684,
+            0.08856
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            4382.066,
+            4589.747,
+            4527.621,
+            4614.213,
+            4510.809
+          ],
+          "candidate": [
+            4546.566,
+            4724.361,
+            4476.464,
+            4452.179,
+            4686.57
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            4556.25747,
+            4494.4256,
+            4478.90869,
+            4571.67682,
+            4465.03692
+          ],
+          "candidate": [
+            4492.7912,
+            4524.32012,
+            4545.2007699999995,
+            4535.54025,
+            4523.72818
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 4494.4256,
+          "candidate": 4524.32012
+        },
+        "reduction_percent": -0.6651466207383772,
+        "observable_sha256": "0de461a340763630bed2103c1fafb721ef90143f5959fa0395613bf9d1beec06"
+      },
+      {
+        "case": "text_parts",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            0.17423,
+            0.13966,
+            0.11351000000000001,
+            0.13525,
+            0.11041000000000001
+          ],
+          "candidate": [
+            0.14196,
+            0.11401,
+            0.13686,
+            0.11051,
+            0.13566
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            4432.902,
+            4232.666,
+            4225.442,
+            4624.152,
+            4556.184
+          ],
+          "candidate": [
+            4317.275,
+            4264.886,
+            4393.658,
+            4450.906,
+            4655.902
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            4481.0643,
+            4381.45535,
+            4535.74496,
+            4787.40949,
+            4652.19734
+          ],
+          "candidate": [
+            4425.93035,
+            4413.01734,
+            4576.2356,
+            4541.2066700000005,
+            4516.89783
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 4535.74496,
+          "candidate": 4516.89783
+        },
+        "reduction_percent": 0.4155244654672985,
+        "observable_sha256": "5b0591d51955a40a256749f0d437af6825132130acf52dee084bb11b404cc0ce"
+      },
+      {
+        "case": "json_schema",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            0.17222,
+            0.09969,
+            0.08887,
+            0.11331,
+            0.10209
+          ],
+          "candidate": [
+            0.10971,
+            0.09919,
+            0.08856,
+            0.08576,
+            0.10089000000000001
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            5980.555,
+            4477.086,
+            4500.169,
+            4368.25,
+            4164.847
+          ],
+          "candidate": [
+            4965.354,
+            4731.184,
+            5496.493,
+            4057.065,
+            4422.492
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            4452.01051,
+            4568.5836,
+            4689.8429,
+            4630.91875,
+            4574.77776
+          ],
+          "candidate": [
+            4520.147849999999,
+            4505.804529999999,
+            4484.3133,
+            4692.40483,
+            4556.33396
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 4574.77776,
+          "candidate": 4520.147849999999
+        },
+        "reduction_percent": 1.194154401939751,
+        "observable_sha256": "eb6414294762896b4e2004b408200f8a3345c3b706ccd0f27f037d09f0187b8f"
+      },
+      {
+        "case": "auto",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            19.1294,
+            16.26441,
+            17.26829,
+            18.18422,
+            15.966949999999999
+          ],
+          "candidate": [
+            3.32135,
+            3.53245,
+            4.38415,
+            3.62993,
+            3.64386
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            4828.446,
+            4853.454,
+            4848.374,
+            5045.525,
+            5003.265
+          ],
+          "candidate": [
+            5067.887,
+            5068.217,
+            4718.489,
+            4745.441,
+            5666.232
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            4874.55537,
+            4894.87263,
+            5021.2248,
+            5204.90667,
+            5209.73945
+          ],
+          "candidate": [
+            5007.53048,
+            4924.91469,
+            5210.11818,
+            5150.13259,
+            5097.13242
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 5021.2248,
+          "candidate": 5097.13242
+        },
+        "reduction_percent": -1.5117351447798244,
+        "observable_sha256": "1f9c690a23ad68b14218b8f72cc905cd7580209fa272e3e3b1d7488b1d13386a"
+      },
+      {
+        "case": "required",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            3.00185,
+            2.16127,
+            2.06719,
+            2.0621799999999997,
+            2.0846199999999997
+          ],
+          "candidate": [
+            6.36157,
+            2.40803,
+            2.33369,
+            2.3369999999999997,
+            2.4214599999999997
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            4650.822,
+            4593.955,
+            4611.809,
+            4785.696,
+            4806.786
+          ],
+          "candidate": [
+            4610.096,
+            4577.574,
+            4643.839,
+            4960.846,
+            4713.961
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            4930.93391,
+            4977.7500900000005,
+            4976.34817,
+            4984.35053,
+            4971.52729
+          ],
+          "candidate": [
+            4904.92192,
+            4882.72127,
+            4866.03456,
+            4760.4732,
+            4894.98304
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 4976.34817,
+          "candidate": 4882.72127
+        },
+        "reduction_percent": 1.8814378898251438,
+        "observable_sha256": "9cd8a5f525eca13317a7ccddc5c99afed768519dd703cb6b45155ac8cc846b67"
+      },
+      {
+        "case": "named",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            6.88967,
+            5.53371,
+            5.4921299999999995,
+            5.44866,
+            5.391649999999999
+          ],
+          "candidate": [
+            6.024539999999999,
+            5.86684,
+            5.6443200000000004,
+            5.52009,
+            5.61917
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            4989.72,
+            4829.318,
+            4817.837,
+            4868.943,
+            4674.436
+          ],
+          "candidate": [
+            5085.29,
+            4956.978,
+            5049.733,
+            4896.674,
+            4779.635
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            4995.42623,
+            4958.30109,
+            5074.59614,
+            4842.56381,
+            4976.6408
+          ],
+          "candidate": [
+            5008.57979,
+            5103.87493,
+            5106.10854,
+            4955.9782000000005,
+            4953.40607
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 4976.6408,
+          "candidate": 5008.57979
+        },
+        "reduction_percent": -0.641778084526412,
+        "observable_sha256": "3e31da642a5b3a3fe789110709c247a21768acc997d076d909348835d054dae5"
+      },
+      {
+        "case": "tools32",
+        "guidance_stage_samples_us_per_request": {
+          "baseline": [
+            31.34178,
+            18.61823,
+            18.29233,
+            19.11007,
+            18.46074
+          ],
+          "candidate": [
+            5.352480000000001,
+            5.12935,
+            5.5784,
+            5.449160000000001,
+            5.50646
+          ]
+        },
+        "first_samples_us": {
+          "baseline": [
+            7142.381,
+            7910.446,
+            8070.427,
+            8275.974,
+            8244.616
+          ],
+          "candidate": [
+            7741.849,
+            8032.446,
+            8104.052,
+            7559.376,
+            7279.659
+          ]
+        },
+        "samples_us_per_request": {
+          "baseline": [
+            7557.57782,
+            7666.539540000001,
+            7980.60596,
+            7649.3927300000005,
+            7543.3033700000005
+          ],
+          "candidate": [
+            9619.02865,
+            7583.64682,
+            7539.637290000001,
+            9550.14869,
+            7639.28221
+          ]
+        },
+        "median_us_per_request": {
+          "baseline": 7649.3927300000005,
+          "candidate": 7639.28221
+        },
+        "reduction_percent": 0.1321741523395481,
+        "observable_sha256": "cc8aaf242be08001cf86443a3d98d50d71b1d8d0e90bb92e6ca33f49ac85abe7"
+      }
+    ]
+  },
+  "native_http": {
+    "scope": "Native localhost HTTP with real Dynamo frontend/router, SGLang processor and cached tokenizer; scripted CPU worker, no model generation",
+    "requests_per_arm": 16,
+    "auto_tool_requests_per_arm": 8,
+    "prompt_and_guidance_identical_pairs": 16,
+    "baseline": {
+      "observed_guidance_parsers": 8,
+      "retained_guidance_parsers": 8
+    },
+    "candidate": {
+      "observed_guidance_parsers": 8,
+      "retained_guidance_parsers": 0
+    },
+    "corpus": "Responses allowed_tools auto/required, flat/namespaced tools, unary/SSE, token batches 1/7 and processor intervals 1/20, Unicode argument value",
+    "model_tokenizer": "Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca",
+    "sglang_source": "v0.5.19@0bcd822377da7b5718e674eaf9c870d349424dd1",
+    "limitation": "Scripted token replay does not qualify real generation. Native runtime reports nine tasks at interpreter exit; no lifecycle improvement claimed.",
+    "pair_sha256": [
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "b3d39ad164155d3da4ba2f0196544002bc94700f36a0b5c801c53379457972ff",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec",
+      "5d4f6ccf2455d21c1e4abc9656a6919800c438fbe6a4fcf380b9f314325618ec"
+    ]
+  },
+  "validation": {
+    "tests_passed": 320,
+    "tests_deselected": 1,
+    "deselection": "Existing byte-fallback tokenizer fixture is not cached offline",
+    "no_cluster_validation": true
+  }
+}
