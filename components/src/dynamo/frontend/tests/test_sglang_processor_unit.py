@@ -3493,6 +3493,48 @@ def test_generator_preserves_decode_and_routing_options(
     assert engine.requests[0]["routing"] == (worker_routing if pin_workers else None)
 
 
+@pytest.mark.parametrize("use_pool", [False, True], ids=["inline", "pool"])
+def test_generator_includes_requested_stop_string(tokenizer, monkeypatch, use_pool):
+    text = "Hi STOP tail"
+    ids = tokenizer.encode(text, add_special_tokens=False)
+    engine = FakeRoutedEngine(items=[{"token_ids": ids, "finish_reason": "length"}])
+    if use_pool:
+        monkeypatch.setattr(sglang_processor_module, "_w_tokenizer", tokenizer)
+        monkeypatch.setattr(sglang_processor_module, "_w_tool_call_parser_name", None)
+        monkeypatch.setattr(sglang_processor_module, "_w_reasoning_parser_name", None)
+        monkeypatch.setattr(
+            sglang_processor_module, "_w_exclude_tools_when_tool_choice_none", True
+        )
+        monkeypatch.setattr(
+            sglang_processor_module, "_w_template_force_reasoning", False
+        )
+        monkeypatch.setattr(sglang_processor_module, "_w_default_thinking_mode", None)
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": "Say hello."}],
+        "stop": ["STOP"],
+        "include_stop_str_in_output": True,
+    }
+    with ThreadPoolExecutor(max_workers=1) if use_pool else nullcontext() as pool:
+        processor = SglangProcessor(
+            tokenizer,
+            engine,
+            None,
+            None,
+            None,
+            preprocess_pool=pool,
+            preprocess_workers=1 if use_pool else 0,
+        )
+
+        async def collect():
+            return [item async for item in processor.generator(request)]
+
+        output = asyncio.run(collect())
+    choices = [c for item in output for c in item.get("data", {}).get("choices", [])]
+    assert "".join(c["delta"].get("content", "") for c in choices) == "Hi STOP"
+    assert [c["finish_reason"] for c in choices if c["finish_reason"]] == ["stop"]
+
+
 class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
     """Test safe-boundary incremental detokenization."""
 
@@ -4008,6 +4050,39 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
         assert final["delta"] == {}
         assert final["finish_reason"] == "stop"
         assert final["logprobs"] is None
+
+    def test_split_included_stop_string_retains_logprobs(self):
+        post = SglangStreamingPostProcessor(
+            tokenizer=self.ByteTokenizer(),
+            tool_call_parser=None,
+            reasoning_parser=None,
+            stop_strings={"END"},
+            include_stop_str_in_output=True,
+        )
+
+        first = post.process_output(
+            {
+                "token_ids": list(b"AEN"),
+                "finish_reason": None,
+                "log_probs": [-0.1, -0.2, -0.3],
+            }
+        )
+        final = post.process_output(
+            {
+                "token_ids": list(b"Dtail"),
+                "finish_reason": None,
+                "log_probs": [-0.4] * 5,
+            }
+        )
+
+        assert first is not None
+        assert first["delta"]["content"] == "A"
+        assert [entry["token"] for entry in first["logprobs"]["content"]] == ["A"]
+        assert final is not None
+        assert final["delta"] == {"content": "END"}
+        assert final["finish_reason"] == "stop"
+        assert [entry["token"] for entry in final["logprobs"]["content"]] == list("END")
+        assert post.process_output({"token_ids": list(b"more")}) is None
 
     def test_pending_stop_logprobs_are_flushed_without_match(self):
         post = SglangStreamingPostProcessor(

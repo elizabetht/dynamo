@@ -1044,6 +1044,7 @@ class SglangStreamingPostProcessor:
         eos_token_ids: list[int] | None = None,
         prompt_token_ids: list[int] | None = None,
         stop_strings: set[str] | None = None,
+        include_stop_str_in_output: bool = False,
         stop_token_ids: set[int] | None = None,
         skip_special_tokens: bool | None = None,
     ) -> None:
@@ -1075,6 +1076,7 @@ class SglangStreamingPostProcessor:
         self._eos_token_ids = set(eos_token_ids or [])
         self._request_stop_token_ids = set(stop_token_ids or [])
         self._stop_strings = stop_strings or set()
+        self._include_stop_str_in_output = include_stop_str_in_output
         self._pending_stop_text = ""
         self._locally_finished = False
         self._local_stop_reason: str | None = None
@@ -1369,13 +1371,16 @@ class SglangStreamingPostProcessor:
         match = self._find_stop_string(text, stop_reason)
         if match is not None:
             match_index, matched_stop_string = match
-            suppressed_text = text[match_index:]
+            visible_end = match_index
+            if self._include_stop_str_in_output:
+                visible_end += len(matched_stop_string)
+            suppressed_text = text[visible_end:]
             suppressed_count = self._trailing_logprobs_count(suppressed_text)
             if suppressed_count:
                 del self._pending_logprobs_content[-suppressed_count:]
             self._locally_finished = True
             self._local_stop_reason = matched_stop_string
-            return text[:match_index], True
+            return text[:visible_end], True
 
         if finish_reason or not text or not self._stop_strings:
             return text, False
