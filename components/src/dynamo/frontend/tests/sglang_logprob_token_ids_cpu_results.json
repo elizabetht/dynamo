@@ -1,0 +1,49 @@
+{
+  "scope": "CPU native HTTP with scripted worker, real SGLang option validation/metadata extraction and Qwen tokenizer; no inference",
+  "baseline_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "sglang_version": "v0.5.19",
+  "cases_per_revision": 64,
+  "corrected_token_id_pairs": 32,
+  "unchanged_text_mode_pairs": 32,
+  "content_and_finish_passed_per_revision": 64,
+  "corpus": [
+    "Hello world",
+    "中文😊"
+  ],
+  "shapes": [
+    "plain",
+    "guided_regex=.*"
+  ],
+  "streams": [
+    false,
+    true
+  ],
+  "worker_token_batches": [
+    1,
+    7
+  ],
+  "frontend_stream_intervals": [
+    1,
+    20
+  ],
+  "request_logprobs": true,
+  "request_top_logprobs": 0,
+  "example": {
+    "token_ids": [
+      9707,
+      1879
+    ],
+    "baseline_tokens": [
+      "Hello",
+      " world"
+    ],
+    "candidate_tokens": [
+      "token_id:9707",
+      "token_id:1879"
+    ]
+  },
+  "tests": "315 passed; 1 uncached TinyLlama tokenizer fixture deselected",
+  "performance": "No performance improvement has been measured",
+  "cluster_validation": "pending"
+}
