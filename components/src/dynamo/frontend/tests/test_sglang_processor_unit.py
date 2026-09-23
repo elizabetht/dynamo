@@ -4900,3 +4900,48 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.parametrize("raw_finish", ["cancelled", "eos", "length", None])
+@pytest.mark.parametrize("requested", [False, True])
+def test_processor_detailed_finish_reason(tokenizer, raw_finish, requested):
+    processor = SglangProcessor(
+        tokenizer=tokenizer,
+        routed_engine=FakeRoutedEngine(
+            [
+                {
+                    "token_ids": tokenizer.encode(
+                        "HelloENDignored" if raw_finish is None else "Hello",
+                        add_special_tokens=False,
+                    )
+                },
+                {"token_ids": [], "finish_reason": raw_finish or "length"},
+            ]
+        ),
+        tool_call_parser_name=None,
+        reasoning_parser_name=None,
+        eos_token_ids=None,
+    )
+    request = {
+        "model": "test-model",
+        "messages": [{"role": "user", "content": "Hello"}],
+        "stream": True,
+    }
+    if raw_finish is None:
+        request["stop"] = ["END"]
+    if requested:
+        request["nvext"] = {"extra_fields": ["detailed_finish_reason"]}
+
+    async def collect():
+        return [item async for item in processor.generator(request)]
+
+    chunks = [item["data"] for item in asyncio.run(collect()) if "data" in item]
+    details = [
+        chunk["nvext"]["detailed_finish_reason"]
+        for chunk in chunks
+        if "detailed_finish_reason" in chunk.get("nvext", {})
+    ]
+    assert details == ([raw_finish or "stop"] if requested else [])
+    assert chunks[-1]["choices"][0]["finish_reason"] == (
+        "length" if raw_finish == "length" else "stop"
+    )
