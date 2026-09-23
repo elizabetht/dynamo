@@ -4900,3 +4900,16 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.parametrize("bias", [{"32": 100.0, "33": -100.0}, {}, None])
+def test_build_dynamo_preproc_preserves_logit_bias(bias):
+    request = {"logit_bias": bias, "nvext": {"extra_fields": ["test"]}}
+    before = copy.deepcopy(request)
+    preproc = _build_dynamo_preproc(request, [1], "model", [2])
+    assert preproc["extra_args"]["nvext"] == {"extra_fields": ["test"]}
+    if bias is None:
+        assert "sampling_options" not in preproc["extra_args"]
+    else:
+        assert preproc["extra_args"]["sampling_options"] == {"logit_bias": bias}
+    assert request == before

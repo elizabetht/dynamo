@@ -2301,3 +2301,51 @@ async def test_supported_sampling_reaches_engine(mode, n):
     assert [output["index"] for output in outputs] == list(range(n))
     assert handler.engine.async_generate.await_args.kwargs["sampling_params"]["n"] == n
     assert all(output["finish_reason"] for output in outputs)
+
+
+@pytest.mark.parametrize("use_sglang_tokenizer", [False, True])
+@pytest.mark.parametrize("bias", [{"32": 100.0, "33": -100.0}, {}, None])
+def test_build_sampling_params_preserves_logit_bias(use_sglang_tokenizer, bias):
+    handler = _new_decode_handler(use_sglang_tokenizer=use_sglang_tokenizer)
+    request = (
+        {"logit_bias": bias}
+        if use_sglang_tokenizer
+        else {
+            "sampling_options": {"temperature": 0.25},
+            "extra_args": {"sampling_options": {"logit_bias": bias}},
+        }
+    )
+    before = deepcopy(request)
+    params = handler._build_sampling_params(request)
+    if bias is None:
+        assert "logit_bias" not in params
+    else:
+        assert params["logit_bias"] == bias
+    assert request == before
+
+
+@pytest.mark.asyncio
+async def test_prefill_forwards_logit_bias_to_engine():
+    from dynamo.health_check import HEALTH_CHECK_KEY
+
+    handler = PrefillWorkerHandler.__new__(PrefillWorkerHandler)
+    handler.bootstrap_host = "127.0.0.1"
+    handler.bootstrap_port = 1234
+    handler._generate_bootstrap_room = lambda: "room"
+    handler._get_input_param = lambda request: {"input_ids": request["token_ids"]}
+    handler.enable_trace = False
+    handler.engine = SimpleNamespace(async_generate=AsyncMock(return_value=_stream([])))
+    request = {
+        "token_ids": [1, 2],
+        "sampling_options": {"temperature": 0.25},
+        "extra_args": {"sampling_options": {"logit_bias": {"32": -100.0}}},
+        HEALTH_CHECK_KEY: True,
+    }
+    before = deepcopy(request)
+    async for _ in handler.generate(request, _Context()):
+        pass
+    params = handler.engine.async_generate.call_args.kwargs["sampling_params"]
+    assert params["logit_bias"] == {"32": -100.0}
+    assert params["max_new_tokens"] == 1
+    assert params["temperature"] == 0.25
+    assert request == before
