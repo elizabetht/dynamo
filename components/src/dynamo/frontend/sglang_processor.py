@@ -641,6 +641,7 @@ class SglangProcessor:
             eos_token_ids=self.eos_token_ids,
             prompt_token_ids=pre.prompt_token_ids,
             stop_strings=_request_stop_strings(request),
+            min_tokens=request.get("min_tokens") or 0,
             skip_special_tokens=request.get("skip_special_tokens"),
             stop_token_ids=set(_request_stop_token_ids(request)),
         )
@@ -705,6 +706,7 @@ class SglangProcessor:
             eos_token_ids=self.eos_token_ids,
             prompt_token_ids=preproc_result.prompt_token_ids,
             stop_strings=_request_stop_strings(request),
+            min_tokens=request.get("min_tokens") or 0,
             skip_special_tokens=request.get("skip_special_tokens"),
             stop_token_ids=set(_request_stop_token_ids(request)),
         )
