@@ -19,6 +19,7 @@ from dynamo.frontend.sglang_prepost import (
 pytestmark = [
     pytest.mark.unit,
     pytest.mark.sglang,
+    pytest.mark.core,
     pytest.mark.gpu_0,
     pytest.mark.pre_merge,
     pytest.mark.profiled_vram_gib(0),
@@ -96,3 +97,50 @@ def test_preprocess_feeds_normalized_chunks_to_template():
 
     assert 42 in result.prompt_token_ids
     assert [c["type"] for c in tok.seen] == ["text", "image"]
+
+
+def test_template_format_cache_tracks_template_text(monkeypatch):
+    from types import SimpleNamespace
+
+    import dynamo.frontend.sglang_prepost as prepost
+
+    detector = prepost.detect_jinja_template_content_format
+    detected = []
+
+    def record(template):
+        detected.append(template)
+        return detector(template)
+
+    monkeypatch.setattr(prepost, "detect_jinja_template_content_format", record)
+    prepost._cached_template_content_format.cache_clear()
+    string_template = "{% for message in messages %}{{ message.content }}{% endfor %}"
+    list_template = (
+        "{% for message in messages %}{% for item in message.content %}"
+        "{{ item.text }}{% endfor %}{% endfor %}"
+    )
+    tokenizer = SimpleNamespace(chat_template=string_template)
+    messages = [{"role": "user", "content": [{"type": "text", "text": "中文😊"}]}]
+    try:
+        for _ in range(2):
+            assert prepost._normalize_messages_for_template(messages, tokenizer) == [
+                {"role": "user", "content": "中文😊"}
+            ]
+        tokenizer.chat_template = list_template
+        assert prepost._normalize_messages_for_template(messages, tokenizer) == messages
+        tokenizer.chat_template = string_template
+        assert (
+            prepost._normalize_messages_for_template(messages, tokenizer)[0]["content"]
+            == "中文😊"
+        )
+        assert detected == [string_template, list_template]
+        assert messages[0]["content"] == [{"type": "text", "text": "中文😊"}]
+    finally:
+        prepost._cached_template_content_format.cache_clear()
+
+
+def test_unhashable_template_preserves_detector_fallback(tokenizer):
+    tokenizer.chat_template = {"default": "{{ messages }}"}
+    messages = [{"role": "user", "content": [{"type": "text", "text": "hello"}]}]
+    assert _normalize_messages_for_template(messages, tokenizer) == [
+        {"role": "user", "content": "hello"}
+    ]

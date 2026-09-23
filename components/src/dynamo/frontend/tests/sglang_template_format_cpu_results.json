@@ -1,0 +1,343 @@
+{
+  "scope": "Warm real Python SGLang preprocessing CPU benchmark, no HTTP or generation",
+  "python": "3.11.15",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "cpu": "AMD Ryzen 7 6800H with Radeon Vega Mobile Gfx",
+  "jinja2": "3.1.6",
+  "pairs": 5,
+  "requests_per_pair_arm": 40,
+  "tokenizer": "Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca",
+  "source_sha256": {
+    "baseline": "744b981f594d189a191d4e11796a8a4999825ea67f2a7aecaee2986d48f8b614",
+    "candidate": "bc2759c7a4611e10d61443a58db9af7c8c7b6fb8d716cf412db72be02a912e83"
+  },
+  "rows": [
+    {
+      "case": "plain",
+      "detector_cold_samples_us": {
+        "baseline": [
+          4565.381,
+          4715.134,
+          4464.672,
+          4414.197,
+          4658.967
+        ],
+        "candidate": [
+          4634.361,
+          4703.501,
+          4570.531,
+          4476.333,
+          4540.715
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          4517.279575,
+          4640.37825,
+          4442.670700000001,
+          4435.975850000001,
+          4522.052825000001
+        ],
+        "candidate": [
+          116.51477500000001,
+          105.67462499999999,
+          110.9831,
+          106.962025,
+          110.453125
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 4517.279575,
+        "candidate": 110.453125
+      },
+      "reduction_percent": 97.5548751595699,
+      "observable_sha256": "0de461a340763630bed2103c1fafb721ef90143f5959fa0395613bf9d1beec06"
+    },
+    {
+      "case": "text_parts",
+      "detector_cold_samples_us": {
+        "baseline": [
+          4372.629,
+          4528.552,
+          4609.795,
+          4699.684,
+          4426.42
+        ],
+        "candidate": [
+          4921.952,
+          4517.962,
+          4413.215,
+          4392.426,
+          4391.845
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          4473.03385,
+          4515.565625,
+          4518.9685,
+          4510.02895,
+          4461.349075
+        ],
+        "candidate": [
+          108.887175,
+          100.2995,
+          110.7186,
+          102.524675,
+          107.9256
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 4510.02895,
+        "candidate": 107.9256
+      },
+      "reduction_percent": 97.60698653608421,
+      "observable_sha256": "5b0591d51955a40a256749f0d437af6825132130acf52dee084bb11b404cc0ce"
+    },
+    {
+      "case": "json_schema",
+      "detector_cold_samples_us": {
+        "baseline": [
+          4356.037,
+          4425.138,
+          4595.267,
+          4457.478,
+          5039.624
+        ],
+        "candidate": [
+          4405.56,
+          4457.989,
+          4484.639,
+          4418.265,
+          4611.158
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          4520.654475,
+          4459.91915,
+          4467.597875,
+          4474.366125,
+          4506.0838
+        ],
+        "candidate": [
+          127.061375,
+          109.3548,
+          111.24135000000001,
+          104.652675,
+          111.954675
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 4474.366125,
+        "candidate": 111.24135000000001
+      },
+      "reduction_percent": 97.51380761224586,
+      "observable_sha256": "eb6414294762896b4e2004b408200f8a3345c3b706ccd0f27f037d09f0187b8f"
+    },
+    {
+      "case": "auto",
+      "detector_cold_samples_us": {
+        "baseline": [
+          4650.251,
+          4716.966,
+          4723.97,
+          4671.822,
+          4682.732
+        ],
+        "candidate": [
+          4642.496,
+          4619.002,
+          5198.382,
+          4932.181,
+          4752.283
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          4828.461975,
+          4952.337075,
+          5068.463575,
+          5033.241575,
+          5008.911525
+        ],
+        "candidate": [
+          392.21635000000003,
+          360.56152499999996,
+          387.85990000000004,
+          368.09794999999997,
+          372.9388
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 5008.911525,
+        "candidate": 372.9388
+      },
+      "reduction_percent": 92.5544941622821,
+      "observable_sha256": "1f9c690a23ad68b14218b8f72cc905cd7580209fa272e3e3b1d7488b1d13386a"
+    },
+    {
+      "case": "required",
+      "detector_cold_samples_us": {
+        "baseline": [
+          5099.537,
+          4742.855,
+          4882.639,
+          4999.949,
+          4778.132
+        ],
+        "candidate": [
+          5045.615,
+          4879.583,
+          4834.688,
+          5121.979,
+          4772.16
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          4882.594575,
+          4843.069675000001,
+          4805.0040500000005,
+          4806.2083250000005,
+          4925.7660750000005
+        ],
+        "candidate": [
+          336.11375,
+          332.46817500000003,
+          344.00210000000004,
+          334.784,
+          358.708775
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 4843.069675000001,
+        "candidate": 336.11375
+      },
+      "reduction_percent": 93.0599026535789,
+      "observable_sha256": "9cd8a5f525eca13317a7ccddc5c99afed768519dd703cb6b45155ac8cc846b67"
+    },
+    {
+      "case": "named",
+      "detector_cold_samples_us": {
+        "baseline": [
+          5199.454,
+          4861.959,
+          4906.784,
+          4844.887,
+          4737.004
+        ],
+        "candidate": [
+          5206.648,
+          4985.151,
+          4816.113,
+          4962.669,
+          5064.29
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          5064.960525,
+          5308.687425,
+          5267.664675,
+          5174.216375,
+          5274.036975
+        ],
+        "candidate": [
+          371.434,
+          389.346925,
+          354.95045,
+          503.508525,
+          353.0644
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 5267.664675,
+        "candidate": 371.434
+      },
+      "reduction_percent": 92.94879186667288,
+      "observable_sha256": "3e31da642a5b3a3fe789110709c247a21768acc997d076d909348835d054dae5"
+    },
+    {
+      "case": "tools32",
+      "detector_cold_samples_us": {
+        "baseline": [
+          8072.752,
+          7843.259,
+          7755.425,
+          7890.809,
+          8064.627
+        ],
+        "candidate": [
+          7743.953,
+          8936.317,
+          8975.761,
+          7744.414,
+          8279.571
+        ]
+      },
+      "samples_us_per_request": {
+        "baseline": [
+          7831.20245,
+          7848.636974999999,
+          8100.8929499999995,
+          7833.908,
+          12941.559225
+        ],
+        "candidate": [
+          3119.996125,
+          3043.8571,
+          3105.68995,
+          2978.9993,
+          2993.52815
+        ]
+      },
+      "median_us_per_request": {
+        "baseline": 7848.636974999999,
+        "candidate": 3043.8571
+      },
+      "reduction_percent": 61.218016456927536,
+      "observable_sha256": "cc8aaf242be08001cf86443a3d98d50d71b1d8d0e90bb92e6ca33f49ac85abe7"
+    }
+  ],
+  "dependencies": {
+    "sglang.srt.parser.jinja_template_utils": {
+      "sha256": "27759425d3b5856095de117e1c431645d4e61e548cec3517be8f237cf0de65be",
+      "version": null
+    },
+    "sglang.srt.function_call.hermes_detector": {
+      "sha256": "5dc30e64c7ccd453f3b5fc50be0321c3bb404dac3e689ad4cc384ab2c45de27c",
+      "version": null
+    },
+    "transformers": {
+      "sha256": "135ddabaeed9a78e2a40f5fd5ec948361b59650c96ce9222cba011826ee17632",
+      "version": "5.12.1"
+    },
+    "transformers.utils.chat_template_utils": {
+      "sha256": "a3e6d60fc0bbd250545f5796403a7911af1b62c36ef3e777b928c5b3abcae643",
+      "version": null
+    },
+    "jinja2": {
+      "sha256": "c717a93bd8bb0c7b2a910ae004476e2ed7e8cf6402b93ebf81b2f85d237585b5",
+      "version": "3.1.6"
+    },
+    "partial_json_parser": {
+      "sha256": "124630a74a07129628894aab76888a26726395cc5156c426db49756d74312ee2",
+      "version": null
+    },
+    "sglang.srt.entrypoints.openai.protocol": {
+      "sha256": "a7cf91c1db5d076b9ad647248351f10b0249153998b974ed4d00610306b01653",
+      "version": null
+    }
+  },
+  "sglang_source_commit": "0bcd822377da7b5718e674eaf9c870d349424dd1",
+  "baseline_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "http_correctness": {
+    "baseline_passed": 16,
+    "candidate_passed": 16,
+    "scope": "Native localhost HTTP, real tokenizer/parsers, scripted worker; no generation",
+    "prompt_guidance_pairs_equal": 16,
+    "candidate_cache_hits": 15,
+    "candidate_cache_misses": 1
+  }
+}

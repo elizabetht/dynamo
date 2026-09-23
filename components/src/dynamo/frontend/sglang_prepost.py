@@ -708,6 +708,11 @@ def _normalize_prompt_token_ids(prompt_token_ids: Any) -> list[int]:
     return list(ids)
 
 
+@lru_cache(maxsize=32)
+def _cached_template_content_format(chat_template: str) -> str:
+    return detect_jinja_template_content_format(chat_template)
+
+
 def _normalize_messages_for_template(
     messages: list[dict[str, Any]], tokenizer: Any
 ) -> list[dict[str, Any]]:
@@ -720,7 +725,11 @@ def _normalize_messages_for_template(
     step in sglang's own OpenAI server and dynamo's Rust default path.
     """
     chat_template = getattr(tokenizer, "chat_template", None) or ""
-    content_format = detect_jinja_template_content_format(chat_template)
+    content_format = (
+        _cached_template_content_format(chat_template)
+        if isinstance(chat_template, str)
+        else detect_jinja_template_content_format(chat_template)
+    )
     # The media-data side outputs are discarded: dynamo's separate
     # ``extract_mm_urls()`` channel is the source of truth for the worker.
     image_sink: list = []
