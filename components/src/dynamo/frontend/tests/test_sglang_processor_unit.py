@@ -698,7 +698,7 @@ class TestMapFinishReason:  # FRONTEND.5 — finish_reason remap (frontend layer
         assert _map_finish_reason("cancelled") == "stop"
 
     def test_content_filter(self):
-        assert _map_finish_reason("content_filter") == "stop"
+        assert _map_finish_reason("content_filter") == "content_filter"
 
     def test_unknown_passthrough(self):
         """Unknown reasons pass through unchanged."""
@@ -4900,3 +4900,62 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("finish_reason", ["content_filter", "stop", "length"])
+@pytest.mark.parametrize("use_tools", [False, True], ids=["plain", "tool"])
+async def test_generator_preserves_worker_content_filter(
+    tokenizer, finish_reason, use_tools
+):
+    text = (
+        '<tool_call>{"name":"get_weather","arguments":{"city":"Paris"}}</tool_call>'
+        if use_tools
+        else "Hello world."
+    )
+    engine = FakeRoutedEngine(
+        items=[
+            {
+                "token_ids": tokenizer.encode(text, add_special_tokens=False),
+                "finish_reason": None,
+            },
+            {"token_ids": [], "finish_reason": finish_reason},
+        ]
+    )
+    processor = SglangProcessor(
+        tokenizer, engine, "hermes", None, None, stream_interval=1
+    )
+    request = {"model": "test", "messages": [{"role": "user", "content": "Hello"}]}
+    if use_tools:
+        request.update(
+            tools=[
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "get_weather",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {"city": {"type": "string"}},
+                        },
+                    },
+                }
+            ],
+            tool_choice="auto",
+        )
+    chunks = [
+        item["data"] async for item in processor.generator(request) if "data" in item
+    ]
+    choices = [choice for chunk in chunks for choice in chunk["choices"]]
+    terminals = [choice for choice in choices if choice.get("finish_reason")]
+    expected = "tool_calls" if use_tools and finish_reason == "stop" else finish_reason
+    assert [choice["finish_reason"] for choice in terminals] == [expected]
+    if use_tools:
+        calls = [
+            call for choice in choices for call in choice["delta"].get("tool_calls", [])
+        ]
+        assert calls[-1]["function"]["name"] == "get_weather"
+        assert json.loads(
+            "".join(call["function"].get("arguments", "") for call in calls)
+        ) == {"city": "Paris"}
+    else:
+        assert "".join(choice["delta"].get("content", "") for choice in choices) == text
