@@ -415,6 +415,11 @@ def _validate_chat_completion_request(
 ) -> ChatCompletionRequest:
     if isinstance(request, ChatCompletionRequest):
         return request
+    stop = request.get("stop")
+    if isinstance(stop, list) and stop and all(type(token) is int for token in stop):
+        # Dynamo's integer stop form takes precedence over stop_token_ids.
+        # vLLM accepts only strings in stop, including on its validation fast path.
+        request = dict(request, stop=[], stop_token_ids=stop)
     if not SKIP_REQUEST_VALIDATION:
         return ChatCompletionRequest.model_validate(request)
 

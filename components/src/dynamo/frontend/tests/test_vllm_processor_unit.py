@@ -3538,3 +3538,32 @@ class TestReasoningTokenAccounting:
         usage = {"completion_tokens_details": {"reasoning_tokens": backend}}
         annotated = self._annotator(post).annotate(usage)
         assert annotated["completion_tokens_details"]["reasoning_tokens"] == 2
+
+
+@pytest.mark.parametrize("skip_validation", [False, True])
+def test_integer_stop_normalization(monkeypatch, skip_validation):
+    monkeypatch.setattr(prepost_module, "SKIP_REQUEST_VALIDATION", skip_validation)
+    request = {
+        "model": "test-model",
+        "messages": [{"role": "user", "content": "Hello"}],
+        "stop": [42, 43],
+        "stop_token_ids": [44],
+    }
+    normalized = prepost_module._validate_chat_completion_request(request)
+    assert normalized.stop == []
+    assert normalized.stop_token_ids == [42, 43]
+    assert request["stop"] == [42, 43]
+    assert request["stop_token_ids"] == [44]
+
+
+@pytest.mark.parametrize("stop", ["K", ["K"], []])
+def test_string_stop_preserves_explicit_token_ids(stop):
+    request = {
+        "model": "test-model",
+        "messages": [{"role": "user", "content": "Hello"}],
+        "stop": stop,
+        "stop_token_ids": [44],
+    }
+    normalized = prepost_module._validate_chat_completion_request(request)
+    assert normalized.stop == stop
+    assert normalized.stop_token_ids == [44]
