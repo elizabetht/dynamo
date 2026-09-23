@@ -3538,3 +3538,94 @@ class TestReasoningTokenAccounting:
         usage = {"completion_tokens_details": {"reasoning_tokens": backend}}
         annotated = self._annotator(post).annotate(usage)
         assert annotated["completion_tokens_details"]["reasoning_tokens"] == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("stream_response", [False, True])
+@pytest.mark.parametrize(
+    "with_tools, raw_reason, expected",
+    [
+        (False, "content_filter", "content_filter"),
+        (True, "content_filter", "content_filter"),
+        (True, "stop", "tool_calls"),
+        (True, "length", "length"),
+    ],
+)
+async def test_worker_content_filter_finish(
+    tokenizer, stream_response, with_tools, raw_reason, expected
+):
+    from vllm.sampling_params import RequestOutputKind
+    from vllm.tool_parsers.hermes_tool_parser import Hermes2ProToolParser
+    from vllm.v1.engine import EngineCoreRequest
+    from vllm.v1.engine.output_processor import OutputProcessor
+
+    from dynamo.frontend.vllm_processor import VllmProcessor
+
+    request = (
+        {**TOOL_REQUEST, "tool_choice": "auto"}
+        if with_tools
+        else {
+            "model": MODEL,
+            "messages": TOOL_REQUEST["messages"],
+        }
+    )
+    request["stream"] = stream_response
+    sampling = SamplingParams(max_tokens=128, output_kind=RequestOutputKind.DELTA)
+    prepared, _, _, _, _ = _prepare_request(
+        request,
+        tokenizer=tokenizer,
+        tool_parser_class=Hermes2ProToolParser if with_tools else None,
+        enable_auto_tool_choice=True,
+    )
+    post = StreamingPostProcessor(
+        tokenizer=tokenizer,
+        request_for_sampling=prepared,
+        sampling_params=sampling,
+        tool_parser=Hermes2ProToolParser(tokenizer) if with_tools else None,
+        prompt_token_ids=[1],
+        reasoning_parser_class=None,
+        chat_template_kwargs={},
+        stream_response=stream_response,
+    )
+    text = (
+        '<tool_call>\n{"name":"get_weather","arguments":{"city":"Paris"}}\n</tool_call>'
+        if with_tools
+        else "Hello"
+    )
+    ids = tokenizer.encode(text, add_special_tokens=False)
+    routed = _FakeRoutedEngine(
+        [
+            {"index": 0, "token_ids": ids[:-1], "finish_reason": None},
+            {"index": 0, "token_ids": ids[-1:], "finish_reason": raw_reason},
+        ]
+    )
+    processor = VllmProcessor.__new__(VllmProcessor)
+    processor.routed_engine = routed
+    processor.output_processor = OutputProcessor(
+        tokenizer, log_stats=False, stream_interval=1
+    )
+    core_request = EngineCoreRequest(
+        request_id="filtered-request",
+        external_req_id="filtered-request",
+        prompt_token_ids=[1],
+        mm_features=None,
+        sampling_params=sampling,
+        pooling_params=None,
+        arrival_time=0,
+        lora_request=None,
+        cache_salt=None,
+        data_parallel_rank=None,
+    )
+    chunks = [
+        item
+        async for item in processor._generate_and_stream(
+            "filtered-request", request, _base_preproc(), [1], core_request, {0: post}
+        )
+    ]
+    choices = [
+        choice for item in chunks for choice in item.get("data", {}).get("choices", [])
+    ]
+    assert [
+        choice["finish_reason"] for choice in choices if choice["finish_reason"]
+    ] == [expected]
+    assert not processor.output_processor.request_states
