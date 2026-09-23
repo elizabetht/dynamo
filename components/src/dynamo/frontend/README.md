@@ -41,9 +41,9 @@ Transformers 5.12.1, Jinja2 3.1.6, and an AMD Ryzen 7 6800H produced:
 The seven full-preprocessing workloads varied from a 1.51% slowdown to a 1.88%
 reduction; no reliable full-preprocessing improvement was established. Named and
 required guidance controls changed by less than 0.4 µs/request at stage scope.
-No serving performance improvement has been measured. Cluster validation is
-pending; TTFT, throughput, GPU memory, and real constraint enforcement were not
-measured. This candidate is independent of the separate template-format cache.
+No serving performance improvement has been measured. The CPU measurements above
+do not measure TTFT, throughput, GPU memory, or real constraint enforcement.
+This candidate is independent of the separate template-format cache.
 
 Reproduce in a CPU environment with the repository's SGLang dependencies and the
 cached `Qwen/Qwen3-0.6B` tokenizer revision
@@ -63,3 +63,60 @@ inspection; inspecting unbound signatures directly would mishandle the receiver.
 Two passes of in-context self-review covered those alternatives and the final
 diff; this was not independent review. Native replay reported nine runtime tasks
 at interpreter exit, so it provides no shutdown-lifecycle qualification.
+
+### Real-model Chat correctness
+
+[Generation evidence and reproduction files](tests/sglang_signature_cache_gpu_results.json)
+record 28 successful streamed requests: seven cases, one warmup and one retained
+observation per case in each arm. Plain chat, text parts, JSON schema,
+auto/required/named tools, and 32 tools all passed output/schema checks. All seven
+non-warmup output pairs and token counts matched. The first plain-chat warmup
+output differed, and four warmup cases had different cache usage; all remained
+valid. Prompt lengths ranged from 14 to 2,076 tokens; output was capped at 128 tokens.
+
+This used one allocated GPU, the pinned Qwen3-0.6B model/tokenizer above,
+bfloat16, temperature 0, seed 17, and the immutable SGLang 0.5.18 image recorded
+in the artifact. Both arms used the same worker sequentially. The artifact pins
+all source files loaded over that image: main common modules and processor,
+plus baseline or candidate preprocessing. It is compatibility validation of this
+source closure, not a current-main native build or SGLang 0.5.19 qualification.
+The older native image fails a separate Responses allowed-tools corpus in both
+arms; this Chat result does not clear that blocker. Auto-tool cases returned
+valid text without calls, so they exercise preprocessing but do not qualify
+auto-selected tool emission. Required/named choices emitted valid calls.
+
+To reconstruct the launch/client files from a checkout containing both
+recorded commits:
+
+```bash
+python - <<'PY'
+import hashlib, json, pathlib, subprocess
+artifact = json.loads(pathlib.Path("components/src/dynamo/frontend/tests/sglang_signature_cache_gpu_results.json").read_text())
+out = pathlib.Path("/tmp/signature-cache-repro")
+for name, text in artifact["reproduction_files"].items():
+    path = out / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text)
+for name, source in artifact["sources"].items():
+    data = subprocess.check_output(["git", "show", source["revision"] + ":" + source["path"]])
+    assert hashlib.sha256(data).hexdigest() == source["sha256"]
+    path = out / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+PY
+```
+
+Inside the recorded image with one allocated GPU and the pinned model cache
+mounted read-only at `/model-cache`, run
+`HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python /tmp/signature-cache-repro/generation.py`.
+Mount the reconstructed directory at that path. The script starts the real
+worker/frontend, validates streamed responses with JSON Schema, emits per-request
+evidence, and stops its own process groups. The measured Job had a
+900-second server-side deadline and a 4-GiB shared-memory volume. Use an isolated
+request plane and a bounded execution environment for reproduction.
+
+No serving performance improvement has been measured. One fixed-order pair with
+a shared worker/cache cannot establish a latency or throughput improvement.
+GPU-memory use and grammar compilation costs were not instrumented. Shutdown
+produced engine diagnostics after process-group termination, so this experiment
+does not qualify graceful shutdown behavior.
