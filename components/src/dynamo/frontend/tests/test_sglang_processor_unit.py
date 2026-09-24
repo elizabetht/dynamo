@@ -4967,3 +4967,45 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.parametrize("chunk_size", [1, 20, 1024])
+def test_json_array_recovers_later_complete_calls(tokenizer, chunk_size):
+    tools = convert_tools(
+        [
+            {
+                "type": "function",
+                "function": {
+                    "name": "weather",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"city": {"type": "string"}},
+                        "required": ["city"],
+                    },
+                },
+            }
+        ]
+    )
+    post = SglangStreamingPostProcessor(
+        tokenizer=tokenizer,
+        tool_call_parser=JsonArrayParser(),
+        reasoning_parser=None,
+        sglang_tools=tools,
+    )
+    text = '[{"name": "weather", "parameters": {"city": "Paris"}}, {"name": "weather", "parameters": {"city": "Rome"}}]'
+    tokens = tokenizer.encode(text, add_special_tokens=False)
+    for offset in range(0, len(tokens), chunk_size):
+        delta = post.process_output(
+            {"token_ids": tokens[offset : offset + chunk_size], "finish_reason": None}
+        )
+        assert delta is None or not delta["delta"].get("tool_calls")
+    final = post.process_output({"token_ids": [], "finish_reason": "stop"})
+    calls = final["delta"]["tool_calls"]
+    assert [call["index"] for call in calls] == [0, 1]
+    assert len({call["id"] for call in calls}) == 2
+    assert [call["function"]["name"] for call in calls] == ["weather", "weather"]
+    assert [json.loads(call["function"]["arguments"]) for call in calls] == [
+        {"city": "Paris"},
+        {"city": "Rome"},
+    ]
+    assert final["finish_reason"] == "tool_calls"
