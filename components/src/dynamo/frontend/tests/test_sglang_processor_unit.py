@@ -3503,6 +3503,10 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
             del skip_special_tokens
             return bytes(token_ids).decode("utf-8", errors="replace")
 
+        def encode(self, text, *, add_special_tokens):
+            assert not add_special_tokens
+            return list(text.encode("utf-8"))
+
     def test_basic_decode(self, tokenizer):
         """Tokens decode to expected text."""
         post = SglangStreamingPostProcessor(
@@ -4900,3 +4904,57 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.core
+@pytest.mark.parametrize("text", ["�", "A�", "��"])
+def test_literal_replacement_streams_before_finish(tokenizer, text):
+    post = SglangStreamingPostProcessor(
+        tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
+    )
+    ids = tokenizer.encode(text, add_special_tokens=False)
+    event = post.process_output({"token_ids": ids})
+    assert event is not None
+    assert event["delta"]["content"] == text
+    assert event["finish_reason"] is None
+    final = post.process_output({"token_ids": [], "finish_reason": "length"})
+    assert not final["delta"].get("content")
+
+
+@pytest.mark.core
+def test_incomplete_byte_before_literal_replacement(tokenizer):
+    post = SglangStreamingPostProcessor(
+        tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
+    )
+    ids = tokenizer.encode("있다", add_special_tokens=False)[:-1]
+    assert post.process_output({"token_ids": ids}) is None
+    literal_ids = tokenizer.encode("�", add_special_tokens=False)
+    event = post.process_output({"token_ids": literal_ids})
+    assert event is not None
+    assert event["delta"]["content"] == tokenizer.decode(ids + literal_ids)
+    final = post.process_output({"token_ids": [], "finish_reason": "length"})
+    assert not final["delta"].get("content")
+
+
+@pytest.mark.core
+@pytest.mark.parametrize("stop", ["�", "�END"])
+def test_literal_replacement_preserves_stop_buffering(tokenizer, stop):
+    post = SglangStreamingPostProcessor(
+        tokenizer=tokenizer,
+        tool_call_parser=None,
+        reasoning_parser=None,
+        stop_strings={stop},
+    )
+    first = post.process_output(
+        {"token_ids": tokenizer.encode("A�", add_special_tokens=False)}
+    )
+    assert first["delta"]["content"] == "A"
+    if stop == "�":
+        assert first["finish_reason"] == "stop"
+    else:
+        assert first["finish_reason"] is None
+        final = post.process_output(
+            {"token_ids": tokenizer.encode("END", add_special_tokens=False)}
+        )
+        assert final["finish_reason"] == "stop"
+        assert not final["delta"].get("content")

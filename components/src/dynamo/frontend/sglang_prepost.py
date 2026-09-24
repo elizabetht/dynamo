@@ -1169,8 +1169,17 @@ class SglangStreamingPostProcessor:
         )
         delta_text = decoded_text[len(context_text) :]
 
-        if not flush and (not delta_text or delta_text.endswith("\ufffd")):
-            return ""
+        if not flush:
+            if not delta_text:
+                return ""
+            if delta_text.endswith("\ufffd"):
+                last_id = self._pending_decode_ids[-1]
+                last_token = self._decode_ids([last_id])
+                # A complete literal replacement token cannot extend a UTF-8 sequence.
+                if not last_token.endswith("\ufffd") or self.tokenizer.encode(
+                    last_token, add_special_tokens=False
+                ) != [last_id]:
+                    return ""
 
         self._decode_context_ids = self._pending_decode_ids
         self._pending_decode_ids = []
