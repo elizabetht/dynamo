@@ -1,0 +1,162 @@
+[
+  {
+    "id": "04",
+    "request": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return exactly this JSON array of two weather calls, preserving both entries: [{\"name\":\"weather\",\"parameters\":{\"city\":\"Paris\"}},{\"name\":\"weather\",\"parameters\":{\"city\":\"Rome\"}}]. Do not omit either city."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "required",
+      "stream": false,
+      "max_tokens": 256,
+      "temperature": 0,
+      "seed": 17,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "parallel_tool_calls": false
+    }
+  },
+  {
+    "id": "05",
+    "request": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return exactly this JSON array of two weather calls, preserving both entries: [{\"name\":\"weather\",\"parameters\":{\"city\":\"Paris\"}},{\"name\":\"weather\",\"parameters\":{\"city\":\"Rome\"}}]. Do not omit either city."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "required",
+      "stream": true,
+      "max_tokens": 256,
+      "temperature": 0,
+      "seed": 17,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "parallel_tool_calls": false
+    }
+  },
+  {
+    "id": "06",
+    "request": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return exactly this JSON array of two weather calls, preserving both entries: [{\"name\":\"weather\",\"parameters\":{\"city\":\"Paris\"}},{\"name\":\"weather\",\"parameters\":{\"city\":\"Rome\"}}]. Do not omit either city."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "required",
+      "stream": false,
+      "max_tokens": 256,
+      "temperature": 0,
+      "seed": 17,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "parallel_tool_calls": true
+    }
+  },
+  {
+    "id": "07",
+    "request": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Return exactly this JSON array of two weather calls, preserving both entries: [{\"name\":\"weather\",\"parameters\":{\"city\":\"Paris\"}},{\"name\":\"weather\",\"parameters\":{\"city\":\"Rome\"}}]. Do not omit either city."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      ],
+      "tool_choice": "required",
+      "stream": true,
+      "max_tokens": 256,
+      "temperature": 0,
+      "seed": 17,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "parallel_tool_calls": true
+    }
+  }
+]

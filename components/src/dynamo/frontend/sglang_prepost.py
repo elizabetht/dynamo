@@ -1610,7 +1610,8 @@ class SglangStreamingPostProcessor:
             )
             should_reparse = False
             full_text = ""
-            if missing_names or missing_args:
+            # A complete first call does not prove that the JSON array is complete.
+            if self._is_json_array_parser or missing_names or missing_args:
                 full_text = "".join(self._tool_text_parts)
                 # Skip the re-parse when the accumulated text has no
                 # tool-call markers.  Avoids wasted `parse_non_stream`
