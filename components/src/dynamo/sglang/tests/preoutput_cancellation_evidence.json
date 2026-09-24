@@ -1,0 +1,81 @@
+{
+  "SPDX-FileCopyrightText": "Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.",
+  "SPDX-License-Identifier": "Apache-2.0",
+  "base_sha": "a76e12e6584f6029aeaa551c7cc8967671f67345",
+  "scope": "CPU native localhost HTTP through actual text handler; scripted engine; no model weights, scheduler or cluster",
+  "request": {
+    "n": 2,
+    "guided_regex": "[a-z]+",
+    "max_tokens": 128,
+    "stream": true
+  },
+  "samples_per_arm": 1,
+  "result": {
+    "baseline": {
+      "observations": [
+        {
+          "control": false,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": false,
+          "aborts": [],
+          "sampling_params": {
+            "n": 2,
+            "max_new_tokens": 128,
+            "stop_token_ids": [
+              151645
+            ],
+            "regex": "[a-z]+"
+          }
+        }
+      ],
+      "imports": {
+        "dynamo.sglang.request_handlers.llm.decode_handler": {
+          "module_file": "decode_handler.py",
+          "sha256": "80bcd589b420d07e379a5ffc4a99f7eecfbb3b58f65da9ca5d77fe641260b085"
+        },
+        "dynamo._core": {
+          "module_file": "_core.abi3.so",
+          "sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e"
+        }
+      }
+    },
+    "candidate": {
+      "observations": [
+        {
+          "control": false,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": [],
+          "sampling_params": {
+            "n": 2,
+            "max_new_tokens": 128,
+            "stop_token_ids": [
+              151645
+            ],
+            "regex": "[a-z]+"
+          }
+        }
+      ],
+      "imports": {
+        "dynamo.sglang.request_handlers.llm.decode_handler": {
+          "module_file": "decode_handler.py",
+          "sha256": "80bcd589b420d07e379a5ffc4a99f7eecfbb3b58f65da9ca5d77fe641260b085"
+        },
+        "dynamo._core": {
+          "module_file": "_core.abi3.so",
+          "sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e"
+        }
+      }
+    }
+  },
+  "tests": {
+    "command": "PYTHONPATH=components/src python -m pytest -q components/src/dynamo/sglang/tests/test_sglang_decode_cancellation.py",
+    "passed": 87
+  },
+  "limitations": [
+    "No scheduler/resource reclamation qualification",
+    "Native interpreter-exit task warning in both arms",
+    "No performance improvement has been measured",
+    "Cluster validation pending"
+  ]
+}
