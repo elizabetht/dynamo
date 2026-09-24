@@ -40,7 +40,7 @@ from dynamo.llm import (
 from dynamo.runtime import DistributedRuntime
 
 
-async def main(output):
+async def main(output, truncate=False, topk=False):
     output.mkdir(parents=True, exist_ok=True)
     model = snapshot_download(
         "Qwen/Qwen3-0.6B",
@@ -48,6 +48,11 @@ async def main(output):
         local_files_only=True,
     )
     tokenizer = AutoTokenizer.from_pretrained(model, local_files_only=True)
+
+    def output_ids(text):
+        ids = tokenizer.encode(text, add_special_tokens=False)
+        return ids[:-1] if truncate else ids
+
     cases = [
         (
             shape + "-" + str(as_ids),
@@ -58,23 +63,27 @@ async def main(output):
             {
                 **extra,
                 "logprobs": True,
-                "top_logprobs": 0,
+                "top_logprobs": int(topk),
                 "return_tokens_as_token_ids": as_ids,
             },
             batch,
             interval,
             streaming,
         )
-        for text in [
-            "Hello world",
-            "中文😊",
-            "\ufffd",
-            "A\ufffdB",
-            "\ufffd😊",
-            "😊\ufffd",
-            "있다",
-            "A있다B",
-        ]
+        for text in (
+            ["😊", "A😊", "있다", "ः�숗𐁩"]
+            if truncate
+            else [
+                "Hello world",
+                "中文😊",
+                "\ufffd",
+                "A\ufffdB",
+                "\ufffd😊",
+                "😊\ufffd",
+                "있다",
+                "A있다B",
+            ]
+        )
         for shape, extra in [("plain", {}), ("guided", {"guided_regex": ".*"})]
         for as_ids in [False]
         for batch in [1, 7]
@@ -90,9 +99,9 @@ async def main(output):
     async def worker(request, context):
         calls.append(request)
         assert build_sglang_logprob_kwargs(
-            request["output_options"], allow_top_logprobs=False
-        ) == {"return_logprob": True, "top_logprobs_num": 0}
-        ids = tokenizer.encode(active["text"], add_special_tokens=False)
+            request["output_options"], allow_top_logprobs=topk
+        ) == {"return_logprob": True, "top_logprobs_num": int(topk)}
+        ids = output_ids(active["text"])
         batch = active["batch"]
         try:
             for start in range(0, len(ids), batch):
@@ -100,10 +109,16 @@ async def main(output):
                     return
                 lp, top = extract_from_sglang_meta(
                     {
+                        "output_top_logprobs": [
+                            [(-0.5, tid, tokenizer.decode([tid]))]
+                            for tid in ids[start : start + batch]
+                        ]
+                        if topk
+                        else None,
                         "output_token_logprobs": [
                             (-0.5, tid, tokenizer.decode([tid]))
                             for tid in ids[start : start + batch]
-                        ]
+                        ],
                     },
                     return_tokens_as_token_ids=request["output_options"][
                         "return_tokens_as_token_ids"
@@ -142,6 +157,7 @@ async def main(output):
         os.environ,
         {
             "DYN_FILE_KV": discovery,
+            "DYN_SGL_ALLOW_TOP_LOGPROBS": "1" if topk else "0",
             "DYN_ROUTER_MIN_INITIAL_WORKERS": "1",
             "DYN_TCP_RPC_HOST": "127.0.0.1",
         },
@@ -248,16 +264,19 @@ async def main(output):
                         for c in choices
                         for entry in (c.get("logprobs") or {}).get("content", [])
                     ]
-                    expected_ids = tokenizer.encode(text, add_special_tokens=False)
+                    expected_ids = output_ids(text)
                     id_tokens = ["token_id:" + str(tid) for tid in expected_ids]
+                    expected = tokenizer.decode(expected_ids, skip_special_tokens=False)
                     row = {
                         "id_format_correct": [e["token"] for e in entries] == id_tokens
                         if extra["return_tokens_as_token_ids"]
                         else None,
                         "logprob_entries": entries,
                         "logprob_text": "".join(e["token"] for e in entries),
-                        "expected_text": text,
-                        "text_fidelity": "".join(e["token"] for e in entries) == text,
+                        "source_text": text,
+                        "expected_text": expected,
+                        "text_fidelity": "".join(e["token"] for e in entries)
+                        == expected,
                         "expected_id_tokens": id_tokens,
                         "case": name,
                         "batch": batch,
@@ -307,7 +326,7 @@ async def main(output):
                     indent=2,
                 )
             )
-    assert len(rows) == 128
+    assert len(rows) == len(cases)
     failed = [row for row in rows if not row["passed"]]
     assert not failed, failed
 
@@ -315,5 +334,13 @@ async def main(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--truncate",
+        action="store_true",
+        help="End output one token before the complete text",
+    )
+    parser.add_argument(
+        "--topk", action="store_true", help="Opt in to one top-logprob alternative"
+    )
     args = parser.parse_args()
-    asyncio.run(asyncio.wait_for(main(args.output), 240))
+    asyncio.run(asyncio.wait_for(main(args.output, args.truncate, args.topk), 240))

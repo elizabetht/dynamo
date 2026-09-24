@@ -4941,3 +4941,98 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.core
+class TestTerminalUnicodeLogprobs:
+    @pytest.mark.parametrize("separate_finish", [False, True])
+    @pytest.mark.parametrize("batch", [1, 7])
+    @pytest.mark.parametrize("text", ["있다", "ः�숗𐁩"])
+    def test_length_finish_preserves_pending_token_text(
+        self, tokenizer, text, batch, separate_finish
+    ):
+        ids = tokenizer.encode(text, add_special_tokens=False)[:-1]
+        post = SglangStreamingPostProcessor(
+            tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
+        )
+        events = []
+        for start in range(0, len(ids), batch):
+            part = ids[start : start + batch]
+            event = post.process_output(
+                {
+                    "token_ids": part,
+                    "log_probs": [-0.5] * len(part),
+                    "top_logprobs": [
+                        [{"token_id": tid, "logprob": -0.5}] for tid in part
+                    ],
+                    "finish_reason": "length"
+                    if not separate_finish and start + batch >= len(ids)
+                    else None,
+                }
+            )
+            if event:
+                events.append(copy.deepcopy(event))
+        if separate_finish:
+            event = post.process_output({"token_ids": [], "finish_reason": "length"})
+            if event:
+                events.append(copy.deepcopy(event))
+        entries = [
+            entry
+            for event in events
+            for entry in (event.get("logprobs") or {}).get("content", [])
+        ]
+        expected = tokenizer.decode(ids)
+        assert (
+            "".join(event["delta"].get("content", "") for event in events) == expected
+        )
+        assert "".join(entry["token"] for entry in entries) == expected
+        assert len(entries) == len(ids)
+        assert all(entry["logprob"] == -0.5 for entry in entries)
+        for entry in entries:
+            assert entry["bytes"] == (
+                list(entry["token"].encode("utf-8")) if entry["token"] else None
+            )
+            assert entry["top_logprobs"][0]["token"] == entry["token"]
+            assert entry["top_logprobs"][0]["bytes"] == entry["bytes"]
+
+    def test_unscored_tail_does_not_rewrite_scored_token(self, tokenizer):
+        ids = tokenizer.encode("𐀀있", add_special_tokens=False)[:-1]
+        post = SglangStreamingPostProcessor(
+            tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
+        )
+        events = []
+        for i, tid in enumerate(ids):
+            chunk = {"token_ids": [tid]}
+            if i == 0:
+                chunk["log_probs"] = [-0.5]
+            event = post.process_output(chunk)
+            if event:
+                events.append(copy.deepcopy(event))
+        event = post.process_output({"token_ids": [], "finish_reason": "length"})
+        if event:
+            events.append(copy.deepcopy(event))
+        entries = [
+            entry
+            for event in events
+            for entry in (event.get("logprobs") or {}).get("content", [])
+        ]
+        assert len(entries) == 1
+        assert entries[0]["token"] == ""
+        assert entries[0]["bytes"] is None
+
+    def test_terminal_replacement_stop_suppresses_logprobs(self, tokenizer):
+        post = SglangStreamingPostProcessor(
+            tokenizer=tokenizer,
+            tool_call_parser=None,
+            reasoning_parser=None,
+            stop_strings={"�"},
+        )
+        ids = tokenizer.encode("있다", add_special_tokens=False)[:-1]
+        assert (
+            post.process_output({"token_ids": ids, "log_probs": [-0.5] * len(ids)})
+            is None
+        )
+        event = post.process_output({"token_ids": [], "finish_reason": "length"})
+        assert event["finish_reason"] == "stop"
+        assert not event["delta"].get("content")
+        assert event["logprobs"] is None

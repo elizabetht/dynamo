@@ -1087,6 +1087,12 @@ class SglangStreamingPostProcessor:
         self._pending_decode_ids: list[int] = []
         self._logprob_context_ids: list[int] = []
         self._pending_logprobs_content: list[dict[str, Any]] = []
+        # Keep completed token boundaries separate from unresolved byte fragments.
+        self._logprob_complete_ids: list[int] = []
+        self._logprob_pending_ids: list[int] = []
+        self._terminal_logprob: tuple[
+            dict[str, Any], list[dict[str, Any]]
+        ] | None = None
         self._has_emitted_role: bool = False
         # Tool call accumulation.  SGLang's streaming parser returns
         # deltas (name in one chunk, argument fragments across subsequent
@@ -1189,6 +1195,7 @@ class SglangStreamingPostProcessor:
         for index, (token_id, logprob) in enumerate(zip(token_ids, log_probs)):
             context_token_ids = (self._logprob_context_ids + token_ids[:index])[-4:]
             token = self._decode_logprob_token(token_id, None, context_token_ids)
+            self._logprob_pending_ids.append(token_id)
             candidates = top_logprobs[index] if top_logprobs else []
             openai_top_logprobs = []
             for candidate in candidates:
@@ -1219,6 +1226,11 @@ class SglangStreamingPostProcessor:
                     "top_logprobs": openai_top_logprobs,
                 }
             )
+
+            self._terminal_logprob = (content[-1], candidates)
+            if token:
+                self._logprob_complete_ids = self._logprob_pending_ids
+                self._logprob_pending_ids = []
 
         return {"content": content, "refusal": None} if content else None
 
@@ -1314,6 +1326,7 @@ class SglangStreamingPostProcessor:
             self._pending_logprobs_content = []
         if not content:
             return None
+        self._terminal_logprob = None
         return {"content": content, "refusal": None}
 
     @property
@@ -1478,12 +1491,45 @@ class SglangStreamingPostProcessor:
             else ""
         )
         openai_logprobs = None
+        if token_ids:
+            self._terminal_logprob = None
+            if log_probs is None or len(log_probs) != len(token_ids):
+                self._logprob_complete_ids = []
+                self._logprob_pending_ids = []
         if log_probs is not None:
             openai_logprobs = self._build_openai_logprobs(
                 log_probs, top_logprobs, token_ids
             )
             if openai_logprobs is not None:
                 self._pending_logprobs_content.extend(openai_logprobs["content"])
+        if finish_reason == "length" and self._terminal_logprob is not None:
+            entry, candidates = self._terminal_logprob
+            if not entry["token"] and self._logprob_pending_ids:
+                context = self._logprob_complete_ids
+                prefix = self.tokenizer.decode(context, skip_special_tokens=False)
+                decoded = self.tokenizer.decode(
+                    context + self._logprob_pending_ids, skip_special_tokens=False
+                )
+                if decoded.startswith(prefix):
+                    token = decoded[len(prefix) :]
+                    entry["token"] = token
+                    entry["bytes"] = list(token.encode("utf-8")) if token else None
+                for alternative, raw in zip(entry["top_logprobs"], candidates):
+                    if not alternative["token"] and raw.get("token_id") is not None:
+                        decoded = self.tokenizer.decode(
+                            context
+                            + self._logprob_pending_ids[:-1]
+                            + [raw["token_id"]],
+                            skip_special_tokens=False,
+                        )
+                        if decoded.startswith(prefix):
+                            token = decoded[len(prefix) :]
+                            alternative["token"] = token
+                            if raw.get("bytes") is None:
+                                alternative["bytes"] = (
+                                    list(token.encode("utf-8")) if token else None
+                                )
+            self._terminal_logprob = None
         self._logprob_context_ids = (self._logprob_context_ids + token_ids)[-4:]
         delta_text, locally_finished = self._filter_stop_string_delta(
             delta_text, finish_reason, stop_reason
