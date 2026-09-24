@@ -4967,3 +4967,90 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.parametrize(
+    "flags, expected_add, expected_continue",
+    [
+        ({}, True, False),
+        ({"add_generation_prompt": False}, False, False),
+        ({"add_generation_prompt": False, "continue_final_message": True}, False, True),
+        (
+            {
+                "add_generation_prompt": False,
+                "continue_final_message": True,
+                "chat_template_kwargs": {
+                    "add_generation_prompt": True,
+                    "continue_final_message": False,
+                },
+            },
+            False,
+            True,
+        ),
+        ({"chat_template_kwargs": {"add_generation_prompt": False}}, False, False),
+    ],
+)
+@pytest.mark.parametrize("guided", [False, True])
+def test_chat_generation_controls(
+    tokenizer, flags, expected_add, expected_continue, guided
+):
+    request = {
+        "model": MODEL,
+        "messages": [
+            {"role": "user", "content": "Return JSON"},
+            {"role": "assistant", "content": '{"city": "'},
+        ],
+        **flags,
+    }
+    if guided:
+        request["response_format"] = {"type": "json_object"}
+    original = copy.deepcopy(request)
+    result = preprocess_chat_request(
+        request,
+        tokenizer=tokenizer,
+        tool_call_parser_name=None,
+        reasoning_parser_name=None,
+    )
+    expected = tokenizer.apply_chat_template(
+        request["messages"],
+        tokenize=True,
+        add_generation_prompt=expected_add,
+        continue_final_message=expected_continue,
+    )
+    assert result.prompt_token_ids == _normalize_prompt_token_ids(expected)
+    assert request == original
+    if guided:
+        assert result.guided_decoding == {"json": {"type": "object"}}
+
+
+@pytest.mark.parametrize("nested_key", ["chat_template_kwargs", "chat_template_args"])
+@pytest.mark.parametrize("override", [None, False])
+def test_nested_continuation_conflict(tokenizer, nested_key, override):
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "assistant", "content": '{"city": "'}],
+        nested_key: {"add_generation_prompt": True, "continue_final_message": True},
+    }
+    if override is False:
+        request["add_generation_prompt"] = False
+        result = preprocess_chat_request(
+            request,
+            tokenizer=tokenizer,
+            tool_call_parser_name=None,
+            reasoning_parser_name=None,
+        )
+        expected = tokenizer.apply_chat_template(
+            request["messages"],
+            tokenize=True,
+            add_generation_prompt=False,
+            continue_final_message=True,
+        )
+        assert result.prompt_token_ids == _normalize_prompt_token_ids(expected)
+    else:
+        with pytest.raises(PreprocessError, match="Cannot set both"):
+            preprocess_chat_request(
+                request,
+                tokenizer=tokenizer,
+                tool_call_parser_name=None,
+                reasoning_parser_name=None,
+            )
