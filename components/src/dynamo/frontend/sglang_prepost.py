@@ -861,26 +861,21 @@ def preprocess_chat_request(
         force_reasoning=force_reasoning,
     )
     response_format_guided_decoding = build_response_format_guided_decoding(request)
-    tool_call_guided_decoding = build_tool_call_guided_decoding(
-        request,
-        tool_call_parser_name=tool_call_parser_name,
-        sglang_tools=sglang_tools,
-    )
-    # This path also never reads the legacy guided_json / guided_regex /
-    # guided_grammar / guided_choice fields at all, so those are dropped silently
-    # while both other paths honor them (and reject them against a forced choice).
+    tool_call_guided_decoding = None
+    if forced_tool_choice or not (legacy_guidance or response_format_guided_decoding):
+        tool_call_guided_decoding = build_tool_call_guided_decoding(
+            request,
+            tool_call_parser_name=tool_call_parser_name,
+            sglang_tools=sglang_tools,
+        )
     if (
-        response_format_guided_decoding is not None
+        forced_tool_choice
+        and response_format_guided_decoding is not None
         and tool_call_guided_decoding is not None
     ):
-        if forced_tool_choice:
-            logger.warning(
-                "response_format guided decoding will be ignored because tool_choice is forced."
-            )
-        else:
-            logger.warning(
-                "Tool-call guided decoding will be ignored because response_format already exists."
-            )
+        logger.warning(
+            "response_format guided decoding will be ignored because tool_choice is forced."
+        )
 
     # A forced tool choice and a legacy guided_* constrain the same token stream,
     # so honoring the guided_* would drop the tool constraint while the forced-tool
