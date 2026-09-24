@@ -1085,6 +1085,7 @@ class SglangStreamingPostProcessor:
         # incomplete byte-fallback sequence.
         self._decode_context_ids = list((prompt_token_ids or [])[-5:])
         self._pending_decode_ids: list[int] = []
+        self._literal_replacement_tokens: dict[int, bool] = {}
         self._logprob_context_ids: list[int] = []
         self._pending_logprobs_content: list[dict[str, Any]] = []
         self._has_emitted_role: bool = False
@@ -1174,11 +1175,18 @@ class SglangStreamingPostProcessor:
                 return ""
             if delta_text.endswith("\ufffd"):
                 last_id = self._pending_decode_ids[-1]
-                last_token = self._decode_ids([last_id])
-                # A complete literal replacement token cannot extend a UTF-8 sequence.
-                if not last_token.endswith("\ufffd") or self.tokenizer.encode(
-                    last_token, add_special_tokens=False
-                ) != [last_id]:
+                is_literal = self._literal_replacement_tokens.get(last_id)
+                if is_literal is None:
+                    last_token = self._decode_ids([last_id])
+                    # A complete literal token cannot extend a UTF-8 sequence.
+                    is_literal = last_token.endswith("\ufffd")
+                    if is_literal:
+                        encoded = self.tokenizer.encode(
+                            last_token, add_special_tokens=False
+                        )
+                        is_literal = encoded == [last_id]
+                    self._literal_replacement_tokens[last_id] = is_literal
+                if not is_literal:
                     return ""
 
         self._decode_context_ids = self._pending_decode_ids

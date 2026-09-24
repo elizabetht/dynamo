@@ -4958,3 +4958,33 @@ def test_literal_replacement_preserves_stop_buffering(tokenizer, stop):
         )
         assert final["finish_reason"] == "stop"
         assert not final["delta"].get("content")
+
+
+@pytest.mark.core
+@pytest.mark.parametrize("text", ["�", "있다"])
+def test_repeated_unicode_classification_is_request_local(tokenizer, monkeypatch, text):
+    ids = tokenizer.encode(text, add_special_tokens=False)
+    encode = tokenizer.encode
+    calls = []
+
+    def counted_encode(*args, **kwargs):
+        calls.append(args[0])
+        return encode(*args, **kwargs)
+
+    monkeypatch.setattr(tokenizer, "encode", counted_encode)
+    for request in range(2):
+        post = SglangStreamingPostProcessor(
+            tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
+        )
+        events = []
+        for token_id in ids * 8:
+            event = post.process_output({"token_ids": [token_id]})
+            if event is not None:
+                events.append(event)
+        final = post.process_output({"token_ids": [], "finish_reason": "length"})
+        events.append(final)
+        assert (
+            "".join(event["delta"].get("content", "") for event in events) == text * 8
+        )
+        assert final["finish_reason"] == "length"
+        assert len(calls) == request + 1
