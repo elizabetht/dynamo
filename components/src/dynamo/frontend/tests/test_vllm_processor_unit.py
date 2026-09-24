@@ -3538,3 +3538,52 @@ class TestReasoningTokenAccounting:
         usage = {"completion_tokens_details": {"reasoning_tokens": backend}}
         annotated = self._annotator(post).annotate(usage)
         assert annotated["completion_tokens_details"]["reasoning_tokens"] == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("parser_kind", ["tool", "reasoning"])
+async def test_nested_parser_rewrite_keeps_parser_guidance(tokenizer, parser_kind):
+    class MutatingGuidance:
+        def adjust_request(self, request):
+            schema = request.response_format.json_schema.json_schema
+            schema["properties"]["answer"]["type"] = "integer"
+            request.structured_outputs = StructuredOutputsParams(json=schema)
+            request.response_format = None
+            return request
+
+    class MutatingToolParser(MutatingGuidance, _FakePassthroughToolParser):
+        pass
+
+    class MutatingReasoningParser(MutatingGuidance, _FakeStructuralTagReasoningParser):
+        pass
+
+    result = await prepost_module.preprocess_chat_request(
+        {
+            **TOOL_REQUEST,
+            "tool_choice": "required",
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "result",
+                    "schema": {
+                        "type": "object",
+                        "properties": {"answer": {"type": "string"}},
+                    },
+                },
+            },
+        },
+        tokenizer=tokenizer,
+        renderer=SimpleNamespace(
+            render_messages_async=AsyncMock(
+                return_value=(None, {"prompt_token_ids": [1]})
+            )
+        ),
+        tool_parser_class=MutatingToolParser if parser_kind == "tool" else None,
+        reasoning_parser_class=(
+            MutatingReasoningParser if parser_kind == "reasoning" else None
+        ),
+    )
+    assert result.guided_decoding == {
+        "json": {"type": "object", "properties": {"answer": {"type": "integer"}}}
+    }
+    assert not result.uses_dynamo_json_tool_call_fallback
