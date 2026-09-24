@@ -39,8 +39,8 @@ median improved; per-pair values and variability are in the
 [measurement summary](tests/sglang_template_format_evidence.json), with
 [raw nanosecond timings](tests/sglang_template_format_timings.csv).
 The host was not isolated; these numbers describe this CPU component and corpus.
-**No end-to-end serving performance improvement has been measured. Cluster
-validation is pending.** First use and eviction still require detection; media
+**No end-to-end serving performance improvement has been measured.** First use
+and eviction still require detection; media
 keyword templates already have a fast path and may benefit less.
 
 The small cache avoids adding template snapshots and invalidation plumbing to
@@ -78,4 +78,53 @@ qualify model generation. Both HTTP arms reuse native bindings built from
 `70e094f650ab89eb81d359825adcb78fc9256aba`, rather than a fresh main build.
 Native HTTP shutdown reported remaining runtime tasks
 at interpreter exit. Review was two-pass in-context self-review, not independent
-review; full CI and GPU qualification remain pending.
+review; full CI remains unqualified. The GPU check below is separate evidence.
+
+### GPU correctness check
+
+A one-GPU GB10 run on ARM64 passed all 28 streamed requests: seven cases,
+one warmup and one checked request per case in each baseline/candidate arm.
+The cases cover ordinary text, text parts with Unicode, JSON response format,
+automatic/required/named tools and 32 automatic tools. JSON outputs and tool
+arguments passed schema validation; forced choices produced the requested calls.
+The real frontend and SGLang worker used file discovery and TCP transport.
+
+The code candidate was `69fbda519e376be60ec6ffd3bca8c4f3603054c7`, compared
+with the same baseline above. Both arms used the September 23 native runtime
+at `517572309e761a3b246690f26de2630cafc392a1`, with exact Python frontend
+source paths and hashes checked at launch. Model weights and tokenizer matched
+the Qwen3-0.6B revision above. The
+[GPU evidence](tests/sglang_template_generation_evidence.json) records the
+immutable ARM64 image, weight hash, package versions and every case result.
+This is one sequential correctness pair, not a serving performance measurement.
+The worker emitted detokenizer SIGTERM/SIGQUIT diagnostics during shutdown;
+the owned Job and Pods were verified absent afterward. Cancellation, other
+models and disaggregated serving remain unqualified.
+
+To reproduce on an isolated GPU using the recorded runtime and SGLang version,
+set `MODEL_PATH` to that model snapshot and `PYTHONPATH` to the selected checkout's
+`components/src`. Keep the worker source unchanged between arms. Run the following
+worker and frontend in separate terminals with the same temporary `DYN_FILE_KV`
+directory and request namespace:
+
+```bash
+python -m dynamo.sglang --namespace template-check --discovery-backend file \
+  --request-plane tcp --event-plane zmq --model-path "$MODEL_PATH" \
+  --served-model-name Qwen/Qwen3-0.6B --dtype bfloat16 --context-length 4096 \
+  --mem-fraction-static 0.35 --disable-cuda-graph --device cuda
+python -m dynamo.frontend --namespace template-check --discovery-backend file \
+  --request-plane tcp --event-plane zmq --http-port 8000 \
+  --dyn-chat-processor sglang --tool-call-parser qwen25 \
+  --reasoning-parser qwen3 --router-mode round-robin
+```
+
+Once `/v1/models` lists the model, run the recorded correctness client from this
+checkout. Restart the frontend with the other arm's source and repeat with
+`--arm candidate`; preserve the same worker and settings:
+
+```bash
+python components/src/dynamo/frontend/tests/reproduce_sglang_template_generation.py \
+  --url http://127.0.0.1:8000 --model Qwen/Qwen3-0.6B \
+  --corpus components/src/dynamo/frontend/tests/sglang_template_generation_corpus.json \
+  --arm baseline --pair 1 --repetitions 1 --output baseline-results.json
+```
