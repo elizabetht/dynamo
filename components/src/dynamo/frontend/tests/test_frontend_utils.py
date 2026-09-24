@@ -8,6 +8,7 @@ import pytest
 from dynamo.frontend.utils import (
     backend_invalid_argument_to_http_error,
     handle_engine_error,
+    legacy_guided_decoding,
     make_backend_error,
     make_internal_error,
     resolve_chat_template,
@@ -74,6 +75,33 @@ class TestValidateLegacyGuidedDecodingConstraints:
         # caller who believes it constrained the output.
         with pytest.raises(InvalidArgument, match="guided_choice must be a list"):
             validate_legacy_guided_decoding_constraints({"guided_choice": choice})
+
+    @pytest.mark.parametrize("element", [None, True, 1, 1.5, {}, [], ["nested"]])
+    @pytest.mark.parametrize("position", [0, 1])
+    def test_non_string_choice_element_is_rejected(self, element, position):
+        choice = ["valid"]
+        choice.insert(position, element)
+        with pytest.raises(
+            InvalidArgument,
+            match=f"guided_choice must be a list of strings; element {position} has type",
+        ):
+            legacy_guided_decoding({"guided_choice": choice})
+
+    @pytest.mark.parametrize("choice", [["yes", "no"], [""], ["é", "你好"], ["x", "x"]])
+    def test_string_choices_are_preserved(self, choice):
+        request = {"guided_choice": choice, "guided_whitespace_pattern": ""}
+        assert legacy_guided_decoding(request) == {
+            "choice": choice,
+            "whitespace_pattern": "",
+        }
+        assert request == {"guided_choice": choice, "guided_whitespace_pattern": ""}
+
+    @pytest.mark.parametrize("choice", [None, []])
+    def test_inactive_choice_preserves_other_constraint(self, choice):
+        assert legacy_guided_decoding({"guided_choice": choice}) is None
+        assert legacy_guided_decoding(
+            {"guided_choice": choice, "guided_regex": "a+"}
+        ) == {"regex": "a+"}
 
     def test_empty_string_message_uses_fallback(self):
         resp = {"status": "error", "message": ""}
