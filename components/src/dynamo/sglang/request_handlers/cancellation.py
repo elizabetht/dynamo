@@ -112,6 +112,7 @@ class CancellationMixin:
         drain_deadline: float | None = None
         while True:
             next_item = asyncio.create_task(_next_stream_item(iterator))
+            is_consumed = False
             try:
                 if drain_deadline is None:
                     done, _ = await asyncio.wait(
@@ -126,6 +127,7 @@ class CancellationMixin:
                         )
                     if next_item in done:
                         try:
+                            is_consumed = True
                             yield next_item.result()
                         except StopAsyncIteration:
                             return
@@ -145,12 +147,15 @@ class CancellationMixin:
                     )
                     return
                 try:
+                    is_consumed = True
                     yield next_item.result()
                 except StopAsyncIteration:
                     return
             finally:
                 if not next_item.done():
                     _cancel_and_detach(next_item)
+                elif not is_consumed:
+                    _consume_detached_task(next_item)
 
     @asynccontextmanager
     async def _wait_for_signal(self, context: Context) -> AsyncGenerator[bool, None]:
