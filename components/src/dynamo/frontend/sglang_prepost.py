@@ -525,6 +525,14 @@ def _render_deepseek_v4_prompt_token_ids(
             if isinstance(fn, dict) and isinstance(fn.get("arguments"), (dict, list)):
                 fn["arguments"] = json.dumps(fn["arguments"], ensure_ascii=False)
 
+    assistant_prefix = None
+    if (
+        request.get("continue_final_message")
+        and encoding_messages
+        and encoding_messages[-1].get("role") == "assistant"
+    ):
+        assistant_prefix = encoding_messages.pop()["content"]
+
     if template_tools:
         if not encoding_messages or encoding_messages[0].get("role") != "system":
             encoding_messages.insert(0, {"role": "system", "content": ""})
@@ -547,7 +555,16 @@ def _render_deepseek_v4_prompt_token_ids(
         thinking_mode=thinking_mode,
         reasoning_effort=reasoning_effort,
     )
-    return _normalize_prompt_token_ids(tokenizer.encode(prompt))
+    prompt_token_ids = _normalize_prompt_token_ids(tokenizer.encode(prompt))
+    if assistant_prefix:
+        # Match SGLang's prefix tokenization without inserting a second BOS.
+        prefix_token_ids = _normalize_prompt_token_ids(
+            tokenizer.encode(assistant_prefix)
+        )
+        if prefix_token_ids and prefix_token_ids[0] == tokenizer.bos_token_id:
+            prefix_token_ids = prefix_token_ids[1:]
+        prompt_token_ids.extend(prefix_token_ids)
+    return prompt_token_ids
 
 
 @lru_cache(maxsize=64)
