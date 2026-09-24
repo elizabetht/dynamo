@@ -4967,3 +4967,77 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.fixture
+def deepseek_encoder():
+    return pytest.importorskip(
+        "sglang.srt.entrypoints.openai.encoding_dsv4"
+    ).encode_messages
+
+
+@pytest.mark.parametrize("thinking", [False, True])
+@pytest.mark.parametrize(
+    "prefix", ['{"city": "東京', "", [{"type": "text", "text": "prefix"}]]
+)
+def test_deepseek_v4_continues_assistant_prefix(
+    tokenizer, deepseek_encoder, thinking, prefix
+):
+    request = {
+        "model": "deepseek-ai/DeepSeek-V4-Flash",
+        "messages": [
+            {"role": "user", "content": "Return JSON"},
+            {"role": "assistant", "content": prefix},
+        ],
+        "continue_final_message": True,
+        "add_generation_prompt": False,
+        "chat_template_kwargs": {"thinking": thinking},
+        "response_format": {"type": "json_object"},
+    }
+    before = copy.deepcopy(request)
+    encoder_tokenizer = copy.deepcopy(tokenizer)
+    encoder_tokenizer.chat_template = None
+    result = preprocess_chat_request(
+        request,
+        tokenizer=encoder_tokenizer,
+        tool_call_parser_name=None,
+        reasoning_parser_name=None,
+    )
+    prompt = deepseek_encoder(
+        request["messages"][:-1], thinking_mode="thinking" if thinking else "chat"
+    )
+    expected = encoder_tokenizer.encode(prompt)
+    suffix = encoder_tokenizer.encode(_flatten_message_content(prefix))
+    if suffix and suffix[0] == encoder_tokenizer.bos_token_id:
+        suffix = suffix[1:]
+    assert result.prompt_token_ids == expected + suffix
+    assert result.guided_decoding == {"json": {"type": "object"}}
+    assert request == before
+
+
+@pytest.mark.parametrize(
+    "continuation,last_role", [(False, "assistant"), (True, "user")]
+)
+def test_deepseek_v4_preserves_non_prefix_messages(
+    tokenizer, deepseek_encoder, continuation, last_role
+):
+    messages = [
+        {"role": "user", "content": "Hello"},
+        {"role": last_role, "content": "World"},
+    ]
+    request = {
+        "model": "deepseek-ai/DeepSeek-V4-Flash",
+        "messages": messages,
+        "continue_final_message": continuation,
+    }
+    encoder_tokenizer = copy.deepcopy(tokenizer)
+    encoder_tokenizer.chat_template = None
+    result = preprocess_chat_request(
+        request,
+        tokenizer=encoder_tokenizer,
+        tool_call_parser_name=None,
+        reasoning_parser_name=None,
+    )
+    assert result.prompt_token_ids == encoder_tokenizer.encode(
+        deepseek_encoder(messages, thinking_mode="chat")
+    )
