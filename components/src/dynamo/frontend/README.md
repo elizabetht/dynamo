@@ -47,9 +47,10 @@ warmups: 20,800 timings total. CPU affinity was not isolated. Warnings were
 suppressed equally in both timed arms. This candidate is independent of the
 separate template-format-cache proposal.
 
-No serving performance improvement has been measured. Cluster validation,
-real constrained generation, TTFT, inter-token latency and GPU memory are
-pending. Local HTTP uses native Dynamo admission/transport and the real
+No serving performance improvement has been measured. The bounded
+real-generation correctness check below passes; TTFT, inter-token latency
+and GPU memory comparisons remain pending. Local CPU HTTP uses native
+Dynamo admission/transport and the real
 SGLang processor with synthetic worker tokens; it cannot validate model output.
 The local native build reports outstanding runtime tasks at interpreter shutdown;
 the bounded replay process exits. Full CI is not established by these local tests.
@@ -84,3 +85,47 @@ live response parser still constructs an unused grammar and couples its state
 to grammar generation; caching grammars adds schema retention and invalidation
 complexity. In-context self-review traced both direct and process-worker callers,
 forced conflicts, validation and diagnostics. It is not an independent review.
+
+### Real-generation correctness
+
+The frozen candidate `2446435aca270e0869388f193dba14e9bf0de982` and main
+baseline above passed 24 streamed requests on one NVIDIA GB10: six cases,
+one warmup and one additional request per case per arm. Strict automatic
+tools with explicit response-format JSON and legacy `guided_json` both
+produce schema-valid JSON. Ordinary chat, JSON-only, automatic tools and
+required tools provide controls. Tool arguments, stable call IDs and
+nontruncated finish reasons were independently checked from saved events.
+
+[Corpus](tests/sglang_guidance_generation_corpus.json),
+[raw output events and environment](tests/sglang_guidance_generation_evidence.json),
+and [client](tests/reproduce_sglang_guidance_generation.py) are included.
+This uses Qwen3-0.6B revision `c1899de289a04d12100db370d81485cdf75e47ca`,
+bfloat16, SGLang 0.5.19, `qwen25` tools, thinking disabled, temperature 0,
+seed 17, maximum 128 output tokens and concurrency 1. The immutable image
+and model hashes are in the evidence. Its September 23 native runtime is
+combined with the exact candidate Python frontend; this is not an exact
+current-native build. No serving performance improvement has been measured.
+
+Start separate baseline and candidate Dynamo/SGLang servers with those
+settings and pinned dependencies. Both processes use the same task-owned
+file discovery directory (`DYN_FILE_KV`) and namespace. Launch the worker
+with `--discovery-backend file --request-plane tcp --event-plane zmq`,
+`--model-path /path/to/pinned/model --served-model-name Qwen/Qwen3-0.6B`,
+`--dtype bfloat16 --context-length 4096 --mem-fraction-static 0.35`,
+`--disable-cuda-graph --device cuda`. Launch the frontend with the same
+transport settings, `--dyn-chat-processor sglang --tool-call-parser qwen25`,
+`--reasoning-parser qwen3 --router-mode round-robin --http-port 8000`.
+Use a compatible native development build or the pinned image with the
+SGLang wheel and exact Python source overlay recorded in the evidence.
+Run the following client against each:
+
+```bash
+python components/src/dynamo/frontend/tests/reproduce_sglang_guidance_generation.py --url http://localhost:8000 --model Qwen/Qwen3-0.6B --corpus components/src/dynamo/frontend/tests/sglang_guidance_generation_corpus.json --arm candidate --pair 1 --repetitions 1 --output candidate-generation.json
+```
+
+Use `--arm baseline` and a separate output file against the baseline server.
+The client validates schemas, tool arguments and finish reasons. One AB pair
+does not establish serving performance. Cancellation, disaggregation and
+multiple GPUs were not tested. Worker signal diagnostics occurred during
+intentional teardown; graceful engine shutdown remains unqualified. Full CI
+is still unqualified.
