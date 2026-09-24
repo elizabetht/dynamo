@@ -846,6 +846,13 @@ def preprocess_chat_request(
             if (value := request.get(key)) is not None:
                 template_kwargs[key] = value
 
+        if template_kwargs.get("continue_final_message") and template_kwargs.get(
+            "add_generation_prompt"
+        ):
+            raise PreprocessError(
+                "Cannot set both `continue_final_message` and `add_generation_prompt` to True."
+            )
+
         if (reasoning_effort := request.get("reasoning_effort")) is not None:
             template_kwargs["reasoning_effort"] = reasoning_effort
 

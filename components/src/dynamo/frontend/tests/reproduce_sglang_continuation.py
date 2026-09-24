@@ -125,11 +125,12 @@ async def main(args):
                             ):
                                 break
                     except aiohttp.ClientConnectorError:
+                        # The listener may not be bound during the startup poll.
                         pass
                     await asyncio.sleep(0.1)
                 else:
                     raise AssertionError("discovery timeout")
-                for name, flags in [
+                cases = [
                     ("default", {}),
                     ("closed", {"add_generation_prompt": False}),
                     (
@@ -139,7 +140,21 @@ async def main(args):
                             "continue_final_message": True,
                         },
                     ),
-                ]:
+                ]
+                if args.invalid_controls:
+                    cases = [
+                        (
+                            key,
+                            {
+                                key: {
+                                    "add_generation_prompt": True,
+                                    "continue_final_message": True,
+                                }
+                            },
+                        )
+                        for key in ("chat_template_kwargs", "chat_template_args")
+                    ]
+                for name, flags in cases:
                     for stream in [False, True]:
                         request = {
                             "model": "probe-model",
@@ -211,6 +226,28 @@ async def main(args):
                 },
             }
             (root / "http.json").write_text(json.dumps(result, indent=2))
+    if args.invalid_controls:
+        assert len(rows) == 4 and not preprocessed and factory_calls
+        for row in rows:
+            assert row["dispatches"] == 0, row
+            if row["stream"]:
+                assert row["status"] == 200, row
+                events = [
+                    json.loads(line[6:])
+                    for line in row["body"].splitlines()
+                    if line.startswith("data: ") and line != "data: [DONE]"
+                ]
+                assert len(events) == 1 and "error" in events[0], row
+                error = events[0]["error"]
+                assert row["body"].count("data: [DONE]") == 1, row
+            else:
+                assert row["status"] == (500 if args.expect_baseline else 400), row
+                error = json.loads(row["body"])
+            assert error["code"] == (500 if args.expect_baseline else 400), row
+            if not args.expect_baseline:
+                assert "Cannot set both" in error["message"], row
+        print(json.dumps(rows))
+        return
     assert len(rows) == 6 and len(preprocessed) == 6 and factory_calls
     assert all(r["status"] == 200 and r["dispatches"] == 1 for r in rows)
     for row in rows:
@@ -257,4 +294,5 @@ if __name__ == "__main__":
     parser.add_argument("--model-path", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--expect-baseline", action="store_true")
+    parser.add_argument("--invalid-controls", action="store_true")
     asyncio.run(asyncio.wait_for(main(parser.parse_args()), 180))
