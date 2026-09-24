@@ -254,7 +254,9 @@ class CancellationMixin:
         ordered_abort_task = None
         request_id = submitted_request_id
         try:
-            if request_id is None:
+            # Parallel requests expose child IDs only through output. Their
+            # bounded drain must start even when no child has produced a token.
+            if request_id is None and request_ids is None:
                 request_id = await request_id_future
             async with self._wait_for_signal(context) as shutdown_requested:
                 tokenizer_manager = getattr(self.engine, "tokenizer_manager", None)

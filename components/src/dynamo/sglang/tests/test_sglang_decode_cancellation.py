@@ -1188,3 +1188,35 @@ async def test_shutdown_survives_ordered_abort_cleanup(decode_cancellation_case)
 
     with pytest.raises(EngineShutdown):
         await operation
+
+
+@pytest.mark.asyncio
+@pytest.mark.timeout(5)
+@pytest.mark.parametrize("signal", ["cancel", "shutdown"])
+async def test_parallel_cancellation_before_any_response(
+    decode_cancellation_case, signal
+):
+    case = decode_cancellation_case
+    case.handler.serving_mode = DisaggregationMode.AGGREGATED
+    case.handler._build_sampling_params = lambda request: {
+        "max_new_tokens": 8,
+        "n": 2,
+    }
+    case.allow_registration.set()
+    consumer = asyncio.create_task(
+        _collect(case.handler.generate(case.request, case.context))
+    )
+    try:
+        await asyncio.wait_for(case.dispatched.wait(), timeout=1)
+        if signal == "shutdown":
+            case.handler.shutdown_event.set()
+            with pytest.raises(EngineShutdown):
+                await asyncio.wait_for(asyncio.shield(consumer), timeout=2)
+        else:
+            case.cancelled.set()
+            assert await asyncio.wait_for(asyncio.shield(consumer), timeout=2) == []
+        assert not case.abort_calls
+        await asyncio.wait_for(case.drained.wait(), timeout=1)
+    finally:
+        consumer.cancel()
+        await asyncio.gather(consumer, return_exceptions=True)
