@@ -3603,11 +3603,9 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
             "한",
         ]
 
-    @pytest.mark.parametrize("text", ["\ufffd", "A\ufffdB", "\ufffd😊", "😊\ufffd"])
+    @pytest.mark.parametrize("text", ["\ufffd", "A\ufffdB", "\ufffd😊", "😊\ufffd", "있다"])
     @pytest.mark.parametrize("batch_size", [1, 64])
-    def test_logprobs_preserve_literal_replacement_character(
-        self, tokenizer, text, batch_size
-    ):
+    def test_logprobs_preserve_unicode_text(self, tokenizer, text, batch_size):
         post = SglangStreamingPostProcessor(
             tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
         )

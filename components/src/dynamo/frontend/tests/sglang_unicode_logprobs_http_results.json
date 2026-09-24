@@ -21,7 +21,7 @@
       "plain",
       "guided_regex .*"
     ],
-    "requests_per_arm": 96
+    "requests_per_arm": 128
   },
   "cases": [
     {
@@ -92,14 +92,14 @@
       }
     },
     {
-      "text": "中文😊",
+      "text": "\u4e2d\u6587\ud83d\ude0a",
       "main-http": {
         "observations": 16,
         "content_and_finish_pass": 16,
         "logprob_text_pass": 16,
         "representative_logprobs": [
           {
-            "token": "中文",
+            "token": "\u4e2d\u6587",
             "logprob": -0.5,
             "bytes": [
               228,
@@ -112,7 +112,7 @@
             "top_logprobs": []
           },
           {
-            "token": "😊",
+            "token": "\ud83d\ude0a",
             "logprob": -0.5,
             "bytes": [
               240,
@@ -130,7 +130,7 @@
         "logprob_text_pass": 16,
         "representative_logprobs": [
           {
-            "token": "中文",
+            "token": "\u4e2d\u6587",
             "logprob": -0.5,
             "bytes": [
               228,
@@ -143,7 +143,7 @@
             "top_logprobs": []
           },
           {
-            "token": "😊",
+            "token": "\ud83d\ude0a",
             "logprob": -0.5,
             "bytes": [
               240,
@@ -157,7 +157,7 @@
       }
     },
     {
-      "text": "�",
+      "text": "\ufffd",
       "main-http": {
         "observations": 16,
         "content_and_finish_pass": 16,
@@ -177,7 +177,7 @@
         "logprob_text_pass": 16,
         "representative_logprobs": [
           {
-            "token": "�",
+            "token": "\ufffd",
             "logprob": -0.5,
             "bytes": [
               239,
@@ -190,7 +190,7 @@
       }
     },
     {
-      "text": "A�B",
+      "text": "A\ufffdB",
       "main-http": {
         "observations": 16,
         "content_and_finish_pass": 16,
@@ -234,7 +234,7 @@
             "top_logprobs": []
           },
           {
-            "token": "�",
+            "token": "\ufffd",
             "logprob": -0.5,
             "bytes": [
               239,
@@ -255,7 +255,7 @@
       }
     },
     {
-      "text": "�😊",
+      "text": "\ufffd\ud83d\ude0a",
       "main-http": {
         "observations": 16,
         "content_and_finish_pass": 16,
@@ -268,7 +268,7 @@
             "top_logprobs": []
           },
           {
-            "token": "😊",
+            "token": "\ud83d\ude0a",
             "logprob": -0.5,
             "bytes": [
               240,
@@ -286,7 +286,7 @@
         "logprob_text_pass": 16,
         "representative_logprobs": [
           {
-            "token": "�",
+            "token": "\ufffd",
             "logprob": -0.5,
             "bytes": [
               239,
@@ -296,7 +296,7 @@
             "top_logprobs": []
           },
           {
-            "token": "😊",
+            "token": "\ud83d\ude0a",
             "logprob": -0.5,
             "bytes": [
               240,
@@ -310,14 +310,14 @@
       }
     },
     {
-      "text": "😊�",
+      "text": "\ud83d\ude0a\ufffd",
       "main-http": {
         "observations": 16,
         "content_and_finish_pass": 16,
         "logprob_text_pass": 0,
         "representative_logprobs": [
           {
-            "token": "😊",
+            "token": "\ud83d\ude0a",
             "logprob": -0.5,
             "bytes": [
               240,
@@ -341,7 +341,7 @@
         "logprob_text_pass": 16,
         "representative_logprobs": [
           {
-            "token": "😊",
+            "token": "\ud83d\ude0a",
             "logprob": -0.5,
             "bytes": [
               240,
@@ -352,12 +352,154 @@
             "top_logprobs": []
           },
           {
-            "token": "�",
+            "token": "\ufffd",
             "logprob": -0.5,
             "bytes": [
               239,
               191,
               189
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "\uc788\ub2e4",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\ufffd\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\uc788\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              236,
+              158,
+              136,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "A\uc788\ub2e4B",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.5,
+            "bytes": [
+              65
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\ufffd\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "B",
+            "logprob": -0.5,
+            "bytes": [
+              66
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.5,
+            "bytes": [
+              65
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\uc788\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              236,
+              158,
+              136,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "B",
+            "logprob": -0.5,
+            "bytes": [
+              66
             ],
             "top_logprobs": []
           }

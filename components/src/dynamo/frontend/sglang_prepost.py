@@ -1233,7 +1233,7 @@ class SglangStreamingPostProcessor:
                 return ""
             token = self.tokenizer.decode([token_id], skip_special_tokens=False)
 
-        if not token.endswith("\ufffd") or token_id is None:
+        if "\ufffd" not in token or token_id is None:
             return token
 
         # A literal U+FFFD token is complete, unlike an incomplete UTF-8 byte token.

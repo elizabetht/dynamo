@@ -65,7 +65,16 @@ async def main(output):
             interval,
             streaming,
         )
-        for text in ["Hello world", "中文😊", "\ufffd", "A\ufffdB", "\ufffd😊", "😊\ufffd"]
+        for text in [
+            "Hello world",
+            "中文😊",
+            "\ufffd",
+            "A\ufffdB",
+            "\ufffd😊",
+            "😊\ufffd",
+            "있다",
+            "A있다B",
+        ]
         for shape, extra in [("plain", {}), ("guided", {"guided_regex": ".*"})]
         for as_ids in [False]
         for batch in [1, 7]
@@ -298,7 +307,7 @@ async def main(output):
                     indent=2,
                 )
             )
-    assert len(rows) == 96
+    assert len(rows) == 128
     failed = [row for row in rows if not row["passed"]]
     assert not failed, failed
 

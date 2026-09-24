@@ -7,7 +7,7 @@ The API gateway for serving LLM inference requests with OpenAI-compatible HTTP a
 
 See [docs/components/frontend/](../../../../docs/fern/pages/developer-guide/knowledge-base/modular-components/frontend/overview.md) for documentation.
 
-## Literal replacement characters in SGLang logprobs
+## Unicode text in SGLang logprobs
 
 A generated literal U+FFFD (`�`) represented by a complete token previously
 remained in response content but
@@ -15,19 +15,22 @@ became an empty logprob token with null bytes. The processor mistook the complet
 token for an unfinished UTF-8 sequence. It now recognizes a complete token when
 encoding its decoded text returns the same token ID. Context reconstruction also
 keeps these literal tokens when completing a subsequent split-byte character.
-The check only runs for token strings ending in U+FFFD; ordinary tokens retain
-the existing path. This does not add a generic raw-byte tokenizer API, and a
-noncanonical token that does not round-trip still uses the existing fallback.
+Tokens containing a leading byte fragment followed by complete text also enter
+context reconstruction. For example, Qwen tokenizes `있다` as two IDs whose
+isolated decodes are `�` and `�다`; previously the logprob text was `�다` even
+though response content was correct. The check runs only for token strings
+containing U+FFFD; ordinary tokens retain the existing path. This does not add a
+generic raw-byte tokenizer API, and a noncanonical token that does not round-trip still uses the existing fallback.
 Literal U+FFFD assembled from multiple byte tokens is outside this narrow fix.
 
-CPU validation: 320 frontend/tool tests passed (one uncached TinyLlama fixture
-excluded). Eight new regressions fail on the baseline and pass with the fix.
+CPU validation: 322 frontend/tool tests passed (one uncached TinyLlama fixture
+excluded). Ten Unicode regressions fail on the baseline and pass with the fix.
 Native localhost HTTP admission, Rust routing, real SGLang preprocessing and the
 Python response processor were exercised with a scripted token worker and the
 cached Qwen3-0.6B tokenizer revision
 `c1899de289a04d12100db370d81485cdf75e47ca`. Across plain/guided requests,
 streaming/unary responses, worker batches 1/7 and frontend intervals 1/20,
-logprob text fidelity improves from 32/96 to 96/96. All 96 response-content and
+logprob text fidelity improves from 32/128 to 128/128. All 128 response-content and
 finish checks pass in both arms. The 32 ordinary Unicode/ASCII controls retain
 correct output. [Grouped HTTP evidence](tests/sglang_unicode_logprobs_http_results.json)
 is committed without private infrastructure details.
