@@ -4967,3 +4967,42 @@ class TestThinkingControlParity:  # FRONTEND.10
             reasoning_parser_name=None,
         )
         assert result.request.get("chat_template_kwargs", {}) == case.expected
+
+
+@pytest.mark.parametrize(
+    "choice", ["required", {"type": "function", "function": {"name": "weather"}}]
+)
+@pytest.mark.parametrize("parallel", ["omitted", None, False, True])
+def test_parallel_tool_default_preprocessing(tokenizer, choice, parallel):
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": "Get weather"}],
+        "tools": [
+            {
+                "type": "function",
+                "function": {
+                    "name": "weather",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"city": {"type": "string"}},
+                        "required": ["city"],
+                        "additionalProperties": False,
+                    },
+                },
+            }
+        ],
+        "tool_choice": choice,
+    }
+    if parallel != "omitted":
+        request["parallel_tool_calls"] = parallel
+    original = copy.deepcopy(request)
+    result = preprocess_chat_request(
+        request,
+        tokenizer=tokenizer,
+        tool_call_parser_name="hermes",
+        reasoning_parser_name=None,
+    )
+    schema = result.guided_decoding["json"]
+    assert schema["minItems"] == 1
+    assert schema.get("maxItems") == (1 if parallel is False else None)
+    assert request == original

@@ -1,0 +1,3497 @@
+{
+  "scope": "Real GPU output correctness passes; multi-call generation effect remains inconclusive; no performance measured",
+  "baseline_sha": "a76e12e6584f6029aeaa551c7cc8967671f67345",
+  "candidate_tested_sha": "c5b826607ab9f1494ad0eaf3c2fc0edd0c19e282",
+  "source_hashes": {
+    "base": "a76e12e6584f6029aeaa551c7cc8967671f67345",
+    "head": "c5b826607ab9f1494ad0eaf3c2fc0edd0c19e282",
+    "baseline_prepost": "60f4bb761e783148b66f33244bfb5c4379311213f83d0571ff5d048544102f14",
+    "candidate_prepost": "5e2fccea31a025b1a4ae1fc3c748b614da427abef23d339346febd1a0da98ac1",
+    "inherited_worker_bundle_sha256": "6e7dd705e28498df5e5137018e98d5fcb6a8f98f215d3ef4e48eeb0480bbb3ad"
+  },
+  "image": "nvcr.io/nvidia/ai-dynamo/sglang-runtime-nightly@sha256:6895f12a744e58d55d91948d387dedfec41647dd9f65cd7bf0674d64f1c1d6ea",
+  "native_revision": "517572309e761a3b246690f26de2630cafc392a1",
+  "native_scope": "September23image native binding with exact baseline/candidate sglang_prepost.py and common Python worker/frontend closure; not exact-current native build",
+  "hardware": "one NVIDIA GB10",
+  "dtype": "bfloat16",
+  "model": "Qwen/Qwen3-0.6B",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "model_sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b",
+  "seed": 17,
+  "temperature": 0,
+  "max_tokens": 256,
+  "concurrency": 1,
+  "warmups": 0,
+  "repetitions_per_case": 1,
+  "tool_parser": "qwen25 (normalized to hermes)",
+  "reasoning_parser": "qwen3",
+  "thinking": false,
+  "packages": {
+    "ai-dynamo": "1.6.0.dev20260923",
+    "ai-dynamo-runtime": "1.6.0.dev20260923",
+    "sglang": "0.5.19",
+    "transformers": "5.12.1",
+    "xgrammar": "0.2.1",
+    "torch": "2.13.0+cu130"
+  },
+  "sglang_overlay_wheel": "sglang-0.5.19-cp312-cp312-manylinux_2_34_aarch64.whl",
+  "sglang_overlay_sha256": "f32da6712a897ce94594ee1473bb14cc9b8cdf7702483e860aef8a3b74c488f2",
+  "requests": 64,
+  "passed": 64,
+  "multiple_call_responses": 0,
+  "corpora": {
+    "original": {
+      "corpus_file": "sglang_parallel_generation_corpus.json",
+      "sha256": "d0d963d7336cb5c159ec4420e54374e2b8cd71625d67dea93fd93ad7c6780d23",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "results": {
+        "baseline": [
+          {
+            "case": "00",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8be087a42f23d483",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_a90a9c3ac9ebd06b",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290773,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a90a9c3ac9ebd06b",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "01",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "864358e89422f4d6",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b901bb5d415246c4",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290792,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b901bb5d415246c4",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "02",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a423ce37ea43d7f3",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_a5ae366ea43591dd",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290792,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a5ae366ea43591dd",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "03",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "928fddbcad70eed2",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_ae836253f4805f2f",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290792,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_ae836253f4805f2f",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "04",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "922b038016b1af8d",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_a91f5c653769f0c9",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290792,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a91f5c653769f0c9",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "05",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8d578c9005686fd2",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_9390df4d6801ff6d",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290792,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9390df4d6801ff6d",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "06",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "9cbd809e32df066b",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_b14d3f0fb765f10e",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290793,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b14d3f0fb765f10e",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "07",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "988479c3bc08c203",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_a75e20f263bffc54",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290793,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a75e20f263bffc54",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "08",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "afa60e545560d657",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_9a1fb11ec340f286",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290793,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9a1fb11ec340f286",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "09",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "bd618cadb1ac808f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_970ba2fc361869c3",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290794,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_970ba2fc361869c3",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "10",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "9f1316782e32db62",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_a43c18aa885cb5b3",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290794,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a43c18aa885cb5b3",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "11",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a900589abfd24f93",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_a8c1acb71b82f892",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290794,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a8c1acb71b82f892",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "12",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "92b1c5d5978ad8b7",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_aef4b1f17bf97ec8",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290794,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_aef4b1f17bf97ec8",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "13",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "bfd57a598a0b1785",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_aa4128cab784b03a",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290794,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_aa4128cab784b03a",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "14",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8f16e5909b472cb2",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_834ed2ef1f607807",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290795,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_834ed2ef1f607807",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "15",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "beeb712781f09beb",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_974de5093319a213",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290795,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_974de5093319a213",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          }
+        ],
+        "candidate": [
+          {
+            "case": "00",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a18a158167a50156",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_97dd9ed1314e58f1",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290802,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_97dd9ed1314e58f1",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "01",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "bbbfec3e3782c98e",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_a27153adf16efae1",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290803,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a27153adf16efae1",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "02",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "bbdcf25596fda53e",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_af6cb78231b3e83b",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290803,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_af6cb78231b3e83b",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "03",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "86100de80439f01c",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_9d1dac91481b071d",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290803,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9d1dac91481b071d",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "04",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8eaef7f66d696220",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_822f3d10e0ee195a",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290804,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_822f3d10e0ee195a",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "05",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "9cd3d1df2a78702b",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_9a05c7a7034d0980",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290804,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9a05c7a7034d0980",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "06",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "839c59400448d47c",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_ad45654823ec23f0",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290804,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_ad45654823ec23f0",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "07",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "90da96ad4357378f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_85ad63f96dd41772",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290804,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_85ad63f96dd41772",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "08",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "b07e24b245046e42",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_addeedabd764dd20",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290805,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_addeedabd764dd20",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "09",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a7cee82b091f51ef",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_822e1e0502e54361",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290805,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_822e1e0502e54361",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "10",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "90f206cbadfd079f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_9328d4182281e98a",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290806,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9328d4182281e98a",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "11",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "9cbce096240b4dfc",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_944e1a85b3e8253b",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290806,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_944e1a85b3e8253b",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "12",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "ae3ebcee8c5f56fe",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_9ab47de77f4b20be",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290806,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9ab47de77f4b20be",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "13",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "b8310b003ffe522b",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b191f1997b80de08",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290806,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 19,
+                  "total_tokens": 194,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b191f1997b80de08",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "14",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "b5ae4bc30a84674f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_b8a8a5b2bd5f47cd",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290807,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b8a8a5b2bd5f47cd",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "15",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "82d22bd07d163397",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_aef0992c5c43792d",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290807,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 175,
+                  "completion_tokens": 35,
+                  "total_tokens": 210,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 174
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_aef0992c5c43792d",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          }
+        ]
+      }
+    },
+    "two_city": {
+      "corpus_file": "sglang_parallel_two_city_corpus.json",
+      "sha256": "b8a63edd6ab1efb70e9bbd6a8a6a832a18c8e5428bef1dd913c818ac8b410842",
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "results": {
+        "baseline": [
+          {
+            "case": "00",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a56660fbc290639a",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_ba663eac8a7e207c",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290924,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_ba663eac8a7e207c",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "01",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "97864681b906c6c6",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_aded5cfd71421a6e",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290943,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_aded5cfd71421a6e",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "02",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "b09f8c19544df08c",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_84f95fe4ca5bd8de",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290943,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_84f95fe4ca5bd8de",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "03",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "840130163e437dcf",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_82bf955066ec9371",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290943,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_82bf955066ec9371",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "04",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "897e0aa20b7852c6",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_91dab1686e5081bc",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290943,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_91dab1686e5081bc",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "05",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "aff9107acb25675f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b0ef2224cae23a3e",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290943,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b0ef2224cae23a3e",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "06",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8fdbb662ea8371d2",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_bb5809a09241a67b",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290944,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_bb5809a09241a67b",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "07",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "929da9b31523da8c",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b8c62f9d675334fa",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290944,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b8c62f9d675334fa",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "08",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8a0f4b08aff0d777",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_9f2b8c20104c8ee0",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290944,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9f2b8c20104c8ee0",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "09",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "ad85cc8773234756",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_976361a75a26a5ad",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290945,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_976361a75a26a5ad",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "10",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8aed0007ea14c741",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_94f81c81c0e30566",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290945,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_94f81c81c0e30566",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "11",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "99185cea2eab86b9",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_bc50201d46bf0341",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290945,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_bc50201d46bf0341",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "12",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "ba44857f828ce4dc",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_88806131184143f0",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290945,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_88806131184143f0",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "13",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "b4f7f1176e5a545f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_91f065c623a3474b",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290945,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_91f065c623a3474b",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "14",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8c81ebf25859447a",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_acc36f38d4221750",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290945,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_acc36f38d4221750",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "15",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "97ee73101be44db2",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b6eb283d9842d2a9",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290946,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b6eb283d9842d2a9",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          }
+        ],
+        "candidate": [
+          {
+            "case": "00",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a6716bd2b8b72297",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_a65315120936d9a2",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290953,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a65315120936d9a2",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "01",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "88c0ead6fcfb5d0f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_80567847ded9aac2",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290954,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_80567847ded9aac2",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "02",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "ae83906475f6f8ad",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_84add5334769f248",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290954,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_84add5334769f248",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "03",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a65fab1af0f5124f",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b52cef6b0da84d6e",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290954,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b52cef6b0da84d6e",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "04",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a7565ee8be8332c0",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_b15a9ce381e8e7dc",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290955,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b15a9ce381e8e7dc",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "05",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "ae6ba1b44beee4a3",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_ac0887c1142bc7f1",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290955,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_ac0887c1142bc7f1",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "06",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "aac564b279b88bdd",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_adaf4dbb82e45b36",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290955,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_adaf4dbb82e45b36",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "07",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "8963df7edbdd7800",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_8a094f98f9a17f90",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290955,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_8a094f98f9a17f90",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "08",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a12947d46e4fb1f9",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_a73c6f9c965aac8f",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290956,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_a73c6f9c965aac8f",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "09",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "ad6a5795615c9bf4",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_91a2e2d16e194994",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290956,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_91a2e2d16e194994",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "10",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "9a29606c70c43243",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_ae2108744cfc44a8",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290956,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_ae2108744cfc44a8",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "11",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "b04702906ec617f8",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_8585ed0abaf4004c",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290957,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_8585ed0abaf4004c",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "12",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a013c105a20c1386",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_8f7df84a0ae85534",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290957,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_8f7df84a0ae85534",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "13",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "a772c5094690beb4",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_b85c9ad61b3b1dd7",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290957,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 18,
+                  "total_tokens": 221,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_b85c9ad61b3b1dd7",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "14",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "99dc036f99a39516",
+                "choices": [
+                  {
+                    "index": 0,
+                    "message": {
+                      "content": null,
+                      "refusal": null,
+                      "tool_calls": [
+                        {
+                          "id": "call_9a4bbfcbca45f324",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290958,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9a4bbfcbca45f324",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          },
+          {
+            "case": "15",
+            "iteration": 0,
+            "events": [
+              {
+                "id": "91dcd4de97b6971b",
+                "choices": [
+                  {
+                    "index": 0,
+                    "delta": {
+                      "tool_calls": [
+                        {
+                          "index": 0,
+                          "id": "call_9d2d3f2f81dec2be",
+                          "type": "function",
+                          "function": {
+                            "name": "weather",
+                            "arguments": "{\"city\": \"Paris\"}"
+                          }
+                        }
+                      ],
+                      "role": "assistant"
+                    },
+                    "finish_reason": "tool_calls",
+                    "logprobs": null
+                  }
+                ],
+                "created": 1790290958,
+                "model": "Qwen/Qwen3-0.6B",
+                "object": "chat.completion.chunk",
+                "usage": {
+                  "prompt_tokens": 203,
+                  "completion_tokens": 35,
+                  "total_tokens": 238,
+                  "prompt_tokens_details": {
+                    "cached_tokens": 202
+                  }
+                }
+              }
+            ],
+            "http_status": 200,
+            "calls": [
+              {
+                "id": "call_9d2d3f2f81dec2be",
+                "name": "weather",
+                "arguments": "{\"city\": \"Paris\"}"
+              }
+            ],
+            "finish_reasons": [
+              "tool_calls"
+            ],
+            "valid": true
+          }
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Both original and explicit-two-call prompts yielded one call in all arms, including explicit true controls. Actual multi-call generation benefit is inconclusive.",
+    "One AB pair per distinct corpus; no performance comparison.",
+    "No cancellation, multiGPU or disaggregation qualification.",
+    "Intentional worker shutdown emits SIGTERM/SIGQUIT diagnostics; graceful engine shutdown remains unqualified.",
+    "Full CI remains unqualified."
+  ]
+}
