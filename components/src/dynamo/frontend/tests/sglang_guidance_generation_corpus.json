@@ -1,0 +1,201 @@
+[
+  [
+    "plain",
+    {
+      "model": "probe-model",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Report the weather in \u4e2d\u6587\ud83d\ude0a."
+        }
+      ]
+    }
+  ],
+  [
+    "json_schema",
+    {
+      "model": "probe-model",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Report the weather in \u4e2d\u6587\ud83d\ude0a."
+        }
+      ],
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "weather",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  [
+    "auto",
+    {
+      "model": "probe-model",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Report the weather in \u4e2d\u6587\ud83d\ude0a."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_choice": "auto"
+    }
+  ],
+  [
+    "required",
+    {
+      "model": "probe-model",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Report the weather in \u4e2d\u6587\ud83d\ude0a."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            }
+          }
+        }
+      ],
+      "tool_choice": "required"
+    }
+  ],
+  [
+    "strict_auto_response_json",
+    {
+      "model": "probe-model",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Report the weather in \u4e2d\u6587\ud83d\ude0a."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            },
+            "strict": true
+          }
+        }
+      ],
+      "tool_choice": "auto",
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "weather",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "city"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  [
+    "strict_auto_legacy_json",
+    {
+      "model": "probe-model",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Report the weather in \u4e2d\u6587\ud83d\ude0a."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "city": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "city"
+              ]
+            },
+            "strict": true
+          }
+        }
+      ],
+      "tool_choice": "auto",
+      "guided_json": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "city"
+        ]
+      }
+    }
+  ]
+]
