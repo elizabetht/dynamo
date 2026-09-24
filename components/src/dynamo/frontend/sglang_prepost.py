@@ -594,6 +594,8 @@ def build_tool_call_guided_decoding(
         return None
 
     parallel_tool_calls = request.get("parallel_tool_calls")
+    if parallel_tool_calls is None:
+        parallel_tool_calls = True
     constraint: Any = None
 
     if tool_choice == "required" or _is_named_tool_choice(tool_choice):
