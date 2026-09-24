@@ -842,6 +842,10 @@ def preprocess_chat_request(
         if chat_template_kwargs:
             template_kwargs.update(chat_template_kwargs)
 
+        for key in ("add_generation_prompt", "continue_final_message"):
+            if (value := request.get(key)) is not None:
+                template_kwargs[key] = value
+
         if (reasoning_effort := request.get("reasoning_effort")) is not None:
             template_kwargs["reasoning_effort"] = reasoning_effort
 
