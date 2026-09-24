@@ -1236,6 +1236,10 @@ class SglangStreamingPostProcessor:
         if not token.endswith("\ufffd") or token_id is None:
             return token
 
+        # A literal U+FFFD token is complete, unlike an incomplete UTF-8 byte token.
+        if self.tokenizer.encode(token, add_special_tokens=False) == [token_id]:
+            return token
+
         for context_size in range(1, min(len(context_token_ids), 4) + 1):
             context = context_token_ids[-context_size:]
             decoded = self.tokenizer.decode(
@@ -1249,7 +1253,9 @@ class SglangStreamingPostProcessor:
                 context_token = self.tokenizer.decode(
                     [context[context_index]], skip_special_tokens=False
                 )
-                if context_token.endswith("\ufffd"):
+                if context_token.endswith("\ufffd") and self.tokenizer.encode(
+                    context_token, add_special_tokens=False
+                ) != [context[context_index]]:
                     clean_end = context_index
                 else:
                     break

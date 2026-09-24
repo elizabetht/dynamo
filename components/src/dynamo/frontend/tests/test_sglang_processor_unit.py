@@ -3499,6 +3499,10 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
     class ByteTokenizer:
         """Decode each token as one byte to exercise split UTF-8 sequences."""
 
+        def encode(self, text, *, add_special_tokens):
+            del add_special_tokens
+            return list(text.encode("utf-8"))
+
         def decode(self, token_ids, *, skip_special_tokens):
             del skip_special_tokens
             return bytes(token_ids).decode("utf-8", errors="replace")
@@ -3598,6 +3602,45 @@ class TestIncrementalDetokenization:  # FRONTEND.6 — token-id stream → text
             "",
             "한",
         ]
+
+    @pytest.mark.parametrize("text", ["\ufffd", "A\ufffdB", "\ufffd😊", "😊\ufffd"])
+    @pytest.mark.parametrize("batch_size", [1, 64])
+    def test_logprobs_preserve_literal_replacement_character(
+        self, tokenizer, text, batch_size
+    ):
+        post = SglangStreamingPostProcessor(
+            tokenizer=tokenizer, tool_call_parser=None, reasoning_parser=None
+        )
+        token_ids = tokenizer.encode(text, add_special_tokens=False)
+        entries = []
+        for start in range(0, len(token_ids), batch_size):
+            batch = token_ids[start : start + batch_size]
+            choice = post.process_output(
+                {
+                    "token_ids": batch,
+                    "log_probs": [-0.5] * len(batch),
+                    "top_logprobs": [
+                        [
+                            {
+                                "token_id": tid,
+                                "token": tokenizer.decode([tid]),
+                                "logprob": -0.5,
+                            }
+                        ]
+                        for tid in batch
+                    ],
+                    "finish_reason": "length"
+                    if start + batch_size >= len(token_ids)
+                    else None,
+                }
+            )
+            if choice and choice["logprobs"]:
+                entries.extend(choice["logprobs"]["content"])
+        assert "".join(entry["token"] for entry in entries) == text
+        assert "".join(entry["top_logprobs"][0]["token"] for entry in entries) == text
+        assert (
+            bytes(b for entry in entries for b in entry["bytes"] or []).decode() == text
+        )
 
     def test_logprobs_regular_token_is_unchanged(self):
         """Ordinary tokens keep their decoded text and UTF-8 bytes."""
