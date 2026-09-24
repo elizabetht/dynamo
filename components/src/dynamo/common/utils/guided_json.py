@@ -59,6 +59,8 @@ def _schema_error(message: str) -> HttpError:
 
 
 def _decode_pointer_token(token: str) -> str | None:
+    if "~" not in token:
+        return token
     decoded = []
     index = 0
     while index < len(token):
