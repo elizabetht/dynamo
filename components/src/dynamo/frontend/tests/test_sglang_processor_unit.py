@@ -5036,3 +5036,55 @@ class TestTerminalUnicodeLogprobs:
         assert event["finish_reason"] == "stop"
         assert not event["delta"].get("content")
         assert event["logprobs"] is None
+
+
+@pytest.mark.core
+@pytest.mark.parametrize("stop_kind", ["eos", "token", "replacement"])
+def test_token_stop_flushes_pending_unicode_logprobs(tokenizer, stop_kind):
+    ids = tokenizer.encode("있다", add_special_tokens=False)
+    stop_id = tokenizer.eos_token_id if stop_kind != "token" else ids[-1]
+    post = SglangStreamingPostProcessor(
+        tokenizer=tokenizer,
+        tool_call_parser=None,
+        reasoning_parser=None,
+        eos_token_ids=[tokenizer.eos_token_id],
+        stop_token_ids={stop_id} if stop_kind == "token" else None,
+        stop_strings={"�"} if stop_kind == "replacement" else None,
+    )
+    assert (
+        post.process_output(
+            {
+                "token_ids": ids[:-1],
+                "log_probs": [-0.5] * (len(ids) - 1),
+                "top_logprobs": [
+                    [{"token_id": tid, "logprob": -0.5}] for tid in ids[:-1]
+                ],
+            }
+        )
+        is None
+    )
+    event = post.process_output(
+        {
+            "token_ids": [stop_id],
+            "log_probs": [-0.7],
+            "top_logprobs": [[{"token_id": stop_id, "logprob": -0.7}]],
+            "finish_reason": "stop",
+            "stop_reason": stop_id if stop_kind == "token" else None,
+        }
+    )
+    assert event["finish_reason"] == "stop"
+    if stop_kind == "replacement":
+        assert not event["delta"].get("content")
+        assert event["logprobs"] is None
+    else:
+        assert event["delta"]["content"] == "�"
+        assert event["logprobs"]["content"] == [
+            {
+                "token": "�",
+                "logprob": -0.5,
+                "bytes": [239, 191, 189],
+                "top_logprobs": [
+                    {"token": "�", "logprob": -0.5, "bytes": [239, 191, 189]}
+                ],
+            }
+        ]

@@ -40,7 +40,7 @@ from dynamo.llm import (
 from dynamo.runtime import DistributedRuntime
 
 
-async def main(output, truncate=False, topk=False):
+async def main(output, truncate=False, topk=False, eos=False):
     output.mkdir(parents=True, exist_ok=True)
     model = snapshot_download(
         "Qwen/Qwen3-0.6B",
@@ -131,8 +131,24 @@ async def main(output, truncate=False, topk=False):
                     "top_logprobs": top,
                 }
                 await asyncio.sleep(0)
+            terminal_ids = [tokenizer.eos_token_id] if eos else []
+            lp, top = extract_from_sglang_meta(
+                {
+                    "output_token_logprobs": [
+                        (-0.5, tid, tokenizer.decode([tid])) for tid in terminal_ids
+                    ],
+                    "output_top_logprobs": [
+                        [(-0.5, tid, tokenizer.decode([tid]))] for tid in terminal_ids
+                    ]
+                    if topk
+                    else None,
+                },
+                return_tokens_as_token_ids=False,
+            )
             yield {
-                "token_ids": [],
+                "token_ids": terminal_ids,
+                "log_probs": lp,
+                "top_logprobs": top,
                 "finish_reason": active["finish"],
                 "stop_reason": active["reason"],
             }
@@ -220,7 +236,7 @@ async def main(output, truncate=False, topk=False):
                     interval,
                     streaming,
                 ) in cases:
-                    finish = "stop" if reason else "length"
+                    finish = "stop" if eos or reason else "length"
                     active.update(text=text, batch=batch, finish=finish, reason=reason)
                     processor.stream_interval = interval
                     request = {
@@ -342,5 +358,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--topk", action="store_true", help="Opt in to one top-logprob alternative"
     )
+    parser.add_argument(
+        "--eos",
+        action="store_true",
+        help="Finish with a model EOS token instead of length",
+    )
     args = parser.parse_args()
-    asyncio.run(asyncio.wait_for(main(args.output, args.truncate, args.topk), 240))
+    asyncio.run(
+        asyncio.wait_for(main(args.output, args.truncate, args.topk, args.eos), 240)
+    )

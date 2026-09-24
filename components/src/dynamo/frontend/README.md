@@ -23,7 +23,7 @@ containing U+FFFD; ordinary tokens retain the existing path. This does not add a
 generic raw-byte tokenizer API, and a noncanonical token that does not round-trip still uses the existing fallback.
 Literal U+FFFD assembled from multiple byte tokens is outside this narrow fix.
 
-CPU validation: 332 frontend/tool tests passed (one uncached TinyLlama fixture
+CPU validation: 335 frontend/tool tests passed (one uncached TinyLlama fixture
 excluded). Ten Unicode regressions fail on the baseline and pass with the fix.
 Native localhost HTTP admission, Rust routing, real SGLang preprocessing and the
 Python response processor were exercised with a scripted token worker and the
@@ -97,3 +97,32 @@ filtering, entry ownership and serialized output. No independent review is
 claimed. Native interpreter-exit task warnings leave shutdown qualification
 pending. Cluster validation and serving measurements remain pending.
 No performance improvement has been measured.
+
+### Token stops inside a Unicode character
+
+The terminal flush also applies to normal stops after the matched stop token has
+been removed. For example, EOS after the first token of `있다` previously
+returned content `�` with an empty selected/top-k logprob token. The same problem
+occurs when a user stop token completes a split character. Reusing the existing
+flush preserves the pending scored token and lets stop-string filtering suppress
+its metadata when the replacement character itself is a stop string.
+
+Three regressions fail on `9964032675623cc7f257d094dc24d497a0279ccb` and pass
+with this correction; the affected CPU suite passes 335 tests (one uncached
+TinyLlama fixture excluded). In a 64-request paired native HTTP corpus with
+opt-in top-k metadata, text matches improve from 32/64 to 64/64. All content and
+finish checks pass in both arms; probabilities and retained entry counts are
+unchanged. Another 64 length-finish and 128 complete-Unicode EOS controls pass.
+[EOS comparison evidence](tests/sglang_eos_logprobs_http_results.json) includes
+sanitized observations. Reproduce with the same observer on each revision:
+
+```bash
+PYTHONPATH=components/src HF_HUB_OFFLINE=1 python \
+  components/src/dynamo/frontend/tests/reproduce_sglang_unicode_logprobs.py \
+  --truncate --topk --eos --output /tmp/sglang-eos-results
+```
+
+This extends the existing terminal logic rather than adding a second decoder.
+Two-pass in-context self-review found no remaining actionable findings. These
+are scripted-worker CPU observations, not model generation. Cluster validation
+is pending. No performance improvement has been measured.

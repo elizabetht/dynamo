@@ -1502,7 +1502,7 @@ class SglangStreamingPostProcessor:
             )
             if openai_logprobs is not None:
                 self._pending_logprobs_content.extend(openai_logprobs["content"])
-        if finish_reason == "length" and self._terminal_logprob is not None:
+        if finish_reason in {"length", "stop"} and self._terminal_logprob is not None:
             entry, candidates = self._terminal_logprob
             if not entry["token"] and self._logprob_pending_ids:
                 context = self._logprob_complete_ids
