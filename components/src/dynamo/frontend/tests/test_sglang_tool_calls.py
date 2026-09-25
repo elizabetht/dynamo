@@ -687,7 +687,7 @@ class TestJsonArrayParserReparse:  # FRONTEND.4 — JSON-array parser reparse pa
         assert tc == []
 
 
-@pytest.mark.parametrize("finish_reason", ["length", "stop"])
+@pytest.mark.parametrize("finish_reason", ["length", "stop", "content_filter"])
 @pytest.mark.parametrize("batch_size", [1, 20, 1024])
 @pytest.mark.parametrize(
     "suffix", ["", ', {"name": "get_weather", "parameters": {"city": "Ro']

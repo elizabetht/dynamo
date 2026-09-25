@@ -1575,7 +1575,11 @@ class SglangStreamingPostProcessor:
             and self.tool_call_parser is not None
             and self._tool_text_parts
         ):
-            if self._is_json_array_parser and finish_reason in {"length", "stop"}:
+            if self._is_json_array_parser and finish_reason in {
+                "length",
+                "stop",
+                "content_filter",
+            }:
                 full_text = "".join(self._tool_text_parts)
                 if (
                     full_text.lstrip().startswith("[")

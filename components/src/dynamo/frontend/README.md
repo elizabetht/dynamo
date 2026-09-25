@@ -10,9 +10,9 @@ See [docs/components/frontend/](../../../../docs/fern/pages/developer-guide/know
 
 ## Truncated required-tool arrays
 
-When required-tool JSON generation ends at the token limit or a requested stop string before
+When required-tool JSON generation ends at the token limit, a requested stop string, or a canonical worker filter before
 closing its array, the frontend returns the original generated text with the
-original `length` or `stop` finish reason and no tool calls. Previously, identical output exposed zero, one or
+original `length`, `stop`, or `content_filter` finish reason and no tool calls. Previously, identical output exposed zero, one or
 more calls depending on token batching. Terminal handling now matches native
 SGLang's unary JSON-array failure fallback. No missing argument delimiters are
 invented. Complete arrays and model-specific marker parsing retain their existing
@@ -43,10 +43,23 @@ candidate passes all 18 stop cases and all 18 length cases. Stop-truncated text
 retains `stop`; complete arrays still report `tool_calls`. Sanitized before/after
 results are in `tests/sglang_stop_array_evidence.json`.
 
+Add `--termination content_filter` for the canonical worker filter case. The
+mapping-only correction proposed in PR #28 is included here: filtering must not
+be reported as `stop` or `tool_calls`. With that mapping alone, identical
+incomplete arrays still expose two, one, or zero calls across batching intervals.
+The combined correction preserves exactly the text emitted by the worker, emits
+no calls from an incomplete array, and retains `content_filter`. It cannot recover
+or disclose tokens withheld by the worker. Complete-array controls preserve their
+calls and the non-success filter status. All 18 filtered HTTP cases and six new
+parser regressions pass; sanitized comparisons are in
+`tests/sglang_filtered_array_evidence.json`. Stock SGLang has no demonstrated
+filter producer here: this validates Dynamo's supported canonical worker boundary
+using synthetic tokens, not real model filtering.
+
 Validation used Qwen3-0.6B tokenizer revision
 `c1899de289a04d12100db370d81485cdf75e47ca` and SGLang source revision
 `303def2253ae36fad89eb34dc66a7245003743f8`. The broader CPU suites passed
-329 tests; one TinyLlama byte-fallback fixture could not initialize because its
+335 tests; one TinyLlama byte-fallback fixture could not initialize because its
 tokenizer was absent from the offline cache. The local native binding is older than this Python source;
 matching-image cluster validation remains pending. Native shutdown logs report
 residual tasks even though the bounded local harness exits successfully; graceful

@@ -74,7 +74,9 @@ async def main(args):
         for index, token in enumerate(ids):
             yield {
                 "token_ids": [token],
-                "finish_reason": ("length" if args.termination == "length" else "eos")
+                "finish_reason": (
+                    args.termination if args.termination != "stop" else "eos"
+                )
                 if index == len(ids) - 1
                 else None,
             }
@@ -262,8 +264,8 @@ async def main(args):
                 message = choice.get("delta", choice.get("message", {}))
                 calls.extend(message.get("tool_calls") or [])
         expected_finish = (
-            "length"
-            if args.termination == "length"
+            args.termination
+            if args.termination != "stop"
             else "tool_calls"
             if row["case"] == "complete"
             else "stop"
@@ -305,5 +307,7 @@ if __name__ == "__main__":
     parser.add_argument("--model-path", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--interval", type=int, choices=[1, 20, 1024], required=True)
-    parser.add_argument("--termination", choices=["length", "stop"], default="length")
+    parser.add_argument(
+        "--termination", choices=["length", "stop", "content_filter"], default="length"
+    )
     asyncio.run(asyncio.wait_for(main(parser.parse_args()), 180))
