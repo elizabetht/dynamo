@@ -1,0 +1,138 @@
+{
+  "scope": "CPU native HTTP with scripted engine and prefill; encoder bypassed; no model generation",
+  "base_sha": "a76e12e6584f6029aeaa551c7cc8967671f67345",
+  "tests": {
+    "baseline": "8 failed, 2 passed, 92 deselected",
+    "candidate": "102 passed"
+  },
+  "http": [
+    {
+      "arm": "baseline",
+      "mode": "aggregated",
+      "imports": {
+        "dynamo.sglang.request_handlers.multimodal.worker_handler": {
+          "module_file": "worker_handler.py",
+          "sha256": "58e5945c084af5bb3cc0bff52b5f1bdad5f39da4d1e321efeb9ae130c085fe37"
+        },
+        "dynamo._core": {
+          "module_file": "_core.abi3.so",
+          "sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e"
+        }
+      },
+      "observations": [
+        {
+          "control": true,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": []
+        },
+        {
+          "control": false,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": false,
+          "aborts": []
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "mode": "decode",
+      "imports": {
+        "dynamo.sglang.request_handlers.multimodal.worker_handler": {
+          "module_file": "worker_handler.py",
+          "sha256": "58e5945c084af5bb3cc0bff52b5f1bdad5f39da4d1e321efeb9ae130c085fe37"
+        },
+        "dynamo._core": {
+          "module_file": "_core.abi3.so",
+          "sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e"
+        }
+      },
+      "observations": [
+        {
+          "control": true,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": []
+        },
+        {
+          "control": false,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": false,
+          "aborts": []
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "mode": "aggregated",
+      "imports": {
+        "dynamo.sglang.request_handlers.multimodal.worker_handler": {
+          "module_file": "worker_handler.py",
+          "sha256": "9497bcec2e0807169693692f69b3e22e850f03fadf445472ac63da9228c9c7ea"
+        },
+        "dynamo._core": {
+          "module_file": "_core.abi3.so",
+          "sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e"
+        }
+      },
+      "observations": [
+        {
+          "control": true,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": []
+        },
+        {
+          "control": false,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": [
+            {
+              "rid": "actual-rid",
+              "abort_all": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "mode": "decode",
+      "imports": {
+        "dynamo.sglang.request_handlers.multimodal.worker_handler": {
+          "module_file": "worker_handler.py",
+          "sha256": "9497bcec2e0807169693692f69b3e22e850f03fadf445472ac63da9228c9c7ea"
+        },
+        "dynamo._core": {
+          "module_file": "_core.abi3.so",
+          "sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e"
+        }
+      },
+      "observations": [
+        {
+          "control": true,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": []
+        },
+        {
+          "control": false,
+          "context_cancelled": true,
+          "handler_completed_before_manual_release": true,
+          "aborts": [
+            {
+              "rid": "actual-rid",
+              "abort_all": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "performance": "No performance improvement has been measured",
+  "cluster_validation": "pending",
+  "native_shutdown": "Both arms report nine native tasks at interpreter exit; full shutdown unqualified",
+  "sglang_revision": "3c82e48e825bae504527ed28e2442b1429d36650",
+  "sglang_version": "0.5.19",
+  "redis_version": "6.2.0"
+}

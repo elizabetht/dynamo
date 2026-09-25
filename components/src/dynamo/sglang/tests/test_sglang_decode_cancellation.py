@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import asyncio
+import gc
 import logging
 from types import SimpleNamespace
 
@@ -9,6 +10,7 @@ import pytest
 
 from dynamo.common.constants import DisaggregationMode
 from dynamo.llm.exceptions import EngineShutdown
+from dynamo.sglang.request_handlers.cancellation import CancellationMixin
 from dynamo.sglang.request_handlers.handler_base import BaseWorkerHandler
 from dynamo.sglang.request_handlers.llm.decode_handler import DecodeWorkerHandler
 
@@ -1188,3 +1190,71 @@ async def test_shutdown_survives_ordered_abort_cleanup(decode_cancellation_case)
 
     with pytest.raises(EngineShutdown):
         await operation
+
+
+@pytest.mark.asyncio
+@pytest.mark.timeout(5)
+@pytest.mark.parametrize("failure", [None, ValueError])
+async def test_simultaneous_shutdown_consumes_stream_result(failure, caplog):
+    loop = asyncio.get_running_loop()
+    errors = []
+    old_handler = loop.get_exception_handler()
+    loop.set_exception_handler(lambda _loop, context: errors.append(context))
+    exhausted = asyncio.Event()
+
+    async def source():
+        exhausted.set()
+        if failure:
+            raise failure("engine stream failure")
+        return
+        yield
+
+    async def shutdown():
+        await exhausted.wait()
+        raise EngineShutdown("shutdown wins")
+
+    try:
+        task = asyncio.create_task(shutdown())
+        with pytest.raises(EngineShutdown, match="shutdown wins"):
+            async for _ in CancellationMixin()._stream_until_cancelled(source(), task):
+                pytest.fail("no output expected")
+        del task
+        gc.collect()
+        await asyncio.sleep(0)
+        assert errors == []
+        diagnostic = "Detached SGLang task failed during cancellation"
+        assert caplog.text.count(diagnostic) == (1 if failure else 0)
+    finally:
+        loop.set_exception_handler(old_handler)
+
+
+@pytest.mark.asyncio
+@pytest.mark.timeout(5)
+@pytest.mark.parametrize("signal", ["cancel", "shutdown"])
+async def test_parallel_cancellation_before_any_response(
+    decode_cancellation_case, signal
+):
+    case = decode_cancellation_case
+    case.handler.serving_mode = DisaggregationMode.AGGREGATED
+    case.handler._build_sampling_params = lambda request: {
+        "max_new_tokens": 8,
+        "n": 2,
+    }
+    case.allow_registration.set()
+    consumer = asyncio.create_task(
+        _collect(case.handler.generate(case.request, case.context))
+    )
+    try:
+        await asyncio.wait_for(case.dispatched.wait(), timeout=1)
+        if signal == "shutdown":
+            case.handler.shutdown_event.set()
+            with pytest.raises(EngineShutdown):
+                await asyncio.wait_for(asyncio.shield(consumer), timeout=2)
+        else:
+            case.cancelled.set()
+            assert await asyncio.wait_for(asyncio.shield(consumer), timeout=2) == []
+        assert not case.abort_calls
+        await asyncio.wait_for(case.drained.wait(), timeout=1)
+    finally:
+        consumer.cancel()
+        await asyncio.gather(consumer, return_exceptions=True)

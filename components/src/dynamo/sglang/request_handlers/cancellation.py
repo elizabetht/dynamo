@@ -112,6 +112,7 @@ class CancellationMixin:
         drain_deadline: float | None = None
         while True:
             next_item = asyncio.create_task(_next_stream_item(iterator))
+            is_consumed = False
             try:
                 if drain_deadline is None:
                     done, _ = await asyncio.wait(
@@ -126,6 +127,7 @@ class CancellationMixin:
                         )
                     if next_item in done:
                         try:
+                            is_consumed = True
                             yield next_item.result()
                         except StopAsyncIteration:
                             return
@@ -145,12 +147,15 @@ class CancellationMixin:
                     )
                     return
                 try:
+                    is_consumed = True
                     yield next_item.result()
                 except StopAsyncIteration:
                     return
             finally:
                 if not next_item.done():
                     _cancel_and_detach(next_item)
+                elif not is_consumed:
+                    _consume_detached_task(next_item)
 
     @asynccontextmanager
     async def _wait_for_signal(self, context: Context) -> AsyncGenerator[bool, None]:
@@ -254,7 +259,9 @@ class CancellationMixin:
         ordered_abort_task = None
         request_id = submitted_request_id
         try:
-            if request_id is None:
+            # Parallel requests expose child IDs only through output. Their
+            # bounded drain must start even when no child has produced a token.
+            if request_id is None and request_ids is None:
                 request_id = await request_id_future
             async with self._wait_for_signal(context) as shutdown_requested:
                 tokenizer_manager = getattr(self.engine, "tokenizer_manager", None)
