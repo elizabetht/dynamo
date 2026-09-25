@@ -1,0 +1,592 @@
+{
+  "baseline": {
+    "1": [
+      {
+        "case": "two_closed",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_835d5692bb32c051",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"\u6771\u4eac \ud83d\ude00\"}"
+            }
+          },
+          {
+            "id": "call_9a2a8879bd339969",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Rome\"}"
+            }
+          }
+        ],
+        "content": " \n",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "two_closed",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_a77cc1011a69a542",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"\u6771\u4eac \ud83d\ude00\"}"
+            }
+          },
+          {
+            "index": 1,
+            "id": "call_adf7f0d870752e7a",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Rome\"}"
+            }
+          }
+        ],
+        "content": " \n",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "partial_second",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_bf9aebda4c459053",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "partial_second",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_9e0dc3094b818f65",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "complete",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_8ffa0a7e5a274f5b",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_aa2c1ce6da549a8e",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      }
+    ],
+    "20": [
+      {
+        "case": "two_closed",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_81d80e14f0a666ea",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"\u6771\u4eac \ud83d\ude00\"}"
+            }
+          }
+        ],
+        "content": " \n",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "two_closed",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_81f39d1963149d10",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"\u6771\u4eac \ud83d\ude00\"}"
+            }
+          }
+        ],
+        "content": " \n",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "partial_second",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_81b2da9c9cee56c0",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "partial_second",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_baaafc3c2e3c9e9b",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "complete",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_9eafa1af5ef19f70",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_a74b253324a69266",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      }
+    ],
+    "1024": [
+      {
+        "case": "two_closed",
+        "stream": false,
+        "calls": [],
+        "content": " \n",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "two_closed",
+        "stream": true,
+        "calls": [],
+        "content": " \n",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "partial_second",
+        "stream": false,
+        "calls": [],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "partial_second",
+        "stream": true,
+        "calls": [],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": false
+      },
+      {
+        "case": "complete",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_929dc847377abe42",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_91a37cda9bd3d7bb",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "candidate": {
+    "1": [
+      {
+        "case": "two_closed",
+        "stream": false,
+        "calls": [],
+        "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"\u6771\u4eac \ud83d\ude00\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "two_closed",
+        "stream": true,
+        "calls": [],
+        "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"\u6771\u4eac \ud83d\ude00\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "partial_second",
+        "stream": false,
+        "calls": [],
+        "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "partial_second",
+        "stream": true,
+        "calls": [],
+        "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_92e678d03f1916df",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_9178ca4632b4dcb9",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      }
+    ],
+    "20": [
+      {
+        "case": "two_closed",
+        "stream": false,
+        "calls": [],
+        "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"\u6771\u4eac \ud83d\ude00\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "two_closed",
+        "stream": true,
+        "calls": [],
+        "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"\u6771\u4eac \ud83d\ude00\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "partial_second",
+        "stream": false,
+        "calls": [],
+        "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "partial_second",
+        "stream": true,
+        "calls": [],
+        "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_b0a8473a46d02daf",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_83812b840ef87896",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      }
+    ],
+    "1024": [
+      {
+        "case": "two_closed",
+        "stream": false,
+        "calls": [],
+        "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"\u6771\u4eac \ud83d\ude00\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "two_closed",
+        "stream": true,
+        "calls": [],
+        "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"\u6771\u4eac \ud83d\ude00\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "partial_second",
+        "stream": false,
+        "calls": [],
+        "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "partial_second",
+        "stream": true,
+        "calls": [],
+        "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": false,
+        "calls": [
+          {
+            "id": "call_8a111b949b138514",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      },
+      {
+        "case": "complete",
+        "stream": true,
+        "calls": [
+          {
+            "index": 0,
+            "id": "call_8bbe3b130ab3df67",
+            "type": "function",
+            "function": {
+              "name": "weather",
+              "arguments": "{\"city\": \"Paris\"}"
+            }
+          }
+        ],
+        "content": "",
+        "finishes": [
+          "length"
+        ],
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "baseline_sha": "a76e12e6584f6029aeaa551c7cc8967671f67345",
+    "sglang_sha": "303def2253ae36fad89eb34dc66a7245003743f8",
+    "tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "scope": "Local native HTTP with synthetic token worker; no generation or performance claim",
+    "cases_per_arm": 18
+  }
+}

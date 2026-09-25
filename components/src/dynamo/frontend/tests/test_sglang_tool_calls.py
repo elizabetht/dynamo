@@ -685,3 +685,40 @@ class TestJsonArrayParserReparse:  # FRONTEND.4 — JSON-array parser reparse pa
         # No tool calls, plain content preserved, no crash.
         tc = (choice or {}).get("delta", {}).get("tool_calls", [])
         assert tc == []
+
+
+@pytest.mark.parametrize("batch_size", [1, 20, 1024])
+@pytest.mark.parametrize(
+    "suffix", ["", ', {"name": "get_weather", "parameters": {"city": "Ro']
+)
+def test_truncated_json_array_returns_original_text(tokenizer, batch_size, suffix):
+    text = (
+        " \n["
+        + json.dumps(
+            {"name": "get_weather", "parameters": {"city": '東京 😀 "quoted"'}},
+            ensure_ascii=False,
+        )
+        + suffix
+    )
+    post = SglangStreamingPostProcessor(
+        tokenizer=tokenizer,
+        tool_call_parser=JsonArrayParser(),
+        reasoning_parser=None,
+        sglang_tools=TOOLS,
+        tool_call_parser_name="hermes",
+    )
+    token_ids = tokenizer.encode(text, add_special_tokens=False)
+    events = []
+    for offset in range(0, len(token_ids), batch_size):
+        event = post.process_output(
+            {
+                "token_ids": token_ids[offset : offset + batch_size],
+                "finish_reason": None,
+            }
+        )
+        if event:
+            events.append(event)
+    events.append(post.process_output({"token_ids": [], "finish_reason": "length"}))
+    assert events[-1]["finish_reason"] == "length"
+    assert not any(event["delta"].get("tool_calls") for event in events)
+    assert "".join(event["delta"].get("content", "") for event in events) == text
