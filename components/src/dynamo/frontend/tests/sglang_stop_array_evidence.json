@@ -1,0 +1,968 @@
+{
+  "scope": "CPU native HTTP with synthetic tokens; no model generation or performance measurement",
+  "baseline_sha": "4502a9683ee9f4a058ca85ad7bd53d806ac978b1",
+  "model_tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "seed": null,
+  "cases": [
+    {
+      "arm": "baseline",
+      "interval": 1,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_a73155686239bae1",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"東京 😀\"}"
+          }
+        },
+        {
+          "id": "call_ac33c2b1000a51a0",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Rome\"}"
+          }
+        }
+      ],
+      "content": " \n",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_91b29d6f278800c4",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"東京 😀\"}"
+          }
+        },
+        {
+          "index": 1,
+          "id": "call_8c002e8132cc3eb3",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Rome\"}"
+          }
+        }
+      ],
+      "content": " \n",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_9794c0d11d56e021",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_8db21e79e927ea3d",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_99573ce395bc6f18",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "baseline",
+      "interval": 1,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_ae8cb18c68fe44ab",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "baseline",
+      "interval": 20,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_b524f35601df4262",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"東京 😀\"}"
+          }
+        }
+      ],
+      "content": " \n",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 20,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_a71c80a87a6e14ff",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"東京 😀\"}"
+          }
+        }
+      ],
+      "content": " \n",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 20,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_87daf3a7451e22f5",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 20,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_b3c867fad22b2bba",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 20,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_a5730d268dc646b7",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "baseline",
+      "interval": 20,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_bb4928c99f997471",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "baseline",
+      "interval": 1024,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n",
+      "finishes": [
+        "stop"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1024,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n",
+      "finishes": [
+        "stop"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1024,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "",
+      "finishes": [
+        "stop"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1024,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "",
+      "finishes": [
+        "stop"
+      ],
+      "passed": false
+    },
+    {
+      "arm": "baseline",
+      "interval": 1024,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_85ab75fddfb7b490",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "baseline",
+      "interval": 1024,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_a7d80426590e907c",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_8708600108e8126f",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_9eebbe8045542d08",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 20,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 20,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 20,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 20,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 20,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_8238540b63ad4c90",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 20,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_96014ddba80c66d2",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1024,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1024,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1024,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1024,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1024,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_a79e92eb89406cb1",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "length_control",
+      "interval": 1024,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_86c861b4157103d6",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "length"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_8b74347eaaaeedcf",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_bcc2af17b65000aa",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 20,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 20,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 20,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 20,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 20,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_b24dfcae53139d2e",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 20,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_9402c0034f9a0afc",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1024,
+      "case": "two_closed",
+      "stream": false,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1024,
+      "case": "two_closed",
+      "stream": true,
+      "calls": [],
+      "content": " \n[{\"name\": \"weather\", \"parameters\": {\"city\": \"東京 😀\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Rome\"}}",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1024,
+      "case": "partial_second",
+      "stream": false,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1024,
+      "case": "partial_second",
+      "stream": true,
+      "calls": [],
+      "content": "[{\"name\": \"weather\", \"parameters\": {\"city\": \"Paris\"}}, {\"name\": \"weather\", \"parameters\": {\"city\": \"Ro",
+      "finishes": [
+        "stop"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1024,
+      "case": "complete",
+      "stream": false,
+      "calls": [
+        {
+          "id": "call_92eb868f38c18921",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    },
+    {
+      "arm": "candidate",
+      "interval": 1024,
+      "case": "complete",
+      "stream": true,
+      "calls": [
+        {
+          "index": 0,
+          "id": "call_89d1520c48737750",
+          "type": "function",
+          "function": {
+            "name": "weather",
+            "arguments": "{\"city\": \"Paris\"}"
+          }
+        }
+      ],
+      "content": "",
+      "finishes": [
+        "tool_calls"
+      ],
+      "passed": true
+    }
+  ],
+  "source_hashes": {
+    "baseline-1": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "5f4435bb2d4aa525a0cd33f7f8cebd982c8ecb7eac3dbf0fee9ae46c2efbd421",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "baseline-20": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "5f4435bb2d4aa525a0cd33f7f8cebd982c8ecb7eac3dbf0fee9ae46c2efbd421",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "baseline-1024": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "5f4435bb2d4aa525a0cd33f7f8cebd982c8ecb7eac3dbf0fee9ae46c2efbd421",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "candidate-1": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "7b018284bfc7e121638589be90913e69cacf762cfca31ac226558adb9f8573b4",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "candidate-20": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "7b018284bfc7e121638589be90913e69cacf762cfca31ac226558adb9f8573b4",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "candidate-1024": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "7b018284bfc7e121638589be90913e69cacf762cfca31ac226558adb9f8573b4",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "length_control-1": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "7b018284bfc7e121638589be90913e69cacf762cfca31ac226558adb9f8573b4",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "length_control-20": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "7b018284bfc7e121638589be90913e69cacf762cfca31ac226558adb9f8573b4",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    },
+    "length_control-1024": {
+      "dynamo._core": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+      "dynamo.frontend.sglang_prepost": "7b018284bfc7e121638589be90913e69cacf762cfca31ac226558adb9f8573b4",
+      "dynamo.frontend.sglang_processor": "6b0a7671d0f1a98803dac41f31d005da10fe65349d3ec6bd1ae95d6faddf755d"
+    }
+  },
+  "comparison_note": "Baseline and candidate use the identical stop probe and thinking-disabled Qwen3 configuration. The committed reproducer also passes all 36 stop/length cases without a reasoning parser."
+}

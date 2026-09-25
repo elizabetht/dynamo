@@ -62,11 +62,21 @@ async def main(args):
     async def worker(request, context):
         dispatched.append(request)
         text = cases[case_id]
+        if args.termination == "stop":
+            text += (
+                'CUT"}}]'
+                if case_id == "partial_second"
+                else "]"
+                if case_id == "two_closed"
+                else ""
+            ) + "HALT"
         ids = tok.encode(text, add_special_tokens=False)
         for index, token in enumerate(ids):
             yield {
                 "token_ids": [token],
-                "finish_reason": "length" if index == len(ids) - 1 else None,
+                "finish_reason": ("length" if args.termination == "length" else "eos")
+                if index == len(ids) - 1
+                else None,
             }
 
     async def factory(instance, card, routed):
@@ -172,6 +182,12 @@ async def main(args):
                                 "stream": stream,
                                 "max_tokens": 64,
                             }
+                            if args.termination == "stop":
+                                request["stop"] = {
+                                    "two_closed": "]",
+                                    "partial_second": "CUT",
+                                    "complete": "HALT",
+                                }[case_id]
                             if flag != "omitted":
                                 request["parallel_tool_calls"] = flag
                             before = len(preprocessed)
@@ -245,7 +261,14 @@ async def main(args):
                     finishes.append(choice["finish_reason"])
                 message = choice.get("delta", choice.get("message", {}))
                 calls.extend(message.get("tool_calls") or [])
-        assert finishes == ["length"], finishes
+        expected_finish = (
+            "length"
+            if args.termination == "length"
+            else "tool_calls"
+            if row["case"] == "complete"
+            else "stop"
+        )
+        assert finishes == [expected_finish], finishes
         content = "".join(
             choice.get("delta", choice.get("message", {})).get("content") or ""
             for event in events
@@ -282,4 +305,5 @@ if __name__ == "__main__":
     parser.add_argument("--model-path", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--interval", type=int, choices=[1, 20, 1024], required=True)
+    parser.add_argument("--termination", choices=["length", "stop"], default="length")
     asyncio.run(asyncio.wait_for(main(parser.parse_args()), 180))

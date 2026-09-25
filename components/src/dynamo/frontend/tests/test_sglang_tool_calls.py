@@ -687,11 +687,14 @@ class TestJsonArrayParserReparse:  # FRONTEND.4 — JSON-array parser reparse pa
         assert tc == []
 
 
+@pytest.mark.parametrize("finish_reason", ["length", "stop"])
 @pytest.mark.parametrize("batch_size", [1, 20, 1024])
 @pytest.mark.parametrize(
     "suffix", ["", ', {"name": "get_weather", "parameters": {"city": "Ro']
 )
-def test_truncated_json_array_returns_original_text(tokenizer, batch_size, suffix):
+def test_truncated_json_array_returns_original_text(
+    tokenizer, batch_size, suffix, finish_reason
+):
     text = (
         " \n["
         + json.dumps(
@@ -718,7 +721,9 @@ def test_truncated_json_array_returns_original_text(tokenizer, batch_size, suffi
         )
         if event:
             events.append(event)
-    events.append(post.process_output({"token_ids": [], "finish_reason": "length"}))
-    assert events[-1]["finish_reason"] == "length"
+    events.append(
+        post.process_output({"token_ids": [], "finish_reason": finish_reason})
+    )
+    assert events[-1]["finish_reason"] == finish_reason
     assert not any(event["delta"].get("tool_calls") for event in events)
     assert "".join(event["delta"].get("content", "") for event in events) == text
