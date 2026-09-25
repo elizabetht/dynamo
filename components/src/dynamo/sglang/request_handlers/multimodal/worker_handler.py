@@ -5,6 +5,7 @@ import asyncio
 import json
 import logging
 import sys
+from contextlib import aclosing
 from typing import Any, AsyncIterator, Callable, Literal, Optional, Protocol
 
 import sglang as sgl
@@ -15,7 +16,7 @@ from dynamo.common.constants import DisaggregationMode, EmbeddingTransferMode
 from dynamo.common.multimodal import EMBEDDING_RECEIVER_FACTORIES, TransferRequest
 from dynamo.common.utils import nvtx_utils as _nvtx
 from dynamo.common.utils.engine_response import normalize_finish_reason
-from dynamo.llm.exceptions import InvalidArgument
+from dynamo.llm.exceptions import EngineShutdown, InvalidArgument
 from dynamo.sglang._disagg import validate_disagg_parallel_sampling
 from dynamo.sglang.args import Config
 from dynamo.sglang.protocol import (
@@ -23,6 +24,9 @@ from dynamo.sglang.protocol import (
     SglangMultimodalRequest,
 )
 from dynamo.sglang.request_handlers.handler_base import BaseWorkerHandler
+from dynamo.sglang.request_handlers.llm.decode_handler import (
+    _ordered_cancellation_request_id,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -502,19 +506,23 @@ class MultimodalWorkerHandler(BaseWorkerHandler[SglangMultimodalRequest, str]):
             if self.serving_mode == DisaggregationMode.DECODE:
                 rng_disagg = _nvtx.start_range("mm:pd:generate_disagg", color="red")
                 try:
-                    async for output in self._generate_disaggregated(
-                        request, _end_ttft, context=context
-                    ):
-                        yield output
+                    async with aclosing(
+                        self._generate_disaggregated(
+                            request, _end_ttft, context=context
+                        )
+                    ) as stream:
+                        async for output in stream:
+                            yield output
                 finally:
                     _nvtx.end_range(rng_disagg)
             else:
                 rng_agg = _nvtx.start_range("mm:pd:generate_agg", color="red")
                 try:
-                    async for output in self._generate_aggregated(
-                        request, _end_ttft, context=context
-                    ):
-                        yield output
+                    async with aclosing(
+                        self._generate_aggregated(request, _end_ttft, context=context)
+                    ) as stream:
+                        async for output in stream:
+                            yield output
                 finally:
                     _nvtx.end_range(rng_agg)
 
@@ -565,16 +573,74 @@ class MultimodalWorkerHandler(BaseWorkerHandler[SglangMultimodalRequest, str]):
         rng_first = _nvtx.start_range("mm:dec:first_token", color="purple")
         first_token = True
         try:
-            async for output in StreamProcessor.process_sglang_stream(decode_stream):
-                if first_token:
-                    end_ttft()
-                    _nvtx.end_range(rng_first)
-                    first_token = False
-                yield output
+            async with aclosing(
+                self._cancel_aware_stream(decode_stream, context, sampling_params)
+            ) as stream:
+                async for output in StreamProcessor.process_sglang_stream(stream):
+                    if first_token:
+                        end_ttft()
+                        _nvtx.end_range(rng_first)
+                        first_token = False
+                    yield output
         finally:
             if first_token:
                 end_ttft()
                 _nvtx.end_range(rng_first)
+
+    async def _cancel_aware_stream(
+        self,
+        source: AsyncIterator[dict[str, Any]],
+        context: Context | None,
+        sampling_params: dict[str, Any],
+    ) -> AsyncIterator[dict[str, Any]]:
+        if context is None:
+            async for chunk in source:
+                yield chunk
+            return
+
+        submitted_request_id = _ordered_cancellation_request_id(
+            context.trace_id,
+            sampling_params,
+            supported=getattr(self, "_supports_ordered_cancellation", False),
+        )
+        request_id_future: asyncio.Future[
+            str
+        ] = asyncio.get_running_loop().create_future()
+        request_ids: set[str] = set()
+        finished_choices: set[int] = set()
+        try:
+            async with self._cancellation_monitor(
+                request_id_future,
+                context,
+                submitted_request_id,
+                request_ids=request_ids,
+            ) as cancellation_task:
+                async for chunk in self._stream_until_cancelled(
+                    source, cancellation_task
+                ):
+                    meta = chunk.get("meta_info", {})
+                    request_id = meta.get("id")
+                    if request_id:
+                        request_ids.add(request_id)
+                        if not request_id_future.done():
+                            request_id_future.set_result(request_id)
+                        if meta.get("finish_reason"):
+                            request_ids.discard(request_id)
+                    if (
+                        context.is_stopped()
+                        or context.is_killed()
+                        or (self.shutdown_event and self.shutdown_event.is_set())
+                    ):
+                        if submitted_request_id is None:
+                            self._abort_requests(request_ids, context)
+                        continue
+                    if meta.get("finish_reason"):
+                        finished_choices.add(chunk.get("index") or 0)
+                    yield chunk
+        except EngineShutdown:
+            # A shutdown during iterator cleanup cannot invalidate delivered terminals.
+            if len(finished_choices) < sampling_params.get("n", 1):
+                raise
 
     async def _generate_aggregated(
         self,
@@ -627,15 +693,18 @@ class MultimodalWorkerHandler(BaseWorkerHandler[SglangMultimodalRequest, str]):
             rng_first = _nvtx.start_range("mm:dec:first_token", color="purple")
             first_token = True
             try:
-                async for output in StreamProcessor.process_sglang_stream(agg_stream):
-                    if first_token:
-                        if tensor_id is not None:
-                            self.embeddings_processor.release_embeddings(tensor_id)
-                            tensor_id = None
-                        end_ttft()
-                        _nvtx.end_range(rng_first)
-                        first_token = False
-                    yield output
+                async with aclosing(
+                    self._cancel_aware_stream(agg_stream, context, sampling_params)
+                ) as stream:
+                    async for output in StreamProcessor.process_sglang_stream(stream):
+                        if first_token:
+                            if tensor_id is not None:
+                                self.embeddings_processor.release_embeddings(tensor_id)
+                                tensor_id = None
+                            end_ttft()
+                            _nvtx.end_range(rng_first)
+                            first_token = False
+                        yield output
             finally:
                 if first_token:
                     end_ttft()
