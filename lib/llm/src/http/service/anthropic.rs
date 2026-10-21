@@ -806,9 +806,8 @@ async fn anthropic_messages(
                             );
                         if semantic_error {
                             saw_error = true;
-                            stream_error_body = annotated_chunk
-                                .error
-                                .as_ref()
+                            stream_error_body = producer_error_signal
+                                .semantic_error()
                                 .map(anthropic_stream_error_body);
                         }
                         let Some(stream_resp) = annotated_chunk.data else {
