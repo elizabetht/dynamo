@@ -20,11 +20,13 @@ from msgspec.structs import replace as msgspec_replace
 from vllm.config import CacheConfig, LoadConfig, ModelConfig, VllmConfig
 from vllm.entrypoints.chat_utils import load_chat_template
 from vllm.exceptions import VLLMClientError
+from vllm.inputs import split_enc_dec_input
 from vllm.reasoning import ReasoningParser, ReasoningParserManager
 from vllm.sampling_params import RequestOutputKind, SamplingParams
 from vllm.tasks import GENERATION_TASKS
 from vllm.tokenizers import TokenizerLike
 from vllm.tool_parsers import ToolParser, ToolParserManager
+from vllm.utils import length_from_prompt_token_ids_or_embeds
 from vllm.v1.engine import EngineCoreOutput, EngineCoreRequest, FinishReason
 from vllm.v1.engine.input_processor import InputProcessor
 from vllm.v1.engine.output_processor import OutputProcessor, OutputProcessorOutput
@@ -690,7 +692,6 @@ class VllmProcessor:
         elif request_for_sampling.max_tokens is not None:
             max_tokens = request_for_sampling.max_tokens
         else:
-            # This should mean model max - prompt len.
             max_tokens = None
 
         sampling_params = SamplingParams(
@@ -738,6 +739,19 @@ class VllmProcessor:
                 mm_processor_kwargs=request_for_sampling.mm_processor_kwargs,
                 defer_multimodal_processing=mm_uuids is not None,
             )
+            default_max_tokens = self.input_processor.generation_config_fields.get(
+                "max_new_tokens"
+            )
+            if max_tokens is None and default_max_tokens is not None:
+                _, decoder_input = split_enc_dec_input(engine_inputs)
+                prompt_length = length_from_prompt_token_ids_or_embeds(
+                    decoder_input.get("prompt_token_ids"),
+                    decoder_input.get("prompt_embeds"),
+                )
+                sampling_params.max_tokens = min(
+                    default_max_tokens,
+                    self.input_processor.model_config.max_model_len - prompt_length,
+                )
             vllm_preproc: EngineCoreRequest = self.input_processor.process_inputs(
                 request_id,
                 engine_inputs,
