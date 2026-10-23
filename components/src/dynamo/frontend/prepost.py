@@ -757,18 +757,26 @@ async def preprocess_chat_request(
         guided_decoding = assistant_guided_decoding
     else:
         guided_decoding = tool_guided_decoding
-    # build_tool_call_guided_decoding falls back to Dynamo's generic JSON schema
-    # when a forced tool choice has no parser-provided grammar.  That can happen
-    # both without a parser and with parsers (for example Hermes) whose
-    # adjust_request() leaves structured_outputs unchanged.  In either case the
-    # model emits Dynamo's bare JSON wire format, which must bypass the parser's
-    # native-syntax decoder during postprocessing.
+    # JSON-capable parsers can install the forced-choice schema themselves.
+    # Its bare JSON wire format still needs the standard tool-call decoder,
+    # rather than the parser's native markup decoder.
     uses_dynamo_json_tool_call_fallback = (
         is_forced_tool_choice
-        and parser_guided_decoding is None
         and guided_decoding is tool_guided_decoding
         and isinstance(tool_guided_decoding, dict)
-        and ("json" in tool_guided_decoding or "regex" in tool_guided_decoding)
+        and (
+            (
+                parser_guided_decoding is None
+                and ("json" in tool_guided_decoding or "regex" in tool_guided_decoding)
+            )
+            or (
+                "json" in tool_guided_decoding
+                and tool_guided_decoding["json"]
+                == get_json_schema_from_tools(
+                    request_for_sampling.tool_choice, request_for_sampling.tools
+                )
+            )
+        )
     )
 
     _, engine_prompt = await renderer.render_messages_async(messages, chat_params)
@@ -1018,17 +1026,23 @@ class StreamingPostProcessor:
             return None
 
         text = "".join(self._dynamo_json_fallback_chunks.pop(output.index))
-        delta: dict[str, Any]
+        reasoning = None
+        if self.reasoning_parser is not None:
+            reasoning, text = self.reasoning_parser.extract_reasoning(
+                text, request=self.request_for_sampling
+            )
+        delta: dict[str, Any] = {}
+        if reasoning and not self._suppress_reasoning_output:
+            delta["reasoning_content"] = reasoning
         try:
-            tool_calls = self._decode_dynamo_json_fallback_tool_calls(text)
+            tool_calls = self._decode_dynamo_json_fallback_tool_calls(text or "")
         except (TypeError, ValueError):
-            delta = {"role": "assistant", "content": text} if text else {}
-            return self._build_choice(output, delta)
-
-        delta = {
-            "role": "assistant",
-            "tool_calls": tool_calls,
-        }
+            if text:
+                delta["content"] = text
+        else:
+            delta["tool_calls"] = tool_calls
+        if delta:
+            delta["role"] = "assistant"
         return self._build_choice(output, delta)
 
     def _should_buffer_for_non_streaming_tool_parse(self) -> bool:
