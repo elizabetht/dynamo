@@ -724,6 +724,11 @@ class VllmProcessor:
         # below. Prefer the OpenAI-compatible root-level field, fall back to the
         # legacy nvext passthrough.
         thinking_token_budget = resolve_thinking_token_budget(request)
+        # Match the Rust preprocessor: canonical nvext takes precedence, while
+        # empty salts fall back to the legacy top-level field.
+        cache_salt = (request.get("nvext") or {}).get("cache_salt") or request.get(
+            "cache_salt"
+        )
 
         with _nvtx.annotate("mm_frontend:process_inputs", color="orange"):
             # render_messages_async returns a raw prompt. Convert it to a typed
@@ -734,7 +739,7 @@ class VllmProcessor:
                 self.input_processor.renderer,
                 engine_prompt,
                 tokens,
-                cache_salt=request_for_sampling.cache_salt,
+                cache_salt=cache_salt,
                 mm_processor_kwargs=request_for_sampling.mm_processor_kwargs,
                 defer_multimodal_processing=mm_uuids is not None,
             )
@@ -792,6 +797,14 @@ class VllmProcessor:
             "annotations": [],
             "routing": request.get("routing"),
         }
+        if cache_salt:
+            dynamo_preproc["routing"] = dict(
+                dynamo_preproc["routing"] or {}, cache_salt=cache_salt
+            )
+            dynamo_preproc.setdefault("extra_args", {})["nvext"] = {
+                "cache_salt": cache_salt
+            }
+
         if guided_decoding is not None:
             dynamo_preproc["sampling_options"]["guided_decoding"] = guided_decoding
         if reasoning_metadata.engine_reasoning_ended is not None:
