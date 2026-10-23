@@ -920,11 +920,6 @@ class StreamingPostProcessor:
         # `n > 1` requests stream multiple choices interleaved; a remap on
         # one choice must not bleed into another. See _remap_finish_reason().
         self._tool_call_choices_emitted: set[int] = set()
-        # Buffer for post-reasoning tool text when </think> and <tool_call>
-        # arrive in the same chunk.  The streaming tool parser cannot handle
-        # this correctly, so we accumulate text here and fall back to the
-        # non-streaming extract_tool_calls() once the buffer is complete.
-        self._tool_text_buffer: str | None = None
         self._dynamo_json_fallback_chunks: dict[int, list[str]] = {}
 
     @property
@@ -1362,31 +1357,7 @@ class StreamingPostProcessor:
 
         delta_message: DeltaMessage | None = DeltaMessage(content=delta_text)
 
-        # ------------------------------------------------------------------
-        # Drain the tool-text buffer (populated when </think> and <tool_call>
-        # arrived in the same chunk).  The streaming tool parser cannot
-        # handle that transition correctly, so we accumulate text here and
-        # use the non-streaming extract_tool_calls() once complete.
-        # ------------------------------------------------------------------
-        if self._tool_text_buffer is not None:
-            self._tool_text_buffer += delta_text
-            buffer_complete = (
-                any(
-                    marker in self._tool_text_buffer
-                    for marker in self._tool_end_markers()
-                )
-            ) or output.finish_reason
-            if buffer_complete:
-                buffered_text = self._tool_text_buffer
-                self._tool_text_buffer = None
-                delta_message = self._extract_tool_calls_from_text(buffered_text)
-            else:
-                # Still accumulating; emit nothing for this chunk.
-                self.previous_text = current_text
-                self.previous_token_ids = current_token_ids
-                return None
-
-        elif not self.reasoning_is_done and self.reasoning_parser:
+        if not self.reasoning_is_done and self.reasoning_parser:
             self._reasoning_parser_streaming_started = True
             delta_message = self.reasoning_parser.extract_reasoning_streaming(
                 self.previous_text,
@@ -1397,11 +1368,6 @@ class StreamingPostProcessor:
                 delta_token_ids,
             )
 
-            # When reasoning ends in this chunk, reset accumulated state.
-            # If there is post-reasoning content (e.g. <tool_call> markup),
-            # buffer it for non-streaming extraction rather than feeding it
-            # to the streaming tool parser which cannot handle the combined
-            # reasoning-end + tool-start in a single chunk.
             if self.reasoning_parser.engine_based_streaming:
                 reasoning_ended = (
                     self.reasoning_parser.has_engine_confirmed_reasoning_end()
@@ -1426,31 +1392,23 @@ class StreamingPostProcessor:
                 current_text = ""
                 current_token_ids = []
 
-                tool_start_markers = self._tool_start_markers()
-                if post_content and any(
-                    marker in post_content for marker in tool_start_markers
-                ):
-                    # Tool call markup present — buffer for non-streaming
-                    # extraction (streaming parser can't handle the combined
-                    # reasoning-end + tool-start in a single chunk).
-                    self._tool_text_buffer = post_content
-                    if output.finish_reason:
-                        # If finish_reason is already set, this is the final
-                        # chunk; parse buffered text now instead of waiting for
-                        # a later call that will never happen.
-                        buffered_text = self._tool_text_buffer
-                        self._tool_text_buffer = None
-                        delta_message = self._extract_tool_calls_from_text(
-                            buffered_text,
-                            saved_reasoning=saved_reasoning,
-                        )
-                    else:
-                        delta_message = self._compose_delta_message(
-                            saved_reasoning,
-                            None,
-                        )
+                if post_content and self._should_parse_tools():
+                    # Start the tool stream with only the post-reasoning suffix,
+                    # retaining the original token IDs for token-aware parsers.
+                    current_text = post_content
+                    current_token_ids = self.reasoning_parser.extract_content_ids(
+                        delta_token_ids
+                    )
+                    delta_message = self._merge_delta_messages(
+                        self._compose_delta_message(saved_reasoning, None),
+                        self._extract_tool_calls_streaming(
+                            current_text=current_text,
+                            delta_text=post_content,
+                            current_token_ids=current_token_ids,
+                            delta_token_ids=current_token_ids,
+                        ),
+                    )
                 else:
-                    # Plain content (or no content) after reasoning end.
                     delta_message = self._compose_delta_message(
                         reasoning=saved_reasoning,
                         content=post_content if post_content else None,
