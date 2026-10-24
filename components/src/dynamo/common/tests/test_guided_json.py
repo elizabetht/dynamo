@@ -127,3 +127,22 @@ def test_allows_schemas_outside_cyclic_root_ref_chains(schema):
 )
 def test_leaves_unresolved_references_to_backend(schema):
     reject_nonprogressing_guided_json_ref_cycles(schema)
+
+
+@pytest.mark.parametrize("name", ["plain", "é😀", ""])
+def test_rejects_cycles_through_unescaped_pointer_tokens(name):
+    ref = f"#/$defs/{name}"
+    schema = {"$defs": {name: {"$ref": ref}}, "$ref": ref}
+
+    with pytest.raises(HttpError, match=r"non-progressing local \$ref cycle") as error:
+        reject_nonprogressing_guided_json_ref_cycles(schema)
+
+    assert error.value.code == 400
+
+
+@pytest.mark.parametrize("name", ["bad~", "bad~2"])
+def test_leaves_malformed_pointer_escapes_to_backend(name):
+    ref = f"#/$defs/{name}"
+    schema = {"$defs": {name: {"$ref": ref}}, "$ref": ref}
+
+    reject_nonprogressing_guided_json_ref_cycles(schema)

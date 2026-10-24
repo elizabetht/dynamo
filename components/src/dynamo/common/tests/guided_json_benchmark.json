@@ -1,0 +1,508 @@
+{
+  "scope": "CPU guided JSON cycle check; not serving performance",
+  "python": "3.11.15",
+  "machine": "x86_64",
+  "cpu": "AMD Ryzen 7 6800H with Radeon Vega Mobile Gfx",
+  "source_sha256": "ad546f99777c193eb995ee9b57ac4a2946fc0971d72aae80b6494bab0938ff62",
+  "baseline_source_sha256": "6125814e7c2cc7bab8438826fd930f9e8bad6fb9892df70a4eafae045afc7449",
+  "corpus_sha256": "011fbfa5256027d2876be01c59fa06502110afa10e9baa380482cf93dd85c266",
+  "seed": 0,
+  "pairs": 4,
+  "order": "AB BA AB BA",
+  "warmups_per_variant_case": 20,
+  "samples_per_variant_case": 400,
+  "token_parity_cases": 19608,
+  "schema_parity": [
+    {
+      "case": "plain-16",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "plain-16",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "escaped-16",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "escaped-16",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "no-ref-16",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "no-ref-16",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "plain-1024",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "plain-1024",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "escaped-1024",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "escaped-1024",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "no-ref-1024",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "no-ref-1024",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "cycle-plain",
+      "representation": "dict",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-plain",
+      "representation": "string",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-a~1b",
+      "representation": "dict",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-a~1b",
+      "representation": "string",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-a~0b",
+      "representation": "dict",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-a~0b",
+      "representation": "string",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-a~01b",
+      "representation": "dict",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-a~01b",
+      "representation": "string",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-%C3%A9%F0%9F%98%80",
+      "representation": "dict",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-%C3%A9%F0%9F%98%80",
+      "representation": "string",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-",
+      "representation": "dict",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-",
+      "representation": "string",
+      "outcome": [
+        400,
+        "HTTP 400: Invalid guided_json schema: non-progressing local $ref cycle detected"
+      ]
+    },
+    {
+      "case": "cycle-bad~2",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "cycle-bad~2",
+      "representation": "string",
+      "outcome": null
+    },
+    {
+      "case": "cycle-bad~",
+      "representation": "dict",
+      "outcome": null
+    },
+    {
+      "case": "cycle-bad~",
+      "representation": "string",
+      "outcome": null
+    }
+  ],
+  "results": [
+    {
+      "case": "plain-16",
+      "representation": "dict",
+      "unit": "us/call",
+      "baseline": 66.28325,
+      "candidate": 53.349,
+      "change_percent": -19.513602606993473,
+      "pair_medians": [
+        {
+          "baseline": 66.48349999999999,
+          "candidate": 53.434
+        },
+        {
+          "candidate": 53.263999999999996,
+          "baseline": 66.2235
+        },
+        {
+          "baseline": 66.34299999999999,
+          "candidate": 54.2555
+        },
+        {
+          "candidate": 53.164,
+          "baseline": 66.19800000000001
+        }
+      ]
+    },
+    {
+      "case": "plain-16",
+      "representation": "string",
+      "unit": "us/call",
+      "baseline": 71.00200000000001,
+      "candidate": 58.526250000000005,
+      "change_percent": -17.570983915946037,
+      "pair_medians": [
+        {
+          "baseline": 71.498,
+          "candidate": 58.2635
+        },
+        {
+          "candidate": 59.491,
+          "baseline": 71.65299999999999
+        },
+        {
+          "baseline": 70.3055,
+          "candidate": 57.7475
+        },
+        {
+          "candidate": 58.789,
+          "baseline": 70.506
+        }
+      ]
+    },
+    {
+      "case": "escaped-16",
+      "representation": "dict",
+      "unit": "us/call",
+      "baseline": 63.98349999999999,
+      "candidate": 58.2785,
+      "change_percent": -8.916361249384597,
+      "pair_medians": [
+        {
+          "baseline": 63.909,
+          "candidate": 59.471
+        },
+        {
+          "candidate": 58.048,
+          "baseline": 64.3445
+        },
+        {
+          "baseline": 64.03399999999999,
+          "candidate": 58.464
+        },
+        {
+          "candidate": 58.093,
+          "baseline": 63.933
+        }
+      ]
+    },
+    {
+      "case": "escaped-16",
+      "representation": "string",
+      "unit": "us/call",
+      "baseline": 70.083,
+      "candidate": 64.31700000000001,
+      "change_percent": -8.227387526218898,
+      "pair_medians": [
+        {
+          "baseline": 70.3755,
+          "candidate": 64.59
+        },
+        {
+          "candidate": 64.2745,
+          "baseline": 70.1055
+        },
+        {
+          "baseline": 70.0605,
+          "candidate": 64.1345
+        },
+        {
+          "candidate": 64.3595,
+          "baseline": 69.945
+        }
+      ]
+    },
+    {
+      "case": "no-ref-16",
+      "representation": "dict",
+      "unit": "us/call",
+      "baseline": 22.657,
+      "candidate": 22.567,
+      "change_percent": -0.3972282296861862,
+      "pair_medians": [
+        {
+          "baseline": 22.442,
+          "candidate": 22.532
+        },
+        {
+          "candidate": 22.602,
+          "baseline": 22.707
+        },
+        {
+          "baseline": 22.607,
+          "candidate": 22.4115
+        },
+        {
+          "candidate": 22.652,
+          "baseline": 22.722
+        }
+      ]
+    },
+    {
+      "case": "no-ref-16",
+      "representation": "string",
+      "unit": "us/call",
+      "baseline": 26.68175,
+      "candidate": 26.697,
+      "change_percent": 0.057155171606049215,
+      "pair_medians": [
+        {
+          "baseline": 26.558999999999997,
+          "candidate": 26.409
+        },
+        {
+          "candidate": 27.216,
+          "baseline": 26.704
+        },
+        {
+          "baseline": 26.7945,
+          "candidate": 26.86
+        },
+        {
+          "candidate": 26.534,
+          "baseline": 26.6595
+        }
+      ]
+    },
+    {
+      "case": "plain-1024",
+      "representation": "dict",
+      "unit": "us/call",
+      "baseline": 4014.7380000000003,
+      "candidate": 3186.9795,
+      "change_percent": -20.617995495596485,
+      "pair_medians": [
+        {
+          "baseline": 4009.318,
+          "candidate": 3184.129
+        },
+        {
+          "candidate": 3189.83,
+          "baseline": 4020.158
+        },
+        {
+          "baseline": 4047.9045,
+          "candidate": 3202.5384999999997
+        },
+        {
+          "candidate": 3179.4855,
+          "baseline": 4007.8355
+        }
+      ]
+    },
+    {
+      "case": "plain-1024",
+      "representation": "string",
+      "unit": "us/call",
+      "baseline": 4209.8935,
+      "candidate": 3419.27075,
+      "change_percent": -18.78011284608506,
+      "pair_medians": [
+        {
+          "baseline": 4199.777,
+          "candidate": 3407.7545
+        },
+        {
+          "candidate": 3430.7870000000003,
+          "baseline": 4234.5675
+        },
+        {
+          "baseline": 4202.512,
+          "candidate": 3347.8280000000004
+        },
+        {
+          "candidate": 3430.8225,
+          "baseline": 4217.275
+        }
+      ]
+    },
+    {
+      "case": "escaped-1024",
+      "representation": "dict",
+      "unit": "us/call",
+      "baseline": 3957.855,
+      "candidate": 3595.4355,
+      "change_percent": -9.156967599874177,
+      "pair_medians": [
+        {
+          "baseline": 3953.254,
+          "candidate": 3573.703
+        },
+        {
+          "candidate": 3588.455,
+          "baseline": 4023.7545
+        },
+        {
+          "baseline": 3962.456,
+          "candidate": 3602.416
+        },
+        {
+          "candidate": 3605.8275000000003,
+          "baseline": 3949.2715
+        }
+      ]
+    },
+    {
+      "case": "escaped-1024",
+      "representation": "string",
+      "unit": "us/call",
+      "baseline": 4154.1595,
+      "candidate": 3776.12425,
+      "change_percent": -9.100162138694968,
+      "pair_medians": [
+        {
+          "baseline": 4224.5935,
+          "candidate": 3780.5425
+        },
+        {
+          "candidate": 3771.706,
+          "baseline": 4158.555
+        },
+        {
+          "baseline": 4148.757,
+          "candidate": 3819.7055
+        },
+        {
+          "candidate": 3770.0185,
+          "baseline": 4149.763999999999
+        }
+      ]
+    },
+    {
+      "case": "no-ref-1024",
+      "representation": "dict",
+      "unit": "us/call",
+      "baseline": 1310.3204999999998,
+      "candidate": 1300.35725,
+      "change_percent": -0.7603674062948595,
+      "pair_medians": [
+        {
+          "baseline": 1303.7930000000001,
+          "candidate": 1298.7845
+        },
+        {
+          "candidate": 1294.441,
+          "baseline": 1309.629
+        },
+        {
+          "baseline": 1311.012,
+          "candidate": 1301.9299999999998
+        },
+        {
+          "candidate": 1340.5115,
+          "baseline": 1322.1875
+        }
+      ]
+    },
+    {
+      "case": "no-ref-1024",
+      "representation": "string",
+      "unit": "us/call",
+      "baseline": 1510.3575,
+      "candidate": 1502.9157500000001,
+      "change_percent": -0.49271447322901674,
+      "pair_medians": [
+        {
+          "baseline": 1511.84,
+          "candidate": 1503.965
+        },
+        {
+          "candidate": 1506.5405,
+          "baseline": 1513.5535
+        },
+        {
+          "baseline": 1508.875,
+          "candidate": 1501.0900000000001
+        },
+        {
+          "candidate": 1501.8665,
+          "baseline": 1507.8474999999999
+        }
+      ]
+    }
+  ],
+  "limitations": "Shared CPU; no affinity or frequency controls. Warm function timings, not schema compilation. No model, image, tokenizer, GPU, HTTP or engine execution."
+}
