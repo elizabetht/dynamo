@@ -24,12 +24,19 @@ def validate_legacy_guided_decoding_constraints(request: dict[str, Any]) -> None
     # constraint. Any other non-list is malformed: silently ignoring it would
     # generate unconstrained text for a caller who believes it constrained the
     # output. The Rust frontend types this field as Option<Vec<String>> and
-    # rejects a scalar, so rejecting here keeps the two paths in step.
+    # rejects non-string elements too, so validate both the container and items.
     if choice is not None and not isinstance(choice, list):
         raise InvalidArgument(
             "guided_choice must be a list of strings; received "
             f"{type(choice).__name__}"
         )
+    if choice is not None:
+        for index, item in enumerate(choice):
+            if not isinstance(item, str):
+                raise InvalidArgument(
+                    "guided_choice must be a list of strings; "
+                    f"element {index} has type {type(item).__name__}"
+                )
     constraints = (
         ("json", request.get("guided_json") is not None),
         ("regex", request.get("guided_regex") is not None),
