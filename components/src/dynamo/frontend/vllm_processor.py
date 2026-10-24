@@ -1023,6 +1023,11 @@ class VllmProcessor:
                     break
 
                 raw_finish_reason = engine_response.get("finish_reason")
+                if isinstance(raw_finish_reason, dict) and "error" in raw_finish_reason:
+                    message = raw_finish_reason["error"]
+                    logger.error("Engine error for request %s: %s", request_id, message)
+                    yield as_error_envelope(make_internal_error(request_id, message))
+                    break
                 finish_reason = map_finish_reason(raw_finish_reason)
                 stop_reason = engine_response.get("stop_reason")
 

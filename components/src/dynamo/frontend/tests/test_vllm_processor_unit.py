@@ -1559,6 +1559,36 @@ async def _run_generate(processor, preproc, *, mm_routing_info=None, context=Non
 
 class TestRoutedEnginePath:
     @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "controlled worker failure",
+            "",
+            'BackendInvalidArgument: {"message":"engine fault","code":400}',
+        ],
+    )
+    async def test_canonical_error_finish_preserves_diagnostic(
+        self, vllm_processor_module, message
+    ):
+        routed_engine = _FakeRoutedEngine(
+            [
+                {"token_ids": [], "finish_reason": {"error": message}},
+                {"token_ids": [101], "finish_reason": "stop"},
+            ]
+        )
+        processor = _make_processor(vllm_processor_module, routed_engine)
+
+        chunks = await _run_generate(processor, _base_preproc())
+
+        assert len(chunks) == 1
+        assert chunks[0]["event"] == "error"
+        assert chunks[0]["comment"] == [
+            message or "Invalid engine response for request request-id"
+        ]
+        assert not processor.output_processor.request_states
+        assert routed_engine.yielded == 1
+
+    @pytest.mark.asyncio
     async def test_backend_rejection_keeps_the_backend_status(
         self, vllm_processor_module
     ):
