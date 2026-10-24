@@ -1,0 +1,651 @@
+{
+  "scope": "Real-model streamed Chat correctness, not a performance benchmark",
+  "baseline_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "candidate_source_sha": "1562927b520a8f72669e7aa9d6f4fe4bd63e35f4",
+  "candidate_patch_sha256": "6fd0cc42615145721adf881b96a29e556114261d58109fafb957fd3e0c8efe45",
+  "engine": "SGLang0.5.18",
+  "engine_sha": "71de97b264b04dcd514cf904003028aefe9775c8",
+  "image": "nvcr.io/nvidia/ai-dynamo/sglang-runtime-nightly@sha256:8e410361722b5bc52bfdcc6107d374d36a49e45297b30dc54144ab942180abcb",
+  "model": "Qwen/Qwen3-0.6B",
+  "model_tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "dtype": "bfloat16",
+  "gpu_count": 1,
+  "gpu_product": "NVIDIA GB10",
+  "seed": 17,
+  "temperature": 0,
+  "max_output_tokens": 128,
+  "concurrency": 1,
+  "pairs": 1,
+  "warmups_per_case_per_arm": 1,
+  "observations_per_case_per_arm": 1,
+  "request_count": 28,
+  "passed_request_count": 28,
+  "identical_nonwarmup_pairs": 7,
+  "warmup_differences": "First plain-chat warmup output differs; cached-token usage differs in four warmup cases. All remain valid.",
+  "sources": {
+    "modules/dynamo.common.utils.guided_json.py": {
+      "revision": "70e094f650ab89eb81d359825adcb78fc9256aba",
+      "path": "components/src/dynamo/common/utils/guided_json.py",
+      "sha256": "6125814e7c2cc7bab8438826fd930f9e8bad6fb9892df70a4eafae045afc7449"
+    },
+    "modules/dynamo.common.utils.engine_response.py": {
+      "revision": "70e094f650ab89eb81d359825adcb78fc9256aba",
+      "path": "components/src/dynamo/common/utils/engine_response.py",
+      "sha256": "6de5a0a17223a5707fe6254cc378c7afda4de7fd7f868396b4d027dcb3b64cdc"
+    },
+    "modules/dynamo.frontend.sglang_processor.py": {
+      "revision": "70e094f650ab89eb81d359825adcb78fc9256aba",
+      "path": "components/src/dynamo/frontend/sglang_processor.py",
+      "sha256": "038f1a0154fd183464dfb53185d452c7d79653b6a69064045194f9541abeb7a8"
+    },
+    "modules/dynamo.frontend.thinking.py": {
+      "revision": "70e094f650ab89eb81d359825adcb78fc9256aba",
+      "path": "components/src/dynamo/frontend/thinking.py",
+      "sha256": "03da16b14eebfec2c08793d61771efce772c8656fe80474a25f4aa0fecb262ee"
+    },
+    "modules/dynamo.frontend.utils.py": {
+      "revision": "70e094f650ab89eb81d359825adcb78fc9256aba",
+      "path": "components/src/dynamo/frontend/utils.py",
+      "sha256": "f939b9eacaeccdd46174677b2c5ddc2e26e43ae0177eb86629a49b463884413a"
+    },
+    "baseline/sglang_prepost.py": {
+      "revision": "70e094f650ab89eb81d359825adcb78fc9256aba",
+      "path": "components/src/dynamo/frontend/sglang_prepost.py",
+      "sha256": "744b981f594d189a191d4e11796a8a4999825ea67f2a7aecaee2986d48f8b614"
+    },
+    "candidate/sglang_prepost.py": {
+      "revision": "1562927b520a8f72669e7aa9d6f4fe4bd63e35f4",
+      "path": "components/src/dynamo/frontend/sglang_prepost.py",
+      "sha256": "729b6f2d8535b25e99d3b67d912fa32075c62e97100185c0ba71abdec90d6edb"
+    }
+  },
+  "rows": {
+    "baseline": [
+      {
+        "case": "plain",
+        "warmup": true,
+        "valid": true,
+        "content": "😊 今天天气晴朗，气温适宜，适合户外活动。",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 15,
+          "total_tokens": 35
+        }
+      },
+      {
+        "case": "plain",
+        "warmup": false,
+        "valid": true,
+        "content": "当然，以下是天气预报的中文报告：\n\n😊 天气预报：晴天，气温在20°C到25°C之间，风力较小，适合户外活动。",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 38,
+          "total_tokens": 58,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "text_parts",
+        "warmup": true,
+        "valid": true,
+        "content": "😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 2,
+          "total_tokens": 16,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 3
+          }
+        }
+      },
+      {
+        "case": "text_parts",
+        "warmup": false,
+        "valid": true,
+        "content": "😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 2,
+          "total_tokens": 16,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 13
+          }
+        }
+      },
+      {
+        "case": "json_schema",
+        "warmup": true,
+        "valid": true,
+        "content": "{\"city\": \"北京\"}",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 7,
+          "total_tokens": 27,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "json_schema",
+        "warmup": false,
+        "valid": true,
+        "content": "{\"city\": \"北京\"}",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 7,
+          "total_tokens": 27,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "auto",
+        "warmup": true,
+        "valid": true,
+        "content": "中国天气情况：晴天，气温在20°C到25°C之间。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 20,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1
+          }
+        }
+      },
+      {
+        "case": "auto",
+        "warmup": false,
+        "valid": true,
+        "content": "中国天气情况：晴天，气温在20°C到25°C之间。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 20,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "required",
+        "warmup": true,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "required",
+        "warmup": false,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "named",
+        "warmup": true,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "named",
+        "warmup": false,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "tools32",
+        "warmup": true,
+        "valid": true,
+        "content": "请提供城市名称以便我为您查询天气信息。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 2076,
+          "completion_tokens": 13,
+          "total_tokens": 2089,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 57
+          }
+        }
+      },
+      {
+        "case": "tools32",
+        "warmup": false,
+        "valid": true,
+        "content": "请提供城市名称以便我为您查询天气信息。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 2076,
+          "completion_tokens": 13,
+          "total_tokens": 2089,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 2075
+          }
+        }
+      }
+    ],
+    "candidate": [
+      {
+        "case": "plain",
+        "warmup": true,
+        "valid": true,
+        "content": "当然，以下是天气预报的中文报告：\n\n😊 天气预报：晴天，气温在20°C到25°C之间，风力较小，适合户外活动。",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 38,
+          "total_tokens": 58,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "plain",
+        "warmup": false,
+        "valid": true,
+        "content": "当然，以下是天气预报的中文报告：\n\n😊 天气预报：晴天，气温在20°C到25°C之间，风力较小，适合户外活动。",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 38,
+          "total_tokens": 58,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "text_parts",
+        "warmup": true,
+        "valid": true,
+        "content": "😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 2,
+          "total_tokens": 16,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 13
+          }
+        }
+      },
+      {
+        "case": "text_parts",
+        "warmup": false,
+        "valid": true,
+        "content": "😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 2,
+          "total_tokens": 16,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 13
+          }
+        }
+      },
+      {
+        "case": "json_schema",
+        "warmup": true,
+        "valid": true,
+        "content": "{\"city\": \"北京\"}",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 7,
+          "total_tokens": 27,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "json_schema",
+        "warmup": false,
+        "valid": true,
+        "content": "{\"city\": \"北京\"}",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 7,
+          "total_tokens": 27,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 19
+          }
+        }
+      },
+      {
+        "case": "auto",
+        "warmup": true,
+        "valid": true,
+        "content": "中国天气情况：晴天，气温在20°C到25°C之间。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 20,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "auto",
+        "warmup": false,
+        "valid": true,
+        "content": "中国天气情况：晴天，气温在20°C到25°C之间。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 20,
+          "total_tokens": 182,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "required",
+        "warmup": true,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "required",
+        "warmup": false,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "named",
+        "warmup": true,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "named",
+        "warmup": false,
+        "valid": true,
+        "content": "",
+        "tool_calls": {
+          "0": {
+            "name": "weather",
+            "arguments": "{\"city\": \"北京\"}"
+          }
+        },
+        "finish_reasons": [
+          "tool_calls"
+        ],
+        "usage": {
+          "prompt_tokens": 162,
+          "completion_tokens": 18,
+          "total_tokens": 180,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 161
+          }
+        }
+      },
+      {
+        "case": "tools32",
+        "warmup": true,
+        "valid": true,
+        "content": "请提供城市名称以便我为您查询天气信息。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 2076,
+          "completion_tokens": 13,
+          "total_tokens": 2089,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 2075
+          }
+        }
+      },
+      {
+        "case": "tools32",
+        "warmup": false,
+        "valid": true,
+        "content": "请提供城市名称以便我为您查询天气信息。😊",
+        "tool_calls": {},
+        "finish_reasons": [
+          "stop"
+        ],
+        "usage": {
+          "prompt_tokens": 2076,
+          "completion_tokens": 13,
+          "total_tokens": 2089,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 2075
+          }
+        }
+      }
+    ]
+  },
+  "reproduction_files": {
+    "bootstrap.py": "if __name__ == '__main__':\n    import importlib,importlib.util,pathlib,runpy,sys\n    r=pathlib.Path(__file__).resolve().parent\n    arm,module=sys.argv[1:3];sys.argv=[module]+sys.argv[3:]\n    def load(name,path):\n     parent=importlib.import_module(name.rsplit('.',1)[0]);spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec);sys.modules[name]=m;spec.loader.exec_module(m);setattr(parent,name.rsplit('.',1)[1],m)\n    for name in ['dynamo.common.utils.engine_response','dynamo.common.utils.guided_json','dynamo.frontend.thinking','dynamo.frontend.utils']:\n     load(name,r/'modules'/(name+'.py'))\n    load('dynamo.frontend.sglang_prepost',r/arm/'sglang_prepost.py')\n    load('dynamo.frontend.sglang_processor',r/'modules/dynamo.frontend.sglang_processor.py')\n    runpy.run_module(module,run_name='__main__')\n",
+    "generation.py": "import json,os,pathlib,signal,subprocess,sys,time,urllib.request\nr=pathlib.Path(__file__).resolve().parent\nargs=json.loads((r/'launch-argv.json').read_text())\nenv=dict(os.environ,DYN_FILE_KV=str(r/'discovery'),PYTHONUNBUFFERED='1')\nprocesses=[]\ndef launch(arm,module,argv,label):\n log=(r/(label+'.log')).open('w')\n p=subprocess.Popen([sys.executable,str(r/'bootstrap.py'),arm,module,*argv],env=env,cwd=r,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)\n processes.append((p,log));return p\n\ndef stop(p):\n if p.poll() is None:\n  os.killpg(p.pid,signal.SIGTERM)\n  try:p.wait(timeout=15)\n  except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait(timeout=5)\n\ndef wait_model(worker,frontend):\n deadline=time.monotonic()+360\n while time.monotonic()<deadline:\n  if worker.poll() is not None or frontend.poll() is not None:raise RuntimeError('worker/frontend exited before model registration')\n  try:\n   with urllib.request.urlopen('http://127.0.0.1:8000/v1/models',timeout=2) as response:\n    data=json.load(response)\n   if any(m['id']=='Qwen/Qwen3-0.6B' for m in data.get('data',[])):return\n  except Exception:pass\n  time.sleep(2)\n raise TimeoutError('model registration exceeded360s')\n\ndef terminate(signum,frame):raise SystemExit(128+signum)\nsignal.signal(signal.SIGTERM,terminate)\ntry:\n worker=launch('baseline','dynamo.sglang',args['worker'],'worker')\n for pair,order in enumerate([['baseline','candidate']],1):\n  for arm in order:\n   frontend=launch(arm,'dynamo.frontend',args['frontend'],arm+'-frontend')\n   try:\n    wait_model(worker,frontend)\n    output=r/(arm+'-results.json')\n    command=[sys.executable,str(r/'future_signature_http.py'),'--url','http://127.0.0.1:8000','--model','Qwen/Qwen3-0.6B','--corpus',str(r/'gpu-corpus.json'),'--arm',arm,'--pair',str(pair),'--repetitions','1','--output',str(output)]\n    result=subprocess.run(command,cwd=r,env=env,timeout=240,capture_output=True,text=True)\n    (r/(arm+'-client.log')).write_text(result.stdout+result.stderr)\n    if output.exists():print('GENERATION_JSON='+output.read_text().replace('\\n',''),flush=True)\n    result.check_returncode()\n   finally:stop(frontend)\n print('GENERATION_COMPLETE=true',flush=True)\nfinally:\n for p,log in reversed(processes):\n  stop(p);log.close()\n for log in sorted(r.glob('*.log')):print('PROCESS_LOG='+log.name+'\\n'+log.read_text(),flush=True)\n",
+    "future_signature_http.py": "\"\"\"Client for a separately authorized, wrapper-owned real-engine experiment.\"\"\"\nimport argparse\nimport asyncio\nimport json\nimport time\nfrom pathlib import Path\nimport aiohttp\nimport jsonschema\n\nasync def main(args):\n    corpus=json.loads(args.corpus.read_text())\n    rows=[]\n    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=90)) as session:\n        for name,payload in corpus:\n            for iteration in range(args.repetitions+1):\n                payload={**payload,'model':args.model,'stream':True,'temperature':0,'seed':17,'max_tokens':128,\n                         'chat_template_kwargs':{'enable_thinking':False},'stream_options':{'include_usage':True}}\n                start=time.perf_counter(); first=None; event_times=[]; events=[]; pending=b''\n                async with session.post(args.url+'/v1/chat/completions',json=payload) as response:\n                    if response.status!=200: raise RuntimeError((response.status,await response.text()))\n                    async for data in response.content.iter_any():\n                        pending+=data\n                        while b'\\n' in pending:\n                            line,pending=pending.split(b'\\n',1);line=line.strip()\n                            if not line.startswith(b'data: ') or line==b'data: [DONE]':continue\n                            event=json.loads(line[6:]);events.append(event)\n                            if any(c.get('delta',{}).get('content') or c.get('delta',{}).get('tool_calls') for c in event.get('choices',[])):\n                                now=time.perf_counter();event_times.append(now-start)\n                                if first is None:first=now-start\n                elapsed=time.perf_counter()-start\n                content='';calls={};finish=None;usage=None\n                for event in events:\n                    usage=event.get('usage') or usage\n                    for c in event.get('choices',[]):\n                        delta=c.get('delta',{});content+=delta.get('content') or '';finish=c.get('finish_reason') or finish\n                        for call in delta.get('tool_calls',[]):\n                            entry=calls.setdefault(call['index'],{'name':'','arguments':''})\n                            for field in entry:entry[field]+=call.get('function',{}).get(field) or ''\n                assert finish in ('stop','tool_calls'),(name,finish)\n                if 'response_format' in payload:\n                    jsonschema.validate(json.loads(content),payload['response_format']['json_schema']['schema'])\n                schemas={t['function']['name']:t['function']['parameters'] for t in payload.get('tools',[])}\n                for call in calls.values():jsonschema.validate(json.loads(call['arguments']),schemas[call['name']])\n                choice=payload.get('tool_choice')\n                if choice=='required' or isinstance(choice,dict):assert calls,(name,'missing forced call')\n                if isinstance(choice,dict):assert all(c['name']==choice['function']['name'] for c in calls.values())\n                assert content or calls,(name,'empty output')\n                rows.append({'case':name,'warmup':iteration==0,'ttft_seconds':first,'duration_seconds':elapsed,\n                             'content_event_times_seconds':event_times,'usage':usage,'events':events,'valid':True})\n                args.output.write_text(json.dumps({'arm':args.arm,'pair':args.pair,'rows':rows},indent=2))\n\nif __name__=='__main__':\n    p=argparse.ArgumentParser(description=__doc__)\n    for n in ['url','model','arm']:p.add_argument('--'+n,required=True)\n    p.add_argument('--corpus',type=Path,required=True);p.add_argument('--output',type=Path,required=True)\n    p.add_argument('--pair',type=int,required=True);p.add_argument('--repetitions',type=int,default=3)\n    asyncio.run(main(p.parse_args()))\n",
+    "launch-argv.json": "{\n  \"worker\": [\n    \"--namespace\",\n    \"signature-cache-repro\",\n    \"--discovery-backend\",\n    \"file\",\n    \"--request-plane\",\n    \"tcp\",\n    \"--event-plane\",\n    \"zmq\",\n    \"--model-path\",\n    \"/model-cache/hub/models--Qwen--Qwen3-0.6B/snapshots/c1899de289a04d12100db370d81485cdf75e47ca\",\n    \"--served-model-name\",\n    \"Qwen/Qwen3-0.6B\",\n    \"--dtype\",\n    \"bfloat16\",\n    \"--context-length\",\n    \"4096\",\n    \"--mem-fraction-static\",\n    \"0.35\",\n    \"--disable-cuda-graph\",\n    \"--device\",\n    \"cuda\"\n  ],\n  \"frontend\": [\n    \"--namespace\",\n    \"signature-cache-repro\",\n    \"--discovery-backend\",\n    \"file\",\n    \"--request-plane\",\n    \"tcp\",\n    \"--event-plane\",\n    \"zmq\",\n    \"--http-port\",\n    \"8000\",\n    \"--dyn-chat-processor\",\n    \"sglang\",\n    \"--tool-call-parser\",\n    \"qwen25\",\n    \"--reasoning-parser\",\n    \"qwen3\",\n    \"--router-mode\",\n    \"round-robin\"\n  ]\n}",
+    "gpu-corpus.json": "[\n  [\n    \"plain\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"Report the weather in \\u4e2d\\u6587\\ud83d\\ude0a.\"\n        }\n      ]\n    }\n  ],\n  [\n    \"text_parts\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": [\n            {\n              \"type\": \"text\",\n              \"text\": \"\\u4e2d\\u6587\\ud83d\\ude0a\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  [\n    \"json_schema\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"Report the weather in \\u4e2d\\u6587\\ud83d\\ude0a.\"\n        }\n      ],\n      \"response_format\": {\n        \"type\": \"json_schema\",\n        \"json_schema\": {\n          \"name\": \"weather\",\n          \"schema\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"city\": {\n                \"type\": \"string\"\n              }\n            },\n            \"required\": [\n              \"city\"\n            ]\n          }\n        }\n      }\n    }\n  ],\n  [\n    \"auto\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"Report the weather in \\u4e2d\\u6587\\ud83d\\ude0a.\"\n        }\n      ],\n      \"tools\": [\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        }\n      ],\n      \"tool_choice\": \"auto\"\n    }\n  ],\n  [\n    \"required\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"Report the weather in \\u4e2d\\u6587\\ud83d\\ude0a.\"\n        }\n      ],\n      \"tools\": [\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        }\n      ],\n      \"tool_choice\": \"required\"\n    }\n  ],\n  [\n    \"named\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"Report the weather in \\u4e2d\\u6587\\ud83d\\ude0a.\"\n        }\n      ],\n      \"tools\": [\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        }\n      ],\n      \"tool_choice\": {\n        \"type\": \"function\",\n        \"function\": {\n          \"name\": \"weather\"\n        }\n      }\n    }\n  ],\n  [\n    \"tools32\",\n    {\n      \"model\": \"probe-model\",\n      \"messages\": [\n        {\n          \"role\": \"user\",\n          \"content\": \"Report the weather in \\u4e2d\\u6587\\ud83d\\ude0a.\"\n        }\n      ],\n      \"tools\": [\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather0\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather1\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather2\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather3\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather4\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather5\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather6\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather7\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather8\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather9\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather10\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather11\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather12\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather13\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather14\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather15\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather16\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather17\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather18\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather19\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather20\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather21\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather22\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather23\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather24\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather25\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather26\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather27\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather28\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather29\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather30\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        },\n        {\n          \"type\": \"function\",\n          \"function\": {\n            \"name\": \"weather31\",\n            \"parameters\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"city\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"city\"\n              ]\n            }\n          }\n        }\n      ],\n      \"tool_choice\": \"auto\"\n    }\n  ]\n]\n"
+  },
+  "limitations": [
+    "Stock older native image with exact source closure; not full current-main native qualification",
+    "Responses allowed_tools fails separately in both arms and is not covered here",
+    "No serving speedup, GPU-memory reduction, compiler cost or shutdown qualification",
+    "Auto-tool cases emitted valid text without calls; auto-selected tool emission remains unqualified",
+    "Single fixed-order pair and shared worker/cache are not serving performance evidence",
+    "Group termination elicited engine shutdown diagnostics after all requests; Kubernetes Job and Pods removed"
+  ]
+}
