@@ -1,0 +1,370 @@
+{
+  "scope": "CPU native localhost HTTP with scripted token worker; no model generation",
+  "baseline_sha": "9964032675623cc7f257d094dc24d497a0279ccb",
+  "tokenizer": "Qwen/Qwen3-0.6B",
+  "tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "sglang": "0.5.19",
+  "summary": {
+    "requests_per_arm": 64,
+    "baseline_text_matches": 32,
+    "candidate_text_matches": 64,
+    "content_and_finish_matches_per_arm": 64,
+    "candidate_length_controls": 64,
+    "candidate_complete_eos_controls": 128
+  },
+  "dimensions": {
+    "shapes": [
+      "plain",
+      "guided_regex=.*"
+    ],
+    "worker_batches": [
+      1,
+      7
+    ],
+    "frontend_intervals": [
+      1,
+      20
+    ],
+    "stream": [
+      false,
+      true
+    ],
+    "top_logprobs": 1
+  },
+  "groups": [
+    {
+      "source_text": "😊",
+      "requests_per_arm": 16,
+      "content": "",
+      "finish": "stop",
+      "baseline_text_matches": 16,
+      "candidate_text_matches": 16,
+      "representative_baseline_logprobs": [],
+      "representative_candidate_logprobs": []
+    },
+    {
+      "source_text": "A😊",
+      "requests_per_arm": 16,
+      "content": "A",
+      "finish": "stop",
+      "baseline_text_matches": 16,
+      "candidate_text_matches": 16,
+      "representative_baseline_logprobs": [
+        {
+          "token": "A",
+          "logprob": -0.5,
+          "bytes": [
+            65
+          ],
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.5,
+              "bytes": [
+                65
+              ]
+            }
+          ]
+        }
+      ],
+      "representative_candidate_logprobs": [
+        {
+          "token": "A",
+          "logprob": -0.5,
+          "bytes": [
+            65
+          ],
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.5,
+              "bytes": [
+                65
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_text": "있다",
+      "requests_per_arm": 16,
+      "content": "�",
+      "finish": "stop",
+      "baseline_text_matches": 0,
+      "candidate_text_matches": 16,
+      "representative_baseline_logprobs": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        }
+      ],
+      "representative_candidate_logprobs": [
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_text": "ः�숗𐁩",
+      "requests_per_arm": 16,
+      "content": "ः�숗�",
+      "finish": "stop",
+      "baseline_text_matches": 0,
+      "candidate_text_matches": 16,
+      "representative_baseline_logprobs": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "ः",
+          "logprob": -0.5,
+          "bytes": [
+            224,
+            164,
+            131
+          ],
+          "top_logprobs": [
+            {
+              "token": "ः",
+              "logprob": -0.5,
+              "bytes": [
+                224,
+                164,
+                131
+              ]
+            }
+          ]
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "숗",
+          "logprob": -0.5,
+          "bytes": [
+            236,
+            136,
+            151
+          ],
+          "top_logprobs": [
+            {
+              "token": "숗",
+              "logprob": -0.5,
+              "bytes": [
+                236,
+                136,
+                151
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        }
+      ],
+      "representative_candidate_logprobs": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "ः",
+          "logprob": -0.5,
+          "bytes": [
+            224,
+            164,
+            131
+          ],
+          "top_logprobs": [
+            {
+              "token": "ः",
+              "logprob": -0.5,
+              "bytes": [
+                224,
+                164,
+                131
+              ]
+            }
+          ]
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "숗",
+          "logprob": -0.5,
+          "bytes": [
+            236,
+            136,
+            151
+          ],
+          "top_logprobs": [
+            {
+              "token": "숗",
+              "logprob": -0.5,
+              "bytes": [
+                236,
+                136,
+                151
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

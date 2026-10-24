@@ -1,0 +1,510 @@
+{
+  "scope": "CPU native localhost HTTP with scripted token worker; no model generation",
+  "base_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "model": "Qwen/Qwen3-0.6B",
+  "performance": "No performance improvement has been measured",
+  "settings": {
+    "worker_batch": [
+      1,
+      7
+    ],
+    "frontend_interval": [
+      1,
+      20
+    ],
+    "stream": [
+      false,
+      true
+    ],
+    "request_shape": [
+      "plain",
+      "guided_regex .*"
+    ],
+    "requests_per_arm": 128
+  },
+  "cases": [
+    {
+      "text": "Hello world",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "Hello",
+            "logprob": -0.5,
+            "bytes": [
+              72,
+              101,
+              108,
+              108,
+              111
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": " world",
+            "logprob": -0.5,
+            "bytes": [
+              32,
+              119,
+              111,
+              114,
+              108,
+              100
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "Hello",
+            "logprob": -0.5,
+            "bytes": [
+              72,
+              101,
+              108,
+              108,
+              111
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": " world",
+            "logprob": -0.5,
+            "bytes": [
+              32,
+              119,
+              111,
+              114,
+              108,
+              100
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "\u4e2d\u6587\ud83d\ude0a",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "\u4e2d\u6587",
+            "logprob": -0.5,
+            "bytes": [
+              228,
+              184,
+              173,
+              230,
+              150,
+              135
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "\ud83d\ude0a",
+            "logprob": -0.5,
+            "bytes": [
+              240,
+              159,
+              152,
+              138
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "\u4e2d\u6587",
+            "logprob": -0.5,
+            "bytes": [
+              228,
+              184,
+              173,
+              230,
+              150,
+              135
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "\ud83d\ude0a",
+            "logprob": -0.5,
+            "bytes": [
+              240,
+              159,
+              152,
+              138
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "\ufffd",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "\ufffd",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "A\ufffdB",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.5,
+            "bytes": [
+              65
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "B",
+            "logprob": -0.5,
+            "bytes": [
+              66
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.5,
+            "bytes": [
+              65
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "\ufffd",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "B",
+            "logprob": -0.5,
+            "bytes": [
+              66
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "\ufffd\ud83d\ude0a",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\ud83d\ude0a",
+            "logprob": -0.5,
+            "bytes": [
+              240,
+              159,
+              152,
+              138
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "\ufffd",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "\ud83d\ude0a",
+            "logprob": -0.5,
+            "bytes": [
+              240,
+              159,
+              152,
+              138
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "\ud83d\ude0a\ufffd",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "\ud83d\ude0a",
+            "logprob": -0.5,
+            "bytes": [
+              240,
+              159,
+              152,
+              138
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "\ud83d\ude0a",
+            "logprob": -0.5,
+            "bytes": [
+              240,
+              159,
+              152,
+              138
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "\ufffd",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "\uc788\ub2e4",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\ufffd\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\uc788\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              236,
+              158,
+              136,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    },
+    {
+      "text": "A\uc788\ub2e4B",
+      "main-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 0,
+        "representative_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.5,
+            "bytes": [
+              65
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\ufffd\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              239,
+              191,
+              189,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "B",
+            "logprob": -0.5,
+            "bytes": [
+              66
+            ],
+            "top_logprobs": []
+          }
+        ]
+      },
+      "candidate-http": {
+        "observations": 16,
+        "content_and_finish_pass": 16,
+        "logprob_text_pass": 16,
+        "representative_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.5,
+            "bytes": [
+              65
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "",
+            "logprob": -0.5,
+            "bytes": null,
+            "top_logprobs": []
+          },
+          {
+            "token": "\uc788\ub2e4",
+            "logprob": -0.5,
+            "bytes": [
+              236,
+              158,
+              136,
+              235,
+              139,
+              164
+            ],
+            "top_logprobs": []
+          },
+          {
+            "token": "B",
+            "logprob": -0.5,
+            "bytes": [
+              66
+            ],
+            "top_logprobs": []
+          }
+        ]
+      }
+    }
+  ]
+}
