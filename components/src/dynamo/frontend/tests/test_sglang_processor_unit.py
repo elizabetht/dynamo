@@ -123,6 +123,34 @@ class TestBuildDynamoPreproc:  # FRONTEND.7 — worker subprocess preproc constr
         assert sampling["repetition_penalty"] == 1.0
         assert sampling["seed"] is None
 
+    @pytest.mark.parametrize(
+        "nvext,legacy,expected",
+        [
+            ({"cache_salt": "canonical"}, "legacy", "canonical"),
+            ({"cache_salt": ""}, "legacy", "legacy"),
+            ({}, None, None),
+        ],
+    )
+    def test_cache_salt_routing_and_passthrough(self, nvext, legacy, expected):
+        request = {
+            "model": "test",
+            "messages": [],
+            "nvext": {**nvext, "metadata_upload": {"key": "value"}},
+            "routing": {"priority": 7},
+            "cache_salt": legacy,
+        }
+        original = copy.deepcopy(request)
+        result = _build_dynamo_preproc(request, [1, 2], "test", 2)
+        assert result["routing"] == {
+            "priority": 7,
+            **({"cache_salt": expected} if expected else {}),
+        }
+        assert result["extra_args"]["nvext"] == {
+            "metadata_upload": {"key": "value"},
+            **({"cache_salt": expected} if expected else {}),
+        }
+        assert request == original
+
     @pytest.mark.multimodal
     def test_rejects_multimodal_cache_uuid(self):
         request = {
