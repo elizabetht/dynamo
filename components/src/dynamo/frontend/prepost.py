@@ -418,16 +418,17 @@ def _validate_chat_completion_request(
     if not SKIP_REQUEST_VALIDATION:
         return ChatCompletionRequest.model_validate(request)
 
-    validated_request = ChatCompletionRequest.model_construct(**request)
-    has_unvalidated_tools = validated_request.tools and any(
-        not hasattr(tool, "model_dump") for tool in validated_request.tools
+    tools = request.get("tools")
+    has_unvalidated_tools = tools and any(
+        not hasattr(tool, "model_dump") for tool in tools
     )
     if (
         has_unvalidated_tools
-        or isinstance(validated_request.response_format, dict)
-        or isinstance(validated_request.structured_outputs, dict)
+        or isinstance(request.get("response_format"), dict)
+        or isinstance(request.get("structured_outputs"), dict)
     ):
         return ChatCompletionRequest.model_validate(request)
+    validated_request = ChatCompletionRequest.model_construct(**request)
     # model_construct leaves tool_choice as the raw client dict. Normalize it
     # here, once, rather than at each consumer: vLLM's helpers branch on the
     # typed ChatCompletionNamedToolChoiceParam, and a dict makes
