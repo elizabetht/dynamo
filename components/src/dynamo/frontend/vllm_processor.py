@@ -1069,6 +1069,10 @@ class VllmProcessor:
                             )
                             postprocess_error = True
                             break
+                        if raw_finish_reason == "content_filter":
+                            # vLLM uses STOP to finalize filtered responses because its
+                            # enum lacks content_filter. Restore it before tool remapping.
+                            output.finish_reason = "content_filter"
                         choice = post.process_output(output)
                         if choice:
                             choices.append(choice)
