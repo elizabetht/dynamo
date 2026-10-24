@@ -1,0 +1,62 @@
+{
+  "observations": 6,
+  "pairs": 3,
+  "passed": true,
+  "scope": "CPU native HTTP with scripted engine",
+  "results": [
+    {
+      "mode": "normal",
+      "http_status": 200,
+      "sse_error_codes": [],
+      "baseline_unconsumed_exceptions": 0,
+      "candidate_unconsumed_exceptions": 0,
+      "sampling_and_abort_and_http_parity": true
+    },
+    {
+      "mode": "eof",
+      "http_status": 200,
+      "sse_error_codes": [
+        503
+      ],
+      "baseline_unconsumed_exceptions": 1,
+      "candidate_unconsumed_exceptions": 0,
+      "sampling_and_abort_and_http_parity": true
+    },
+    {
+      "mode": "error",
+      "http_status": 200,
+      "sse_error_codes": [
+        503
+      ],
+      "baseline_unconsumed_exceptions": 1,
+      "candidate_unconsumed_exceptions": 0,
+      "sampling_and_abort_and_http_parity": true
+    }
+  ],
+  "baseline_sha": "70e094f650ab89eb81d359825adcb78fc9256aba",
+  "python": "3.11.15",
+  "sglang_version": "0.5.19",
+  "sglang_source_sha": "3c82e48e825bae504527ed28e2442b1429d36650",
+  "native_binding_sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+  "model_metadata_sha256": {
+    "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+    "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+    "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+    "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+    "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+    "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+    "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "candidate_helper_sha256": "2738eab54a4f4525aed695e64bfc806719f621820923ce26580b64c1d1f929ca",
+  "tests": {
+    "baseline_regressions_failed": 2,
+    "candidate_suite_passed": 87
+  },
+  "limitations": [
+    "Scripted engine; no scheduler, GPU or model generation",
+    "Same native extension in both arms; Python helper isolation only",
+    "Pre-existing native interpreter-exit task warning remains",
+    "No performance improvement has been measured"
+  ]
+}
