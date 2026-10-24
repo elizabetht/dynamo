@@ -860,3 +860,135 @@ async fn tool_name_limit_is_shared_across_protocols() {
     })
     .await;
 }
+
+#[tokio::test]
+#[serial]
+async fn canonical_worker_errors_override_private_status_envelopes() {
+    use dynamo_runtime::error::ErrorClass;
+
+    let mut env = BASE_ENV.to_vec();
+    env.retain(|(key, _)| *key != DYN_HTTP_PRE_COMMIT_ERROR_PEEK_MS);
+    env.push((DYN_HTTP_PRE_COMMIT_ERROR_PEEK_MS, Some("1000")));
+    temp_env::async_with_vars(env, async {
+        for (class, diagnostic_code, status, public_message) in [
+            (ErrorClass::Internal, 400, 500, None),
+            (ErrorClass::InvalidRequest, 500, 400, Some("Invalid JSON schema")),
+            (ErrorClass::Unavailable, 400, 503, None),
+        ] {
+            for streaming in [false, true] {
+                for (path, endpoint, request) in [
+                    ("/v1/chat/completions", Endpoint::ChatCompletions, json!({
+                        "model": MODEL, "messages": [{"role": "user", "content": "Return JSON"}],
+                        "response_format": {"type": "json_object"}, "stream": streaming
+                    })),
+                    ("/v1/responses", Endpoint::Responses, json!({
+                        "model": MODEL, "input": "Return JSON", "stream": streaming
+                    })),
+                    ("/v1/messages", Endpoint::AnthropicMessages, json!({
+                        "model": MODEL, "messages": [{"role": "user", "content": "Return JSON"}],
+                        "max_tokens": 16, "stream": streaming
+                    })),
+                ] {
+                    let mut builder = DynamoError::builder().class(class).diagnostic(
+                        json!({"message": "private worker detail", "code": diagnostic_code}).to_string()
+                    );
+                    if let Some(message) = public_message {
+                        builder = builder.public_message(message);
+                    }
+                    // Exercise the worker wire representation as well as HTTP admission.
+                    let error = serde_json::from_value(serde_json::to_value(builder.build()).unwrap()).unwrap();
+                    let svc = HarnessService::start_with_backend_error(Vec::new(), error).await;
+                    let response = post_json(&svc, path, request).await;
+                    let actual_status = response.status().as_u16();
+                    let body = response.text().await.unwrap();
+                    assert_eq!(actual_status, status, "{class:?} {path} stream={streaming}: {body}");
+                    assert!(!body.contains("private worker detail"), "{body}");
+                    if let Some(message) = public_message {
+                        assert!(body.contains(message), "{body}");
+                    }
+                    let error_type = match class {
+                        ErrorClass::InvalidRequest => ErrorType::Validation,
+                        ErrorClass::Unavailable => ErrorType::Unavailable,
+                        _ => ErrorType::Internal,
+                    };
+                    assert_error_metrics(&svc, &endpoint,
+                        &if streaming { RequestType::Stream } else { RequestType::Unary },
+                        &[(error_type, 1)]);
+                    svc.shutdown().await;
+                }
+            }
+        }
+    }).await;
+}
+
+#[tokio::test]
+#[serial]
+async fn legacy_worker_status_envelopes_remain_supported_at_preflight() {
+    let mut env = BASE_ENV.to_vec();
+    env.retain(|(key, _)| *key != DYN_HTTP_PRE_COMMIT_ERROR_PEEK_MS);
+    env.push((DYN_HTTP_PRE_COMMIT_ERROR_PEEK_MS, Some("1000")));
+    temp_env::async_with_vars(env, async {
+        for (legacy_class, code) in [("InvalidArgument", 415), ("Unknown", 503)] {
+            for streaming in [false, true] {
+                let error = serde_json::from_value(json!({
+                    "error_type": {"Backend": legacy_class},
+                    "message": json!({"message": "private worker detail", "code": code}).to_string()
+                }))
+                .unwrap();
+                let svc = HarnessService::start_with_backend_error(Vec::new(), error).await;
+                let response = post_json(
+                    &svc,
+                    "/v1/chat/completions",
+                    json!({
+                        "model": MODEL, "messages": [{"role": "user", "content": "Return JSON"}],
+                        "stream": streaming
+                    }),
+                )
+                .await;
+                assert_eq!(response.status().as_u16(), code);
+                let body: Value = response.json().await.unwrap();
+                assert_eq!(body["code"], code);
+                assert!(!body.to_string().contains("private worker detail"));
+                svc.shutdown().await;
+            }
+        }
+    })
+    .await;
+}
+
+#[tokio::test]
+#[serial]
+async fn responses_late_canonical_error_ignores_private_status_envelope() {
+    use dynamo_runtime::error::ErrorClass;
+
+    temp_env::async_with_vars(BASE_ENV, async {
+        let mut prefix = load_agent_fixture("text.sse").await.unwrap();
+        prefix.truncate(2);
+        let error = DynamoError::builder()
+            .class(ErrorClass::Internal)
+            .diagnostic(r#"{"message":"private worker detail","code":400}"#)
+            .build();
+        let svc = HarnessService::start_with_backend_error(prefix, error).await;
+        let response = post_json(
+            &svc,
+            "/v1/responses",
+            json!({
+                "model": MODEL, "input": "Return JSON", "stream": true
+            }),
+        )
+        .await;
+        assert_eq!(response.status(), reqwest::StatusCode::OK);
+        let body = response.text().await.unwrap();
+        let events = http_harness::parse_json_sse(&body).await.unwrap();
+        let failed = events
+            .iter()
+            .find(|event| event.event == "response.failed")
+            .expect("response.failed");
+        assert_eq!(failed.data["response"]["error"]["code"], "server_error");
+        assert!(!body.contains("private worker detail"));
+        assert!(body.contains("Pong."));
+        assert!(!body.contains("event: response.completed"));
+        svc.shutdown().await;
+    })
+    .await;
+}

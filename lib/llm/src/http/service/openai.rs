@@ -2904,7 +2904,17 @@ fn extract_backend_error_if_present<T: serde::Serialize>(
             .as_ref()
             .map(|error| error.message())
             .unwrap_or(&error_str);
-        if let Ok(error_payload) = serde_json::from_str::<ErrorPayload>(status_message) {
+        // N-2 Python workers used these fallback identities for HTTP envelopes.
+        // Remove diagnostic parsing when those workers leave the compatibility window.
+        let has_legacy_status = semantic.is_none_or(|error| {
+            matches!(
+                error.reason().as_str(),
+                "backend.unknown" | "backend.invalid_argument" | "runtime.unclassified"
+            ) && error.public_details().is_none()
+        });
+        if (overloaded || has_legacy_status)
+            && let Ok(error_payload) = serde_json::from_str::<ErrorPayload>(status_message)
+        {
             // Preserve explicit HTTP-like statuses (for example 415); Python
             // 4xx exceptions share the Backend(InvalidArgument) category.
             let code = if overloaded {
