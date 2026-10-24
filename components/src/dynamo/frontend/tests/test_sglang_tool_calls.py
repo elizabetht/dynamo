@@ -9,9 +9,11 @@ parse_non_stream fallback for the chunking-sensitivity issue in
 BaseFormatDetector.parse_streaming_increment.
 """
 
+import asyncio
 import json
 
 import pytest
+from _routed_engine_fakes import FakeRoutedEngine
 from sglang.srt.entrypoints.openai.protocol import Function as SglangFunction
 from sglang.srt.entrypoints.openai.protocol import Tool as SglangTool
 from sglang.srt.function_call.function_call_parser import FunctionCallParser
@@ -20,6 +22,7 @@ from sglang.srt.parser.reasoning_parser import ReasoningParser
 from sglang.srt.utils.hf_transformers_utils import get_tokenizer
 
 from dynamo.frontend.sglang_prepost import SglangStreamingPostProcessor
+from dynamo.frontend.sglang_processor import SglangProcessor
 
 # Needs sglang packages (gpu_1 container), but does not allocate GPU VRAM.
 pytestmark = [
@@ -685,3 +688,95 @@ class TestJsonArrayParserReparse:  # FRONTEND.4 — JSON-array parser reparse pa
         # No tool calls, plain content preserved, no crash.
         tc = (choice or {}).get("delta", {}).get("tool_calls", [])
         assert tc == []
+
+
+@pytest.mark.parametrize("stream_interval", [1, 20, 32])
+@pytest.mark.parametrize("finish_reason", ["stop", "length"])
+def test_generator_preserves_batched_parallel_calls(
+    tokenizer, stream_interval, finish_reason
+):
+    text = (
+        '<tool_call>\n{"name": "get_weather", '
+        '"arguments": {"city": "London"}}\n</tool_call>\n'
+        '<tool_call>\n{"name": "get_weather", '
+        '"arguments": {"city": "東京 🗼"}}\n</tool_call>'
+    )
+    choices, engine = _run_generator(tokenizer, text, stream_interval, finish_reason)
+    calls = _extract_tool_calls(choices)
+    assert [call["function"]["name"] for call in calls] == [
+        "get_weather",
+        "get_weather",
+    ]
+    assert [json.loads(call["function"]["arguments"]) for call in calls] == [
+        {"city": "London"},
+        {"city": "東京 🗼"},
+    ]
+    assert [call["index"] for call in calls] == [0, 1]
+    assert len({call["id"] for call in calls}) == 2
+    assert all(call["id"].startswith("call_") for call in calls)
+    assert not any(choice["delta"].get("tool_calls") for choice in choices[:-1])
+    assert choices[-1]["finish_reason"] == (
+        "tool_calls" if finish_reason == "stop" else "length"
+    )
+    assert len(engine.requests) == 1
+    assert engine.stream_released
+
+
+def test_generator_preserves_complete_call_before_truncation(tokenizer):
+    text = (
+        '<tool_call>{"name": "get_weather", "arguments": {"city": "London"}}</tool_call>\n'
+        '<tool_call>{"name": "get_weather", "arguments": {"city": "'
+    )
+    choices, _ = _run_generator(tokenizer, text, 1, "length")
+    calls = _extract_tool_calls(choices)
+    assert len(calls) == 1
+    assert json.loads(calls[0]["function"]["arguments"]) == {"city": "London"}
+    assert choices[-1]["finish_reason"] == "length"
+
+
+def test_generator_with_tools_preserves_plain_text(tokenizer):
+    choices, _ = _run_generator(tokenizer, "Hello 東京!", 20, "stop")
+    assert not _extract_tool_calls(choices)
+    assert (
+        "".join(choice["delta"].get("content", "") for choice in choices) == "Hello 東京!"
+    )
+    assert choices[-1]["finish_reason"] == "stop"
+
+
+def _run_generator(tokenizer, text, stream_interval, finish_reason):
+    # Replay generated tokens; preprocessing, batching, and parsing are real.
+    token_ids = tokenizer.encode(text, add_special_tokens=False)
+    engine = FakeRoutedEngine(
+        items=[
+            {
+                "token_ids": [token],
+                "finish_reason": finish_reason if index == len(token_ids) - 1 else None,
+            }
+            for index, token in enumerate(token_ids)
+        ]
+    )
+    processor = SglangProcessor(
+        tokenizer=tokenizer,
+        routed_engine=engine,
+        tool_call_parser_name="hermes",
+        reasoning_parser_name=None,
+        eos_token_ids=None,
+        stream_interval=stream_interval,
+    )
+    request = {
+        "model": MODEL,
+        "messages": [{"role": "user", "content": "Check the weather in both cities."}],
+        "tools": [tool.model_dump() for tool in TOOLS],
+        "tool_choice": "auto",
+        "parallel_tool_calls": True,
+        "stream": True,
+    }
+
+    async def collect():
+        return [
+            choice
+            async for envelope in processor.generator(request)
+            for choice in envelope.get("data", {}).get("choices", [])
+        ]
+
+    return asyncio.run(collect()), engine
