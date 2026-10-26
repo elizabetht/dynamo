@@ -1231,6 +1231,7 @@ class SglangStreamingPostProcessor:
             for parser in (tool_call_parser, reasoning_parser)
         )
         self._is_json_array_parser = isinstance(tool_call_parser, JsonArrayParser)
+        self._json_array_prefix_length = 0
         # Required/named guided output may be either bare JSON or
         # reasoning followed by JSON. Delay only the ambiguous bracket-leading
         # prefix so bare JSON does not get trapped as reasoning.
@@ -1749,6 +1750,30 @@ class SglangStreamingPostProcessor:
             and self.tool_call_parser is not None
             and self._tool_text_parts
         ):
+            if self._is_json_array_parser and finish_reason in {
+                "length",
+                "stop",
+                "content_filter",
+            }:
+                full_text = "".join(self._tool_text_parts)
+                if (
+                    full_text.lstrip().startswith("[")
+                    and _try_parse_json_array(full_text) is None
+                ):
+                    # Calls are buffered until finish. An incomplete array must
+                    # not expose whichever calls happened to parse between chunks.
+                    self._tool_call_ids.clear()
+                    self._tool_call_names.clear()
+                    self._tool_call_args.clear()
+                    # Leading whitespace may already have reached the client.
+                    delta["content"] = full_text[self._json_array_prefix_length :]
+                    return {
+                        "index": 0,
+                        "delta": self._with_initial_role(delta),
+                        "finish_reason": finish_reason,
+                        "logprobs": self._take_pending_logprobs(),
+                    }
+
             # Purge streaming results that don't match any known tool.
             # When guided decoding is not enforced the streaming parser
             # can misidentify words in the prompt (e.g. a person's name)
@@ -1921,6 +1946,8 @@ class SglangStreamingPostProcessor:
             effective_finish = "tool_calls"
 
         if has_content or effective_finish:
+            if self._is_json_array_parser and content_text:
+                self._json_array_prefix_length += len(content_text)
             return {
                 "index": 0,
                 "delta": self._with_initial_role(delta),
