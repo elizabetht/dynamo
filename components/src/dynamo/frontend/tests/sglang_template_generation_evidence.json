@@ -1,0 +1,328 @@
+{
+  "scope": "Real GPU HTTP streaming correctness only; no serving performance comparison",
+  "baseline_sha": "a76e12e6584f6029aeaa551c7cc8967671f67345",
+  "candidate_code_sha": "69fbda519e376be60ec6ffd3bca8c4f3603054c7",
+  "native_build_sha": "517572309e761a3b246690f26de2630cafc392a1",
+  "native_sha256": "1ef0a8de7ded94766d31f6962e99ed6eddb1b6bfe5358f684a411dbad9d5ea4d",
+  "image": "nvcr.io/nvidia/ai-dynamo/sglang-runtime-nightly@sha256:6895f12a744e58d55d91948d387dedfec41647dd9f65cd7bf0674d64f1c1d6ea",
+  "environment": {
+    "architecture": "aarch64",
+    "gpu": "NVIDIA GB10",
+    "gpu_count": 1,
+    "python": "3.12.3",
+    "sglang": "0.5.19",
+    "torch": "2.13.0+cu130",
+    "transformers": "5.12.1",
+    "xgrammar": "0.2.1",
+    "dtype": "bfloat16"
+  },
+  "model": "Qwen/Qwen3-0.6B",
+  "model_tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "model_weight_sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b",
+  "request_policy": {
+    "pairs": 1,
+    "order": [
+      "baseline",
+      "candidate"
+    ],
+    "warmup_per_case_arm": 1,
+    "measured_requests_per_case_arm": 1,
+    "concurrency": 1,
+    "seed": 17,
+    "temperature": 0,
+    "max_tokens": 128,
+    "enable_thinking": false,
+    "stream": true
+  },
+  "worker_policy": {
+    "context_length": 4096,
+    "mem_fraction_static": 0.35,
+    "disable_cuda_graph": true
+  },
+  "frontend_policy": {
+    "dyn_chat_processor": "sglang",
+    "tool_call_parser": "qwen25",
+    "reasoning_parser": "qwen3",
+    "router_mode": "round-robin"
+  },
+  "checks": [
+    "actual native constructor accepts response_plane",
+    "actual frontend CLI serves model list",
+    "source paths and hashes match each arm",
+    "model and tokenizer hashes match",
+    "HTTP200",
+    "nonempty content or tool calls",
+    "finish_reason stop or tool_calls",
+    "response JSON validates against schema",
+    "each tool name exists and its arguments validate",
+    "required/named choice emits calls; named choice uses requested name"
+  ],
+  "cases": [
+    {
+      "arm": "baseline",
+      "case": "plain",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "plain",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "text_parts",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "text_parts",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "json_schema",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "json_schema",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "auto",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "auto",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "required",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "required",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "named",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "named",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "tools32",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "baseline",
+      "case": "tools32",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "plain",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "plain",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "text_parts",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "text_parts",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "json_schema",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "json_schema",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "auto",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "auto",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "required",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "required",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "named",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "named",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "tool_calls"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "tools32",
+      "warmup": true,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "case": "tools32",
+      "warmup": false,
+      "valid": true,
+      "finish_reasons": [
+        "stop"
+      ]
+    }
+  ],
+  "limitations": [
+    "Only one sequential pair; no serving speedup or latency claim",
+    "Native source is September23; Python source is the frozen PR44 closure",
+    "No cancellation or multi-GPU/disaggregated validation",
+    "Worker shutdown emits detokenizer SIGTERM/SIGQUIT diagnostics; exact Job/Pod cleanup verified",
+    "Full CI remains unqualified"
+  ],
+  "artifacts": {
+    "baseline-results.json": "2a7e9c613c669512efaff4f1f7cd945c263efd970ab3f01e10bb75e2b5c4871a",
+    "candidate-results.json": "aeae37629154d379440969b24810839e83d88de5d7d726b449fa488616817467",
+    "gpu-corpus.json": "230d186068a857e607435c153d1e73071eb3b70536b441412b589eb114202103",
+    "future_signature_http.py": "db91527e5be12b272bd1741c2835d4f5d7f4fa0a3ca665e1ed3210c46dcdb4cc",
+    "generation.log": "7ae0cd63b2c4e585d388b6d6c78c59771c797212c610cb39bee61c102a6853f9"
+  }
+}
