@@ -1,0 +1,1024 @@
+{
+  "scope": "CPU postprocessor microbenchmark; no inference or HTTP timing",
+  "model": "Qwen/Qwen3-0.6B",
+  "tokenizer_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "source_sha256": {
+    "baseline": "63ef6987ff392605b9fb6a944741b2c64ac29dfffce13d82f7bf00e8d9b027f7",
+    "candidate": "e2ac17b71f61c2f39a7d5546df06c8a44a7fb2fda80a7093eb4bede9058f0e82"
+  },
+  "environment": {
+    "python": "3.11.15",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "packages": {
+      "sglang": "0.5.19",
+      "transformers": "5.12.1",
+      "tokenizers": "0.22.2"
+    }
+  },
+  "pairs": 5,
+  "requests_per_arm_per_pair": 20,
+  "warmup_requests_per_arm": 3,
+  "corpus": {
+    "ascii": "Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. Explain how streaming text works. ",
+    "korean": "있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. 있다 없는 숗 한글 문장입니다. ",
+    "emoji": "😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 😊🚀🤖👩🏽‍💻 ",
+    "literal": "A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� A�B� C�D� ",
+    "json": "{\"message\": \"한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�한국어 😊�\"}"
+  },
+  "event_parity_cases": 10,
+  "rows": [
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 1250.3173
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 1229.68845
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 1224.72025
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 1224.0775
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 1224.0079
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 1233.1584
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 1305.38565
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 1272.13935
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 1230.40075
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 1,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 1235.70215
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 170.99435
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 172.71955
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 185.0525
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 172.3454
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 173.20195
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 173.9849
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 176.6123
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 171.16215
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 172.16805
+    },
+    {
+      "corpus": "ascii",
+      "tokens": 194,
+      "batch": 20,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 173.7415
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 3101.45655
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 2230.30705
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 2217.5734
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 3094.3999
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 3174.3029
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 2322.11375
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 2299.04385
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 3160.8464
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 3175.7236
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 1,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 2198.2064
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 295.4242
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 306.5018
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 298.69975
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 304.4009
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 300.95045
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 299.91755
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 298.94775
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 302.9176
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 298.7163
+    },
+    {
+      "corpus": "korean",
+      "tokens": 322,
+      "batch": 20,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 310.8003
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 3688.72375
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 2003.89865
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 1997.04495
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 3714.7887
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 3584.26355
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 2020.59675
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 2018.55795
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 3603.89805
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 3592.66465
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 1,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 1978.0757
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 380.09605
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 354.47545
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 352.22575
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 376.92115
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 374.47215
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 351.29855
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 350.5186
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 379.00405
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 375.8512
+    },
+    {
+      "corpus": "emoji",
+      "tokens": 288,
+      "batch": 20,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 351.36115
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 4975.6771
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 1766.42525
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 1742.7101
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 5227.6225
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 5164.0854
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 1712.5045
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 1712.31415
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 4955.2436
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 5167.41355
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 1,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 1767.08795
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 545.6053
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 250.5703
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 267.80885
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 532.1713
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 524.24255
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 232.56985
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 249.57395
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 542.7224
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 491.31635
+    },
+    {
+      "corpus": "literal",
+      "tokens": 257,
+      "batch": 20,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 241.68075
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 2922.6236
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 1396.5712
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 1373.3971
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 2948.10795
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 3235.2788
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 1394.18775
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 1440.8986
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 3263.13605
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 3396.41485
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 1,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 1432.0431
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 0,
+      "arm": "baseline",
+      "us_per_request": 338.4006
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 0,
+      "arm": "candidate",
+      "us_per_request": 240.9474
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 1,
+      "arm": "candidate",
+      "us_per_request": 292.17115
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 1,
+      "arm": "baseline",
+      "us_per_request": 350.98445
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 2,
+      "arm": "baseline",
+      "us_per_request": 333.13025
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 2,
+      "arm": "candidate",
+      "us_per_request": 253.61945
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 3,
+      "arm": "candidate",
+      "us_per_request": 302.22235
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 3,
+      "arm": "baseline",
+      "us_per_request": 363.82385
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 4,
+      "arm": "baseline",
+      "us_per_request": 358.8716
+    },
+    {
+      "corpus": "json",
+      "tokens": 197,
+      "batch": 20,
+      "pair": 4,
+      "arm": "candidate",
+      "us_per_request": 255.4724
+    }
+  ],
+  "summary": [
+    {
+      "corpus": "ascii",
+      "batch": 1,
+      "median_us_per_request": {
+        "baseline": 1230.40075,
+        "candidate": 1233.1584
+      },
+      "range_us_per_request": {
+        "baseline": [
+          1224.0079,
+          1272.13935
+        ],
+        "candidate": [
+          1224.72025,
+          1305.38565
+        ]
+      },
+      "reduction_pct": -0.22412616377225358
+    },
+    {
+      "corpus": "ascii",
+      "batch": 20,
+      "median_us_per_request": {
+        "baseline": 172.16805,
+        "candidate": 173.9849
+      },
+      "range_us_per_request": {
+        "baseline": [
+          170.99435,
+          173.20195
+        ],
+        "candidate": [
+          172.71955,
+          185.0525
+        ]
+      },
+      "reduction_pct": -1.0552770969991299
+    },
+    {
+      "corpus": "korean",
+      "batch": 1,
+      "median_us_per_request": {
+        "baseline": 3160.8464,
+        "candidate": 2230.30705
+      },
+      "range_us_per_request": {
+        "baseline": [
+          3094.3999,
+          3175.7236
+        ],
+        "candidate": [
+          2198.2064,
+          2322.11375
+        ]
+      },
+      "reduction_pct": 29.439562453904756
+    },
+    {
+      "corpus": "korean",
+      "batch": 20,
+      "median_us_per_request": {
+        "baseline": 300.95045,
+        "candidate": 299.91755
+      },
+      "range_us_per_request": {
+        "baseline": [
+          295.4242,
+          304.4009
+        ],
+        "candidate": [
+          298.69975,
+          310.8003
+        ]
+      },
+      "reduction_pct": 0.34321264513809124
+    },
+    {
+      "corpus": "emoji",
+      "batch": 1,
+      "median_us_per_request": {
+        "baseline": 3603.89805,
+        "candidate": 2003.89865
+      },
+      "range_us_per_request": {
+        "baseline": [
+          3584.26355,
+          3714.7887
+        ],
+        "candidate": [
+          1978.0757,
+          2020.59675
+        ]
+      },
+      "reduction_pct": 44.39635577371563
+    },
+    {
+      "corpus": "emoji",
+      "batch": 20,
+      "median_us_per_request": {
+        "baseline": 376.92115,
+        "candidate": 351.36115
+      },
+      "range_us_per_request": {
+        "baseline": [
+          374.47215,
+          380.09605
+        ],
+        "candidate": [
+          350.5186,
+          354.47545
+        ]
+      },
+      "reduction_pct": 6.78125915725345
+    },
+    {
+      "corpus": "literal",
+      "batch": 1,
+      "median_us_per_request": {
+        "baseline": 5164.0854,
+        "candidate": 1742.7101
+      },
+      "range_us_per_request": {
+        "baseline": [
+          4955.2436,
+          5227.6225
+        ],
+        "candidate": [
+          1712.31415,
+          1767.08795
+        ]
+      },
+      "reduction_pct": 66.25326722908184
+    },
+    {
+      "corpus": "literal",
+      "batch": 20,
+      "median_us_per_request": {
+        "baseline": 532.1713,
+        "candidate": 249.57395
+      },
+      "range_us_per_request": {
+        "baseline": [
+          491.31635,
+          545.6053
+        ],
+        "candidate": [
+          232.56985,
+          267.80885
+        ]
+      },
+      "reduction_pct": 53.10270396017223
+    },
+    {
+      "corpus": "json",
+      "batch": 1,
+      "median_us_per_request": {
+        "baseline": 3235.2788,
+        "candidate": 1396.5712
+      },
+      "range_us_per_request": {
+        "baseline": [
+          2922.6236,
+          3396.41485
+        ],
+        "candidate": [
+          1373.3971,
+          1440.8986
+        ]
+      },
+      "reduction_pct": 56.833049442292264
+    },
+    {
+      "corpus": "json",
+      "batch": 20,
+      "median_us_per_request": {
+        "baseline": 350.98445,
+        "candidate": 255.4724
+      },
+      "range_us_per_request": {
+        "baseline": [
+          333.13025,
+          363.82385
+        ],
+        "candidate": [
+          240.9474,
+          302.22235
+        ]
+      },
+      "reduction_pct": 27.21261582956168
+    }
+  ]
+}
