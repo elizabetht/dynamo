@@ -1,0 +1,646 @@
+{
+  "scope": "Native localhost CPU Chat with scripted worker; not generation or performance",
+  "baseline_sha": "1b1167997decfcb5563a5174630602475addcea2",
+  "candidate_revision": "This commit",
+  "model_tokenizer": "Qwen/Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca",
+  "backend": "SGLang v0.5.19, commit3c82e48e825bae504527ed28e2442b1429d36650",
+  "native_binding_sha256": "73c5c6440a4f01affdf47abfa61b8098a74bc6481f8b6cd394cece6c89de790e",
+  "dimensions": {
+    "request": [
+      "plain",
+      "guided_regex"
+    ],
+    "response": [
+      "unary",
+      "SSE"
+    ],
+    "worker_batch": [
+      1,
+      7
+    ],
+    "frontend_interval": [
+      1,
+      20
+    ],
+    "topk": [
+      0,
+      1
+    ]
+  },
+  "commands": [
+    "PYTHONPATH=components/src HF_HUB_OFFLINE=1 python components/src/dynamo/frontend/tests/reproduce_sglang_unicode_logprobs.py --truncate --output /tmp/sglang-terminal-results",
+    "PYTHONPATH=components/src HF_HUB_OFFLINE=1 python components/src/dynamo/frontend/tests/reproduce_sglang_unicode_logprobs.py --truncate --topk --output /tmp/sglang-terminal-topk-results"
+  ],
+  "groups": [
+    {
+      "arm": "baseline",
+      "topk": false,
+      "source_text": "😊",
+      "expected_text": "",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": []
+    },
+    {
+      "arm": "baseline",
+      "topk": false,
+      "source_text": "A😊",
+      "expected_text": "A",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "A",
+          "logprob": -0.5,
+          "bytes": [
+            65
+          ],
+          "top_logprobs": []
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "topk": false,
+      "source_text": "있다",
+      "expected_text": "�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 0,
+      "sample_entries": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "topk": false,
+      "source_text": "ः�숗𐁩",
+      "expected_text": "ः�숗�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 0,
+      "sample_entries": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        },
+        {
+          "token": "ः",
+          "logprob": -0.5,
+          "bytes": [
+            224,
+            164,
+            131
+          ],
+          "top_logprobs": []
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": []
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        },
+        {
+          "token": "숗",
+          "logprob": -0.5,
+          "bytes": [
+            236,
+            136,
+            151
+          ],
+          "top_logprobs": []
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "topk": false,
+      "source_text": "😊",
+      "expected_text": "",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": []
+    },
+    {
+      "arm": "candidate",
+      "topk": false,
+      "source_text": "A😊",
+      "expected_text": "A",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "A",
+          "logprob": -0.5,
+          "bytes": [
+            65
+          ],
+          "top_logprobs": []
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "topk": false,
+      "source_text": "있다",
+      "expected_text": "�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": []
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "topk": false,
+      "source_text": "ः�숗𐁩",
+      "expected_text": "ः�숗�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        },
+        {
+          "token": "ः",
+          "logprob": -0.5,
+          "bytes": [
+            224,
+            164,
+            131
+          ],
+          "top_logprobs": []
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": []
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        },
+        {
+          "token": "숗",
+          "logprob": -0.5,
+          "bytes": [
+            236,
+            136,
+            151
+          ],
+          "top_logprobs": []
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": []
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": []
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "topk": true,
+      "source_text": "😊",
+      "expected_text": "",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": []
+    },
+    {
+      "arm": "baseline",
+      "topk": true,
+      "source_text": "A😊",
+      "expected_text": "A",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "A",
+          "logprob": -0.5,
+          "bytes": [
+            65
+          ],
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.5,
+              "bytes": [
+                65
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "topk": true,
+      "source_text": "있다",
+      "expected_text": "�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 0,
+      "sample_entries": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "topk": true,
+      "source_text": "ः�숗𐁩",
+      "expected_text": "ः�숗�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 0,
+      "sample_entries": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "ः",
+          "logprob": -0.5,
+          "bytes": [
+            224,
+            164,
+            131
+          ],
+          "top_logprobs": [
+            {
+              "token": "ः",
+              "logprob": -0.5,
+              "bytes": [
+                224,
+                164,
+                131
+              ]
+            }
+          ]
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "숗",
+          "logprob": -0.5,
+          "bytes": [
+            236,
+            136,
+            151
+          ],
+          "top_logprobs": [
+            {
+              "token": "숗",
+              "logprob": -0.5,
+              "bytes": [
+                236,
+                136,
+                151
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "topk": true,
+      "source_text": "😊",
+      "expected_text": "",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": []
+    },
+    {
+      "arm": "candidate",
+      "topk": true,
+      "source_text": "A😊",
+      "expected_text": "A",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "A",
+          "logprob": -0.5,
+          "bytes": [
+            65
+          ],
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.5,
+              "bytes": [
+                65
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "topk": true,
+      "source_text": "있다",
+      "expected_text": "�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "topk": true,
+      "source_text": "ः�숗𐁩",
+      "expected_text": "ः�숗�",
+      "observations": 16,
+      "content_finish_passes": 16,
+      "logprob_text_passes": 16,
+      "sample_entries": [
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "ः",
+          "logprob": -0.5,
+          "bytes": [
+            224,
+            164,
+            131
+          ],
+          "top_logprobs": [
+            {
+              "token": "ः",
+              "logprob": -0.5,
+              "bytes": [
+                224,
+                164,
+                131
+              ]
+            }
+          ]
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "숗",
+          "logprob": -0.5,
+          "bytes": [
+            236,
+            136,
+            151
+          ],
+          "top_logprobs": [
+            {
+              "token": "숗",
+              "logprob": -0.5,
+              "bytes": [
+                236,
+                136,
+                151
+              ]
+            }
+          ]
+        },
+        {
+          "token": "",
+          "logprob": -0.5,
+          "bytes": null,
+          "top_logprobs": [
+            {
+              "token": "",
+              "logprob": -0.5,
+              "bytes": null
+            }
+          ]
+        },
+        {
+          "token": "�",
+          "logprob": -0.5,
+          "bytes": [
+            239,
+            191,
+            189
+          ],
+          "top_logprobs": [
+            {
+              "token": "�",
+              "logprob": -0.5,
+              "bytes": [
+                239,
+                191,
+                189
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "One unavailable TinyLlama fixture excluded",
+    "Native interpreter-exit tasks remain unqualified",
+    "Cluster generation and full CI pending",
+    "No performance improvement has been measured"
+  ]
+}
