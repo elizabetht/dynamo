@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import math
 import os
 import pathlib
 from typing import Any, Dict, Optional
@@ -210,6 +211,7 @@ class FrontendConfig(RouterConfigBase, KvRouterConfigBase, AisPerfConfigBase):
     event_plane: Optional[str] = None
     chat_processor: str
     enable_anthropic_api: bool
+    enable_systemone_api: bool
     strip_anthropic_preamble: bool
     debug_perf: bool
     enable_streaming_tool_dispatch: bool
@@ -217,6 +219,11 @@ class FrontendConfig(RouterConfigBase, KvRouterConfigBase, AisPerfConfigBase):
     reasoning_field_name: str
     exclude_tools_when_tool_choice_none: bool
     preprocess_workers: Optional[int]
+    experimental_delta_tokenizer: bool = False
+    delta_tokenizer_max_entries: int = 16
+    delta_tokenizer_max_bytes: int = 1073741824
+    delta_tokenizer_ttl_secs: float = 300
+    delta_tokenizer_verify_rate: float = 0
     tokenizer_backend: str
     tokenizer_fallback: bool
     trust_remote_code: bool
@@ -225,6 +232,29 @@ class FrontendConfig(RouterConfigBase, KvRouterConfigBase, AisPerfConfigBase):
     _VALID_TOKENIZER_BACKENDS = {"default", "fastokens", "basetenkenizer"}
 
     def validate(self) -> None:
+        if self.delta_tokenizer_max_entries <= 0 or self.delta_tokenizer_max_bytes <= 0:
+            raise ValueError("delta tokenizer entry and byte limits must be positive")
+        if (
+            not math.isfinite(self.delta_tokenizer_ttl_secs)
+            or self.delta_tokenizer_ttl_secs <= 0
+        ):
+            raise ValueError("delta tokenizer TTL must be finite and positive")
+        if (
+            not math.isfinite(self.delta_tokenizer_verify_rate)
+            or not 0 <= self.delta_tokenizer_verify_rate <= 1
+        ):
+            raise ValueError("delta tokenizer verification rate must be in [0, 1]")
+        if self.experimental_delta_tokenizer:
+            if self.chat_processor != "sglang" or self.tokenizer_backend != "default":
+                raise ValueError(
+                    "experimental delta tokenization requires the SGLang processor and default tokenizer"
+                )
+            if self.preprocess_workers is None:
+                self.preprocess_workers = 0
+            if self.preprocess_workers != 0:
+                raise ValueError(
+                    "experimental delta tokenization requires --dyn-preprocess-workers=0"
+                )
         if self.preprocess_workers is None:
             self.preprocess_workers = (
                 _default_sglang_preprocess_workers()
@@ -237,6 +267,12 @@ class FrontendConfig(RouterConfigBase, KvRouterConfigBase, AisPerfConfigBase):
         if self.load_aware:
             self.router_mode = "kv"
         self.apply_router_config()
+
+        # Fail at startup on an invalid DYN_MM_* value, not on every request.
+        # Imported here: dynamo.common.http imports this configuration package.
+        from dynamo.common.http.url_validator import UrlValidationPolicy
+
+        UrlValidationPolicy.from_env()
 
         if bool(self.tls_cert_path) ^ bool(self.tls_key_path):  # ^ is XOR
             raise ValueError(
@@ -349,7 +385,9 @@ class FrontendConfig(RouterConfigBase, KvRouterConfigBase, AisPerfConfigBase):
         if self.conditional_disagg_enabled and not self.use_kv_events:
             raise ValueError("--router-conditional-disagg requires --router-kv-events")
         self.validate_rejection_thresholds()
-        self.log_rejection_thresholds()
+        # Direct mode ignores the thresholds.
+        if self.router_mode != "direct":
+            self.log_rejection_thresholds()
 
 
 @register_encoder(FrontendConfig)
@@ -563,7 +601,9 @@ class FrontendArgGroup(ArgGroup):
             help=(
                 "Maximum number of times a request may be migrated to a different engine worker. "
                 "When > 0, enables migration after worker disconnects, response timeouts, "
-                "incomplete streams, and worker-local overload rejection."
+                "incomplete streams, and worker-local overload rejection. Also limits replacement "
+                "attempts over the lifetime of an explicit-commit PCM realtime transcription "
+                "session; unfinished audio is replayed to a compatible warm worker."
             ),
             arg_type=int,
         )
@@ -679,7 +719,7 @@ class FrontendArgGroup(ArgGroup):
             env_var="DYN_RESPONSE_PLANE",
             default="tcp",
             help="Select the response transport. Frontend and workers must match.",
-            choices=["tcp", "quic"],
+            choices=["tcp", "quic", "velo"],
         )
         add_argument(
             g,
@@ -699,6 +739,16 @@ class FrontendArgGroup(ArgGroup):
             help=(
                 "[EXPERIMENTAL] Enable Anthropic Messages API endpoint (/v1/messages). "
                 "This feature is experimental and may change."
+            ),
+        )
+        add_negatable_bool_argument(
+            g,
+            flag_name="--enable-systemone-api",
+            env_var="DYN_ENABLE_SYSTEMONE_API",
+            default=False,
+            help=(
+                "[EXPERIMENTAL] Enable typed decision APIs (/v1/decisions and "
+                "/v1/systemone) for qualified aggregate SGLang models."
             ),
         )
         add_negatable_bool_argument(
@@ -804,6 +854,34 @@ class FrontendArgGroup(ArgGroup):
                 "env var: DYN_PREPROCESS_WORKERS | default: auto for SGLang, 0 otherwise"
             ),
         )
+
+        add_negatable_bool_argument(
+            g,
+            flag_name="--experimental-delta-tokenizer",
+            env_var="DYN_EXPERIMENTAL_DELTA_TOKENIZER",
+            default=False,
+            help=(
+                "Experimental process-local incremental prompt tokenization for "
+                "the single-process SGLang frontend. Retains prompt text until "
+                "TTL/eviction and safely falls back for uncertified inputs. "
+                "Requires ai-dynamo[delta-tokenizer] and staged TokTier artifacts."
+            ),
+            env_value_type=parse_bool,
+        )
+        for flag, env, default, value_type in (
+            ("max-entries", "MAX_ENTRIES", 16, int),
+            ("max-bytes", "MAX_BYTES", 1073741824, int),
+            ("ttl-secs", "TTL_SECS", 300, float),
+            ("verify-rate", "VERIFY_RATE", 0, float),
+        ):
+            add_argument(
+                g,
+                flag_name=f"--delta-tokenizer-{flag}",
+                env_var=f"DYN_DELTA_TOKENIZER_{env}",
+                default=default,
+                arg_type=value_type,
+                help=f"Experimental delta tokenizer {flag}; process-local state only.",
+            )
 
         add_argument(
             g,
